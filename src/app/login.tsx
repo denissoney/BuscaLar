@@ -151,13 +151,43 @@ export default function Login() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
-  scroll: { padding: 24, alignItems: "center" },
-  logo: { width: 220, height: 80, marginTop: 20, backgroundColor: "transparent" },
-  titulo: { fontSize: 28, color: "#FF8C00", fontWeight: "400", marginTop: 15 },
-  subtitulo: { fontSize: 12, color: "#000", marginTop: 2, marginBottom: 20, fontWeight: "500" },
-  form: { width: "100%" },
-  label: { fontSize: 12, fontWeight: "bold", color: "#000", marginBottom: 4, marginTop: 10 },
+  container: { 
+    flex: 1, 
+    backgroundColor: "#fff" 
+  },
+  scroll: { 
+    padding: 24, 
+    alignItems: "center" 
+  },
+  logo: { 
+    width: 220, 
+    height: 80, 
+    marginTop: 20, 
+    backgroundColor: "transparent" 
+  },
+  titulo: { 
+    fontSize: 28, 
+    color: "#FF8C00", 
+    fontWeight: "400", 
+    marginTop: 15 
+  },
+  subtitulo: { 
+    fontSize: 12, 
+    color: "#000", 
+    marginTop: 2, 
+    marginBottom: 20, 
+    fontWeight: "500" 
+  },
+  form: {
+    width: "100%" 
+  },
+  label: { 
+    fontSize: 12, 
+    fontWeight: "bold", 
+    color: "#000", 
+    marginBottom: 4, 
+    marginTop: 10 
+  },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -168,35 +198,131 @@ const styles = StyleSheet.create({
     height: 38,
     backgroundColor: "#fff",
   },
-  icon: { marginRight: 6 },
-  input: { flex: 1, fontSize: 12, color: "#000", height: "100%" },
-  esqueceuContainer: { flexDirection: "row", justifyContent: "flex-end", marginTop: 6, marginBottom: 10 },
-  esqueceuTexto: { fontSize: 11, color: "#000" },
-  esqueceuLink: { fontSize: 11, color: "#FF8C00", marginLeft: 3, fontWeight: "bold" },
-  termos: { flexDirection: "row", alignItems: "flex-start", marginBottom: 15 },
+  icon: { 
+    marginRight: 6 
+  },
+  input: { 
+    flex: 1, 
+    fontSize: 12, 
+    color: "#000", 
+    height: "100%" 
+  },
+  esqueceuContainer: { 
+    flexDirection: "row", 
+    justifyContent: "flex-end", 
+    marginTop: 6, 
+    marginBottom: 10 
+  },
+  esqueceuTexto: { 
+    fontSize: 11, 
+    color: "#000" 
+  },
+  esqueceuLink: { 
+    fontSize: 11, 
+    color: "#FF8C00", 
+    marginLeft: 3, 
+    fontWeight: "bold" 
+  },
+  termos: { 
+    flexDirection: "row", 
+    alignItems: "flex-start", 
+    marginBottom: 15 
+  },
   checkbox: {
-    width: 14, height: 14, borderWidth: 1, borderColor: "#000", borderRadius: 2,
-    marginRight: 6, marginTop: 1, alignItems: "center", justifyContent: "center",
+    width: 14, 
+    height: 14, 
+    borderWidth: 1, 
+    borderColor: "#000", 
+    borderRadius: 2,
+    marginRight: 6, 
+    marginTop: 1, 
+    alignItems: "center", 
+    justifyContent: "center",
   },
-  checkboxAtivo: { backgroundColor: "#0B5FFF", borderColor: "#0B5FFF" },
-  termosTexto: { fontSize: 9, color: "#000", flex: 1, lineHeight: 11 },
-  linkLaranja: { color: "#FF8C00" },
+  checkboxAtivo: {
+    backgroundColor: "#0B5FFF", 
+    borderColor: "#0B5FFF" 
+  },
+  termosTexto: { 
+    fontSize: 9, 
+    color: "#000", 
+    flex: 1, 
+    lineHeight: 11 
+  },
+  linkLaranja: { 
+    color: "#FF8C00" 
+  },
   botaoAzul: {
-    backgroundColor: "#0B5FFF", height: 40, borderRadius: 8,
-    alignItems: "center", justifyContent: "center", marginBottom: 12,
+    backgroundColor: "#0B5FFF", 
+    height: 40, 
+    borderRadius: 8,
+    alignItems: "center", 
+    justifyContent: "center", 
+    marginBottom: 12,
   },
-  botaoAzulTexto: { color: "#fff", fontWeight: "bold", fontSize: 15 },
-  divisorContainer: { flexDirection: "row", alignItems: "center", marginVertical: 8 },
-  linha: { flex: 1, height: 1, backgroundColor: "#000" },
-  divisorTexto: { marginHorizontal: 12, fontSize: 14, fontWeight: "bold", color: "#000" },
+  botaoAzulTexto: { 
+    color: "#fff", 
+    fontWeight: "bold", 
+    fontSize: 15 
+  },
+  divisorContainer: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    marginVertical: 8 
+  },
+  linha: { 
+    flex: 1, 
+    height: 1, 
+    backgroundColor: "#000" 
+  },
+  divisorTexto: { 
+    marginHorizontal: 12, 
+    fontSize: 14, 
+    fontWeight: "bold", 
+    color: "#000" 
+  },
   botaoBranco: {
-    backgroundColor: "#fff", height: 40, borderRadius: 8, borderWidth: 1,
-    borderColor: "#000", alignItems: "center", justifyContent: "center", marginBottom: 10,
+    backgroundColor: "#fff", 
+    height: 40, 
+    borderRadius: 8, 
+    borderWidth: 1,
+    borderColor: "#000", 
+    alignItems: "center", 
+    justifyContent: "center", 
+    marginBottom: 10,
   },
-  botaoBrancoTextoAzul: { color: "#0B5FFF", fontWeight: "bold", fontSize: 14 },
-  botaoBrancoTexto: { color: "#000", fontWeight: "500", fontSize: 13 },
-  botaoComIcone: { flexDirection: "row", alignItems: "center" },
-  iconGoogle: { fontSize: 16, fontWeight: "bold", color: "#DB4437", marginRight: 8 },
-  iconFacebook: { width: 18, height: 18, backgroundColor: "#1877F2", borderRadius: 9, alignItems: "center", justifyContent: "center", marginRight: 8 },
-  iconFacebookText: { color: "#fff", fontWeight: "bold", fontSize: 12 },
+  botaoBrancoTextoAzul: { 
+    color: "#0B5FFF", 
+    fontWeight: "bold", 
+    fontSize: 14 
+  },
+  botaoBrancoTexto: { 
+    color: "#000", 
+    fontWeight: "500", 
+    fontSize: 13 
+  },
+  botaoComIcone: { 
+    flexDirection: "row", 
+    alignItems: "center" 
+  },
+  iconGoogle: { 
+    fontSize: 16, 
+    fontWeight: "bold", 
+    color: "#DB4437", 
+    marginRight: 8 
+  },
+  iconFacebook: {
+    width: 18, 
+    height: 18, 
+    backgroundColor: "#1877F2", 
+    borderRadius: 9, 
+    alignItems: "center", 
+    justifyContent: "center", 
+    marginRight: 8 
+  },
+  iconFacebookText: { 
+    color: "#fff", 
+    fontWeight: "bold", 
+    fontSize: 12 
+  },
 });

@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "",
+    "name": "BuscaLar",
     "slug": "buscalar",
     "version": "1.0.0",
     "orientation": "portrait",
+    "backgroundColor": "#000000",
+    "userInterfaceStyle": "dark",
     "icon": "./assets/images/logo.png",
     "scheme": "buscalar",
-    "userInterfaceStyle": "light",
-    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
@@ -15,7 +15,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo.png",
         "backgroundColor": "#000000"
-      }
+      },
+      "package": "com.anonymous.buscalar"
     },
     "web": {
       "bundler": "metro",
