@@ -1,7 +1,8 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, Modal, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 
 const IMOVEIS = [
   { id: "1", preco: "R$ 1.000/mês", desc: "Apartamento 2 quartos", local: "Barra de são miguel, AL", img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400" },
@@ -15,20 +16,27 @@ const IMOVEIS = [
 export default function Explorar() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  const irPara = (rota: string) => {
+    setMenuVisible(false);
+    setTimeout(() => router.push(rota as any), 250);
+  };
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.topoAzul}>
         <View style={styles.headerAzul}>
-          <TouchableOpacity style={styles.btnHamburguer}>
-            <View style={[styles.traco, { width: 22 }]} />
-            <View style={[styles.traco, { width: 15 }]} />
-            <View style={[styles.traco, { width: 9 }]} />
+          {/* HAMBURGUER IGUAL AO DO PERFIL */}
+          <TouchableOpacity style={styles.btnHamburguer} onPress={() => setMenuVisible(true)} activeOpacity={0.7}>
+            <View style={[styles.traco, { width: 18 }]} />
+            <View style={[styles.traco, { width: 12 }]} />
+            <View style={[styles.traco, { width: 7 }]} />
           </TouchableOpacity>
 
-          <Image source={require("/home/usuario/Desktop/BuscaLar/assets/images/BuscaLar-preto.png")} style={styles.logoImg} resizeMode="contain" />
+          <Image source={require("../../../assets/images/BuscaLar-preto.png")} style={styles.logoImg} resizeMode="contain" />
 
-          <TouchableOpacity style={styles.btnEngrenagem}>
+          <TouchableOpacity style={styles.btnEngrenagem} onPress={() => irPara("/configuracoes")}>
             <Ionicons name="settings" size={18} color="#000" />
           </TouchableOpacity>
         </View>
@@ -74,6 +82,45 @@ export default function Explorar() {
           )}
         />
       </View>
+
+      {/* MENU IGUAL AO PRINT - MESMO DO PERFIL */}
+      <Modal visible={menuVisible} transparent animationType="fade" onRequestClose={() => setMenuVisible(false)}>
+        <View style={styles.menuWrapper}>
+          <Pressable style={styles.menuBackground} onPress={() => setMenuVisible(false)} />
+          <View style={[styles.sideMenu, { paddingTop: insets.top + 10 }]}>
+            <View style={styles.menuTopo}>
+              <View style={styles.avatarLaranja}><Text style={styles.avatarLaranjaText}>D</Text></View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.menuNome}>Davi Miguel</Text>
+                <Text style={styles.menuEmail}>davi.miguel@gmail.com</Text>
+              </View>
+              <Ionicons name="chevron-down" size={18} color="#000" />
+            </View>
+
+            <View style={styles.lista}>
+              <TouchableOpacity style={styles.item} onPress={() => irPara("/")}><Ionicons name="home" size={22} color="#000" /><Text style={styles.itemText}>Inicio</Text></TouchableOpacity>
+              <View style={styles.linha} />
+              <TouchableOpacity style={styles.item} onPress={() => irPara("/explorar")}><Ionicons name="location" size={22} color="#000" /><Text style={styles.itemText}>Filtro</Text></TouchableOpacity>
+              <View style={styles.linha} />
+              <TouchableOpacity style={styles.item} onPress={() => irPara("/favoritos")}><Ionicons name="heart-outline" size={22} color="#000" /><Text style={styles.itemText}>Favorito</Text></TouchableOpacity>
+              <View style={styles.linha} />
+              <TouchableOpacity style={styles.item} onPress={() => irPara("/agendamento")}><Ionicons name="calendar" size={22} color="#000" /><Text style={styles.itemText}>Agendamentos</Text></TouchableOpacity>
+              <View style={styles.linha} />
+              <TouchableOpacity style={styles.item} onPress={() => irPara("/pagamentos")}><Ionicons name="card" size={22} color="#000" /><Text style={styles.itemText}>Pagamentos</Text></TouchableOpacity>
+              <View style={styles.linha} />
+              <TouchableOpacity style={styles.item} onPress={() => irPara("/contrato")}><Ionicons name="document-text" size={22} color="#000" /><Text style={styles.itemText}>Contrato</Text></TouchableOpacity>
+              <View style={styles.linha} />
+              <TouchableOpacity style={styles.item} onPress={() => irPara("/perfil-proprietario")}><Ionicons name="person" size={22} color="#000" /><Text style={styles.itemText}>Perfil</Text></TouchableOpacity>
+              <View style={styles.linha} />
+              <TouchableOpacity style={styles.item} onPress={() => irPara("/meus-imoveis")}><Ionicons name="home-outline" size={22} color="#000" /><Text style={styles.itemText}>Casas</Text></TouchableOpacity>
+              <View style={styles.linha} />
+              <TouchableOpacity style={styles.item} onPress={() => irPara("/configuracoes")}><Ionicons name="settings" size={22} color="#000" /><Text style={styles.itemText}>Configurações</Text></TouchableOpacity>
+              <View style={styles.linha} />
+              <TouchableOpacity style={styles.item} onPress={() => irPara("/login")}><Ionicons name="exit-outline" size={22} color="#E53935" /><Text style={[styles.itemText, { color: "#E53935" }]}>Sair</Text></TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -82,7 +129,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#1A5CFF" },
   topoAzul: { backgroundColor: "#1A5CFF", paddingBottom: 16 },
   headerAzul: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, paddingVertical: 10, backgroundColor: "#1A5CFF" },
-  btnHamburguer: { width: 32, height: 32, justifyContent: "center", gap: 4 },
+  btnHamburguer: { width: 32, height: 32, justifyContent: "center", gap: 5, alignItems: "flex-start" },
   traco: { height: 2.8, backgroundColor: "#fff", borderRadius: 10 },
   logoImg: { width: 160, height: 45 },
   btnEngrenagem: { width: 36, height: 36, borderRadius: 18, backgroundColor: "#D9D9D9", alignItems: "center", justifyContent: "center" },
@@ -106,4 +153,17 @@ const styles = StyleSheet.create({
   infoRow: { flexDirection: "row", gap: 8, marginTop: 6 },
   infoItem: { flexDirection: "row", alignItems: "center" },
   infoText: { fontSize: 7, color: "#000" },
+  // MENU
+  menuWrapper: { flex: 1, flexDirection: "row" },
+  menuBackground: { position: "absolute", top: 0, bottom: 0, left: 0, right: 0, backgroundColor: "rgba(0,0,0,0.45)" },
+  sideMenu: { width: 280, height: "100%", backgroundColor: "#FFF", elevation: 20 },
+  menuTopo: { flexDirection: "row", alignItems: "center", paddingHorizontal: 16, paddingVertical: 14, gap: 10 },
+  avatarLaranja: { width: 36, height: 36, borderRadius: 18, backgroundColor: "#FF8C00", alignItems: "center", justifyContent: "center" },
+  avatarLaranjaText: { color: "#FFF", fontWeight: "800", fontSize: 16 },
+  menuNome: { fontSize: 15, fontWeight: "700", color: "#000" },
+  menuEmail: { fontSize: 11, color: "#777", marginTop: 1 },
+  lista: { marginTop: 4 },
+  item: { flexDirection: "row", alignItems: "center", paddingHorizontal: 18, paddingVertical: 14, gap: 14 },
+  itemText: { fontSize: 14, color: "#000", fontWeight: "500" },
+  linha: { height: 0.8, backgroundColor: "#EEE", marginHorizontal: 16 },
 });

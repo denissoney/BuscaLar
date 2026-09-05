@@ -12,6 +12,8 @@ import {
   Alert,
   Modal,
   Pressable,
+  PanResponder,
+  Animated,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -39,7 +41,7 @@ export default function Home() {
   const ref = useRef<FlatList>(null) as React.MutableRefObject<FlatList | null>;
 
   const isTablet = width >= 768;
-  const filtroPadding = isTablet ? 24 : 16;
+  const filtroPadding = isTablet? 24 : 16;
   const CARD_GAP = 12;
   const CARD_WIDTH = width - filtroPadding * 2;
 
@@ -50,14 +52,30 @@ export default function Home() {
   const [quartos, setQuartos] = useState("");
   const [imoveis, setImoveis] = useState(TODOS_IMOVEIS);
 
+  const slideAnim = useRef(new Animated.Value(-320)).current;
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (evt, gestureState) => {
+        return evt.nativeEvent.pageX < 35 && gestureState.dx > 60 && Math.abs(gestureState.dy) < 50;
+      },
+      onPanResponderRelease: () => setMenuAberto(true),
+    })
+  ).current;
+
+  useEffect(() => {
+    if (menuAberto) {
+      Animated.timing(slideAnim, { toValue: 0, duration: 250, useNativeDriver: true }).start();
+    } else {
+      Animated.timing(slideAnim, { toValue: -320, duration: 200, useNativeDriver: true }).start();
+    }
+  }, [menuAberto]);
+
   useEffect(() => {
     const timer = setInterval(() => {
       setAtivo((prev) => {
         const prox = (prev + 1) % BANNERS.length;
-        (ref.current as any)?.scrollToOffset({
-          offset: (CARD_WIDTH + CARD_GAP) * prox,
-          animated: true,
-        });
+        (ref.current as any)?.scrollToOffset({ offset: (CARD_WIDTH + CARD_GAP) * prox, animated: true });
         return prox;
       });
     }, 4000);
@@ -66,17 +84,12 @@ export default function Home() {
 
   function buscar() {
     let filtrados = TODOS_IMOVEIS;
-    if (localizacao.trim() !== "")
-      filtrados = filtrados.filter(
-        (i) =>
-          i.local.toLowerCase().includes(localizacao.toLowerCase()) ||
-          i.nome.toLowerCase().includes(localizacao.toLowerCase())
-      );
-    if (valor.trim() !== "") {
+    if (localizacao.trim()!== "") filtrados = filtrados.filter((i) => i.local.toLowerCase().includes(localizacao.toLowerCase()) || i.nome.toLowerCase().includes(localizacao.toLowerCase()));
+    if (valor.trim()!== "") {
       const v = parseInt(valor.replace(/\D/g, ""));
       if (!isNaN(v)) filtrados = filtrados.filter((i) => i.valor <= v);
     }
-    if (quartos.trim() !== "") {
+    if (quartos.trim()!== "") {
       const q = parseInt(quartos);
       if (!isNaN(q)) filtrados = filtrados.filter((i) => i.quartos === q);
     }
@@ -84,168 +97,92 @@ export default function Home() {
     if (filtrados.length === 0) Alert.alert("BuscaLar", "Nenhum imóvel encontrado");
   }
 
-  const bannerHeight = isTablet ? 260 : 175;
+  const irPara = (rota: string) => {
+    setMenuAberto(false);
+    setTimeout(() => router.push(rota as any), 250);
+  };
+
+  const bannerHeight = isTablet? 260 : 175;
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, { paddingTop: insets.top }]} {...panResponder.panHandlers}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 + insets.bottom }}>
-        {/* HEADER COM HAMBURGUER IGUAL DO PRINT */}
         <View style={[styles.headerPrint, { paddingHorizontal: filtroPadding }]}>
-          <TouchableOpacity onPress={() => setMenuAberto(true)} style={styles.btnHamburguerPrint}>
+          <TouchableOpacity onPress={() => setMenuAberto(true)} style={styles.btnHamburguerPrint} hitSlop={10}>
             <View style={[styles.traco, { width: 22 }]} />
             <View style={[styles.traco, { width: 15 }]} />
             <View style={[styles.traco, { width: 9 }]} />
           </TouchableOpacity>
           <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>D</Text>
-            </View>
-            <View>
-              <Text style={styles.ola}>Olá, Davi Miguel!</Text>
-              <Text style={styles.sub}>O que você vai explorar hoje?</Text>
-            </View>
+            <View style={styles.avatar}><Text style={styles.avatarText}>D</Text></View>
+            <View><Text style={styles.ola}>Olá, Davi Miguel!</Text><Text style={styles.sub}>O que você vai explorar hoje?</Text></View>
           </View>
-          <TouchableOpacity style={styles.btnEngrenagem}>
-            <Ionicons name="settings" size={20} color="#fff" />
-          </TouchableOpacity>
+          <TouchableOpacity style={styles.btnEngrenagem} onPress={() => irPara("/configuracoes")}><Ionicons name="settings" size={20} color="#fff" /></TouchableOpacity>
         </View>
 
-        {/* BARRA DE PESQUISA */}
         <View style={[styles.searchRow, { paddingHorizontal: filtroPadding }]}>
-          <View style={styles.searchBox}>
-            <TextInput placeholder="Buscar destinos, atividades e" placeholderTextColor="#999" style={styles.searchInput} />
-          </View>
-          <TouchableOpacity style={styles.btnBuscar} onPress={buscar}>
-            <Text style={styles.btnBuscarText}>BUSCAR</Text>
-          </TouchableOpacity>
+          <View style={styles.searchBox}><TextInput placeholder="Buscar destinos, atividades e" placeholderTextColor="#999" style={styles.searchInput} /></View>
+          <TouchableOpacity style={styles.btnBuscar} onPress={buscar}><Text style={styles.btnBuscarText}>BUSCAR</Text></TouchableOpacity>
         </View>
 
-        {/* CARROSSEL */}
         <View style={{ marginTop: 12 }}>
-          <FlatList
-            ref={ref}
-            data={BANNERS}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => item.id}
-            snapToInterval={CARD_WIDTH + CARD_GAP}
-            snapToAlignment="start"
-            decelerationRate="fast"
-            getItemLayout={(_, index) => ({ length: CARD_WIDTH + CARD_GAP, offset: (CARD_WIDTH + CARD_GAP) * index, index })}
-            onMomentumScrollEnd={(e) => {
-              const newIndex = Math.round(e.nativeEvent.contentOffset.x / (CARD_WIDTH + CARD_GAP));
-              setAtivo(newIndex);
-            }}
-            contentContainerStyle={{ paddingHorizontal: filtroPadding }}
-            ItemSeparatorComponent={() => <View style={{ width: CARD_GAP }} />}
-            renderItem={({ item }) => (
-              <View style={[styles.bannerSlide, { width: CARD_WIDTH, height: bannerHeight }]}>
-                <Image source={{ uri: item.img }} style={styles.bannerImgFull} />
-                <View style={styles.overlay} />
-                <View style={styles.bannerLeft}>
-                  <Text style={styles.emAlta}>Em alta</Text>
-                  <Text style={styles.bannerTitulo}>{item.titulo}</Text>
-                  <Text style={styles.bannerSub}>{item.sub}</Text>
-                  <TouchableOpacity style={styles.btnExplorar}>
-                    <Text style={styles.btnExplorarTxt}>Explorar agora</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            )}
-          />
-          <View style={styles.dotsCentro}>
-            {BANNERS.map((_, i) => (
-              <View key={i.toString()} style={[styles.dot, i === ativo ? styles.dotAtivo : styles.dotInativo]} />
-            ))}
-          </View>
+          <FlatList ref={ref} data={BANNERS} horizontal showsHorizontalScrollIndicator={false} keyExtractor={(item) => item.id} snapToInterval={CARD_WIDTH + CARD_GAP} snapToAlignment="start" decelerationRate="fast" getItemLayout={(_, index) => ({ length: CARD_WIDTH + CARD_GAP, offset: (CARD_WIDTH + CARD_GAP) * index, index })} onMomentumScrollEnd={(e) => { const newIndex = Math.round(e.nativeEvent.contentOffset.x / (CARD_WIDTH + CARD_GAP)); setAtivo(newIndex); }} contentContainerStyle={{ paddingHorizontal: filtroPadding }} ItemSeparatorComponent={() => <View style={{ width: CARD_GAP }} />} renderItem={({ item }) => (
+            <View style={[styles.bannerSlide, { width: CARD_WIDTH, height: bannerHeight }]}>
+              <Image source={{ uri: item.img }} style={styles.bannerImgFull} /><View style={styles.overlay} />
+              <View style={styles.bannerLeft}><Text style={styles.emAlta}>Em alta</Text><Text style={styles.bannerTitulo}>{item.titulo}</Text><Text style={styles.bannerSub}>{item.sub}</Text><TouchableOpacity style={styles.btnExplorar}><Text style={styles.btnExplorarTxt}>Explorar agora</Text></TouchableOpacity></View>
+            </View>
+          )} />
+          <View style={styles.dotsCentro}>{BANNERS.map((_, i) => (<View key={i.toString()} style={[styles.dot, i === ativo? styles.dotAtivo : styles.dotInativo]} />))}</View>
         </View>
 
-        {/* FILTROS LARANJA */}
         <View style={[styles.filtroContainer, { marginHorizontal: filtroPadding }]}>
-          <View style={styles.filtroItem}>
-            <View style={styles.filtroLabelRow}>
-              <Ionicons name="location-outline" size={11} color="#000" />
-              <Text style={styles.filtroLabel}>Localização</Text>
-            </View>
-            <TextInput style={styles.filtroInputReal} placeholder="Maceió-AL" value={localizacao} onChangeText={setLocalizacao} placeholderTextColor="#999" />
-          </View>
-          <View style={styles.filtroItem}>
-            <View style={styles.filtroLabelRow}>
-              <Ionicons name="cash-outline" size={11} color="#000" />
-              <Text style={styles.filtroLabel}>Valor</Text>
-            </View>
-            <TextInput style={styles.filtroInputReal} placeholder="2000" keyboardType="numeric" value={valor} onChangeText={setValor} placeholderTextColor="#999" />
-          </View>
-          <View style={styles.filtroItem}>
-            <View style={styles.filtroLabelRow}>
-              <Ionicons name="bed-outline" size={11} color="#000" />
-              <Text style={styles.filtroLabel}>Quartos</Text>
-            </View>
-            <TextInput style={styles.filtroInputReal} placeholder="01" keyboardType="numeric" value={quartos} onChangeText={setQuartos} placeholderTextColor="#999" />
-          </View>
+          <View style={styles.filtroItem}><View style={styles.filtroLabelRow}><Ionicons name="location-outline" size={11} color="#000" /><Text style={styles.filtroLabel}>Localização</Text></View><TextInput style={styles.filtroInputReal} placeholder="Maceió-AL" value={localizacao} onChangeText={setLocalizacao} placeholderTextColor="#999" /></View>
+          <View style={styles.filtroItem}><View style={styles.filtroLabelRow}><Ionicons name="cash-outline" size={11} color="#000" /><Text style={styles.filtroLabel}>Valor</Text></View><TextInput style={styles.filtroInputReal} placeholder="2000" keyboardType="numeric" value={valor} onChangeText={setValor} placeholderTextColor="#999" /></View>
+          <View style={styles.filtroItem}><View style={styles.filtroLabelRow}><Ionicons name="bed-outline" size={11} color="#000" /><Text style={styles.filtroLabel}>Quartos</Text></View><TextInput style={styles.filtroInputReal} placeholder="01" keyboardType="numeric" value={quartos} onChangeText={setQuartos} placeholderTextColor="#999" /></View>
         </View>
 
         <Text style={[styles.tituloSecao, { marginHorizontal: filtroPadding }]}>Lugares em destaque ({imoveis.length})</Text>
-
-        {/* GRID - AGORA COM CARD CLICÁVEL LINHA 124 */}
         <View style={[styles.grid, { paddingHorizontal: filtroPadding }]}>
           {imoveis.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={[styles.card, { width: isTablet ? (width - filtroPadding * 2 - 12) / 2 : "100%" }]}
-              onPress={() => router.push("/perfil-proprietario" as any)}
-              activeOpacity={0.8}
-            >
-              <Image source={{ uri: item.img }} style={styles.cardImg} />
-              <View style={styles.cardInfo}>
-                <Text style={styles.cardNome}>{item.nome}</Text>
-                <Text style={styles.cardPreco}>R$ {item.valor} - {item.quartos} quarto(s) • {item.local}</Text>
-              </View>
+            <TouchableOpacity key={item.id} style={[styles.card, { width: isTablet? (width - filtroPadding * 2 - 12) / 2 : "100%" }]} onPress={() => router.push("/perfil-proprietario" as any)} activeOpacity={0.8}>
+              <Image source={{ uri: item.img }} style={styles.cardImg} /><View style={styles.cardInfo}><Text style={styles.cardNome}>{item.nome}</Text><Text style={styles.cardPreco}>R$ {item.valor} - {item.quartos} quarto(s) • {item.local}</Text></View>
             </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
 
-      {/* MENU HAMBURGUER */}
-      <Modal visible={menuAberto} transparent animationType="slide" onRequestClose={() => setMenuAberto(false)}>
+      <Modal visible={menuAberto} transparent onRequestClose={() => setMenuAberto(false)}>
         <View style={styles.overlayMenu}>
-          <View style={[styles.menuLateral, { paddingTop: insets.top + 10 }]}>
-            <View style={styles.menuHeader}>
-              <View style={styles.avatarMenu}>
-                <Text style={styles.avatarTextMenu}>D</Text>
+          <Animated.View style={[styles.menuLateral, { paddingTop: insets.top + 10, transform: [{ translateX: slideAnim }] }]}>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <View style={styles.menuHeader}>
+                <View style={styles.avatarMenu}><Text style={styles.avatarTextMenu}>D</Text></View>
+                <View style={{ flex: 1 }}><Text style={styles.menuNome}>Davi Miguel</Text><Text style={styles.menuEmail}>davi.miguel@gmail.com</Text></View>
+                <TouchableOpacity onPress={() => setMenuAberto(false)} style={styles.menuClose}><Ionicons name="close" size={22} color="#000" /></TouchableOpacity>
               </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.menuNome}>Davi Miguel</Text>
-                <Text style={styles.menuEmail}>davi@email.com</Text>
-              </View>
-              <TouchableOpacity onPress={() => setMenuAberto(false)} style={styles.menuClose}>
-                <Ionicons name="close" size={22} color="#000" />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.divisor} />
-            <TouchableOpacity style={styles.menuItem} onPress={() => { setMenuAberto(false); router.push("/(tabs)/index" as any); }}>
-              <Ionicons name="home-outline" size={20} color="#000" /><Text style={styles.menuItemText}>Início</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem} onPress={() => { setMenuAberto(false); router.push("/(tabs)/explorar" as any); }}>
-              <Ionicons name="location-outline" size={20} color="#000" /><Text style={styles.menuItemText}>Explorar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem} onPress={() => { setMenuAberto(false); router.push("/(tabs)/agendamento" as any); }}>
-              <Ionicons name="calendar-outline" size={20} color="#000" /><Text style={styles.menuItemText}>Agendamentos</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem} onPress={() => { setMenuAberto(false); router.push("/(tabs)/favoritos" as any); }}>
-              <Ionicons name="heart-outline" size={20} color="#000" /><Text style={styles.menuItemText}>Favoritos</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem} onPress={() => { setMenuAberto(false); router.push("/(tabs)/perfil" as any); }}>
-              <Ionicons name="person-outline" size={20} color="#000" /><Text style={styles.menuItemText}>Perfil</Text>
-            </TouchableOpacity>
-            <View style={styles.divisor} />
-            <TouchableOpacity style={styles.menuItem}>
-              <Ionicons name="settings-outline" size={20} color="#000" /><Text style={styles.menuItemText}>Configurações</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem}>
-              <Ionicons name="log-out-outline" size={20} color="#FF3B30" /><Text style={[styles.menuItemText, { color: "#FF3B30" }]}>Sair</Text>
-            </TouchableOpacity>
-          </View>
+              <View style={styles.divisor} />
+
+              <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/(tabs)/index")}><Ionicons name="home" size={22} color="#000" /><Text style={styles.menuItemText}>Inicio</Text></TouchableOpacity>
+              <View style={styles.linha} />
+              <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/filtro")}><Ionicons name="location" size={22} color="#000" /><Text style={styles.menuItemText}>Filtro</Text></TouchableOpacity>
+              <View style={styles.linha} />
+              <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/(tabs)/favoritos")}><Ionicons name="heart-outline" size={22} color="#000" /><Text style={styles.menuItemText}>Favorito</Text></TouchableOpacity>
+              <View style={styles.linha} />
+              <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/(tabs)/agendamento")}><Ionicons name="calendar" size={22} color="#000" /><Text style={styles.menuItemText}>Agendamentos</Text></TouchableOpacity>
+              <View style={styles.linha} />
+              <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/(tabs)/pagamentos")}><Ionicons name="card" size={22} color="#000" /><Text style={styles.menuItemText}>Pagamentos</Text></TouchableOpacity>
+              <View style={styles.linha} />
+              <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/(tabs)/contrato")}><Ionicons name="document-text" size={22} color="#000" /><Text style={styles.menuItemText}>Contrato</Text></TouchableOpacity>
+              <View style={styles.linha} />
+              <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/(tabs)/perfil")}><Ionicons name="person" size={22} color="#000" /><Text style={styles.menuItemText}>Perfil</Text></TouchableOpacity>
+              <View style={styles.linha} />
+              <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/(tabs)/meus-imoveis")}><Ionicons name="home-outline" size={22} color="#000" /><Text style={styles.menuItemText}>Casas</Text></TouchableOpacity>
+              <View style={styles.linha} />
+              <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/configuracoes")}><Ionicons name="settings" size={22} color="#000" /><Text style={styles.menuItemText}>Configurações</Text></TouchableOpacity>
+              <View style={styles.linha} />
+              <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/login")}><Ionicons name="exit-outline" size={22} color="#E53935" /><Text style={[styles.menuItemText, { color: "#E53935" }]}>Sair</Text></TouchableOpacity>
+            </ScrollView>
+          </Animated.View>
           <Pressable style={{ flex: 1 }} onPress={() => setMenuAberto(false)} />
         </View>
       </Modal>
@@ -302,6 +239,7 @@ const styles = StyleSheet.create({
   menuEmail: { color: "#777", fontSize: 11 },
   menuClose: { width: 32, height: 32, borderRadius: 16, backgroundColor: "#F2F2F2", alignItems: "center", justifyContent: "center" },
   divisor: { height: 1, backgroundColor: "#EEE", marginVertical: 10 },
+  linha: { height: 0.8, backgroundColor: "#EEE", marginHorizontal: 4 },
   menuItem: { flexDirection: "row", alignItems: "center", gap: 14, paddingVertical: 14 },
   menuItemText: { fontSize: 14, fontWeight: "500", color: "#000" },
 });
