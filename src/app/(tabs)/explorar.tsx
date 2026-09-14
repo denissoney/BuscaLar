@@ -1,3 +1,4 @@
+import React, { useRef, useState } from "react";
 import {
   View,
   Text,
@@ -5,13 +6,11 @@ import {
   Image,
   TouchableOpacity,
   FlatList,
+  PanResponder,
 } from "react-native";
-
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { useState } from "react";
-
 import MenuDrawer from "../../app/componets/MenuDrawer";
 
 const IMOVEIS = [
@@ -22,6 +21,7 @@ const IMOVEIS = [
     local: "Barra de São Miguel, AL",
     img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400",
   },
+
   {
     id: "2",
     preco: "R$ 1.000/mês",
@@ -29,6 +29,7 @@ const IMOVEIS = [
     local: "Barra de São Miguel, AL",
     img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400",
   },
+
   {
     id: "3",
     preco: "R$ 1.000/mês",
@@ -36,6 +37,7 @@ const IMOVEIS = [
     local: "Barra de São Miguel, AL",
     img: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400",
   },
+
   {
     id: "4",
     preco: "R$ 1.000/mês",
@@ -43,6 +45,7 @@ const IMOVEIS = [
     local: "Barra de São Miguel, AL",
     img: "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?w=400",
   },
+
   {
     id: "5",
     preco: "R$ 1.000/mês",
@@ -50,6 +53,7 @@ const IMOVEIS = [
     local: "Barra de São Miguel, AL",
     img: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400",
   },
+
   {
     id: "6",
     preco: "R$ 1.000/mês",
@@ -65,6 +69,10 @@ export default function Explorar() {
 
   const [menuVisible, setMenuVisible] = useState(false);
 
+  // =========================================================
+  // MENU
+  // =========================================================
+
   function abrirMenu() {
     setMenuVisible(true);
   }
@@ -72,6 +80,10 @@ export default function Explorar() {
   function fecharMenu() {
     setMenuVisible(false);
   }
+
+  // =========================================================
+  // NAVEGAÇÃO
+  // =========================================================
 
   function irPara(rota: string) {
     setMenuVisible(false);
@@ -81,6 +93,107 @@ export default function Explorar() {
     }, 260);
   }
 
+  // =========================================================
+  // GESTO DA LATERAL ESQUERDA
+  //
+  // O usuário pode começar o movimento em qualquer altura
+  // da tela, desde que comece nos primeiros 70px da esquerda.
+  //
+  // O botão do hambúrguer continua funcionando porque o
+  // responder NÃO captura o toque no início. Ele só assume
+  // o controle quando detecta um arrasto horizontal.
+  // =========================================================
+
+  const panResponder = useRef(
+    PanResponder.create({
+      // Não captura um toque simples.
+      // Isso permite que o TouchableOpacity do hambúrguer
+      // continue recebendo o onPress normalmente.
+      onStartShouldSetPanResponder: () => false,
+
+      onStartShouldSetPanResponderCapture: () => false,
+
+      // Só assume o gesto quando realmente começar a arrastar.
+      onMoveShouldSetPanResponder: (
+        _,
+        gestureState
+      ) => {
+        if (menuVisible) {
+          return false;
+        }
+
+        const { dx, dy, x0 } = gestureState;
+
+        // O dedo precisa começar na lateral esquerda.
+        const iniciouNaEsquerda = x0 <= 70;
+
+        // Movimento precisa ser predominantemente horizontal.
+        const movimentoHorizontal =
+          Math.abs(dx) >
+          Math.abs(dy) * 1.2;
+
+        // Precisa estar puxando para a direita.
+        const puxandoParaDireita = dx > 10;
+
+        return (
+          iniciouNaEsquerda &&
+          movimentoHorizontal &&
+          puxandoParaDireita
+        );
+      },
+
+      // Capture é importante porque a tela possui FlatList.
+      // Assim o gesto lateral não fica sendo "roubado"
+      // pela lista de imóveis.
+      onMoveShouldSetPanResponderCapture: (
+        _,
+        gestureState
+      ) => {
+        if (menuVisible) {
+          return false;
+        }
+
+        const { dx, dy, x0 } = gestureState;
+
+        const iniciouNaEsquerda = x0 <= 70;
+
+        const movimentoHorizontal =
+          Math.abs(dx) >
+          Math.abs(dy) * 1.2;
+
+        const puxandoParaDireita = dx > 10;
+
+        return (
+          iniciouNaEsquerda &&
+          movimentoHorizontal &&
+          puxandoParaDireita
+        );
+      },
+
+      // Quando o usuário soltar o dedo,
+      // abre o menu.
+      onPanResponderRelease: (
+        _,
+        gestureState
+      ) => {
+        if (
+          gestureState.dx >= 70
+        ) {
+          abrirMenu();
+        }
+      },
+
+      onPanResponderTerminate: () => {
+        // Não faz nada.
+        // O menu só abre se o gesto atingir o limite.
+      },
+    })
+  ).current;
+
+  // =========================================================
+  // TELA
+  // =========================================================
+
   return (
     <View
       style={[
@@ -89,33 +202,63 @@ export default function Explorar() {
           paddingTop: insets.top,
         },
       ]}
+      {...panResponder.panHandlers}
     >
-      {/* TOPO AZUL */}
+
+      {/* =====================================================
+          TOPO AZUL
+      ====================================================== */}
+
       <View style={styles.topoAzul}>
+
         <View style={styles.headerAzul}>
 
-          {/* HAMBURGUER */}
+          {/* HAMBÚRGUER */}
+
           <TouchableOpacity
             style={styles.btnHamburguer}
             onPress={abrirMenu}
             activeOpacity={0.7}
           >
-            <View style={[styles.traco, { width: 18 }]} />
-            <View style={[styles.traco, { width: 12 }]} />
-            <View style={[styles.traco, { width: 7 }]} />
+            <View
+              style={[
+                styles.traco,
+                { width: 18 },
+              ]}
+            />
+
+            <View
+              style={[
+                styles.traco,
+                { width: 12 },
+              ]}
+            />
+
+            <View
+              style={[
+                styles.traco,
+                { width: 7 },
+              ]}
+            />
           </TouchableOpacity>
 
           {/* LOGO */}
+
           <Image
-            source={require("../../../assets/images/BuscaLar-preto.png")}
+            source={require(
+              "../../../assets/images/BuscaLar-preto.png"
+            )}
             style={styles.logoImg}
             resizeMode="contain"
           />
 
           {/* CONFIGURAÇÕES */}
+
           <TouchableOpacity
             style={styles.btnEngrenagem}
-            onPress={() => irPara("/configuracoes")}
+            onPress={() =>
+              irPara("/configuracoes")
+            }
             activeOpacity={0.8}
           >
             <Ionicons
@@ -124,10 +267,15 @@ export default function Explorar() {
               color="#000"
             />
           </TouchableOpacity>
+
         </View>
 
-        {/* FILTROS */}
+        {/* ===================================================
+            FILTROS
+        ==================================================== */}
+
         <View style={styles.filtrosRow}>
+
           <TouchableOpacity
             style={styles.filtroLocal}
             activeOpacity={0.8}
@@ -136,15 +284,29 @@ export default function Explorar() {
               name="location"
               size={14}
               color="#000"
-              style={{ marginRight: 4 }}
+              style={{
+                marginRight: 4,
+              }}
             />
 
-            <View style={{ flex: 1 }}>
-              <Text style={styles.filtroLabel}>
+            <View
+              style={{
+                flex: 1,
+              }}
+            >
+              <Text
+                style={
+                  styles.filtroLabel
+                }
+              >
                 Filtrar por localização
               </Text>
 
-              <Text style={styles.filtroValue}>
+              <Text
+                style={
+                  styles.filtroValue
+                }
+              >
                 Barra de São Miguel
               </Text>
             </View>
@@ -166,18 +328,28 @@ export default function Explorar() {
               color="#000"
             />
 
-            <Text style={styles.btnFiltrosText}>
+            <Text
+              style={
+                styles.btnFiltrosText
+              }
+            >
               Filtros
             </Text>
           </TouchableOpacity>
+
         </View>
       </View>
 
-      {/* CONTEÚDO */}
+      {/* =====================================================
+          CONTEÚDO
+      ====================================================== */}
+
       <View style={styles.contentBox}>
 
         {/* TÍTULO */}
+
         <View style={styles.titleRow}>
+
           <TouchableOpacity
             onPress={() => router.back()}
             style={styles.backBtn}
@@ -193,34 +365,52 @@ export default function Explorar() {
           <Text style={styles.title}>
             Aluguéis Disponíveis
           </Text>
+
         </View>
 
-        {/* LISTA DE IMÓVEIS */}
+        {/* ===================================================
+            LISTA
+        ==================================================== */}
+
         <FlatList
           data={IMOVEIS}
           numColumns={2}
-          keyExtractor={(item) => item.id}
-          columnWrapperStyle={{ gap: 10 }}
+          keyExtractor={(item) =>
+            item.id
+          }
+          columnWrapperStyle={{
+            gap: 10,
+          }}
           contentContainerStyle={{
             paddingBottom: 130,
             gap: 10,
           }}
-          showsVerticalScrollIndicator={false}
+          showsVerticalScrollIndicator={
+            false
+          }
           renderItem={({ item }) => (
+
             <TouchableOpacity
               style={styles.card}
               activeOpacity={0.8}
               onPress={() =>
-                router.push("/perfil-proprietario" as any)
+                router.push(
+                  "/perfil-proprietario" as any
+                )
               }
             >
+
               {/* FOTO */}
+
               <Image
-                source={{ uri: item.img }}
+                source={{
+                  uri: item.img,
+                }}
                 style={styles.cardImg}
               />
 
               {/* INFORMAÇÕES */}
+
               <View style={styles.cardBody}>
 
                 <Text style={styles.preco}>
@@ -231,66 +421,109 @@ export default function Explorar() {
                   {item.desc}
                 </Text>
 
-                <View style={styles.localRow}>
+                <View
+                  style={
+                    styles.localRow
+                  }
+                >
                   <Ionicons
                     name="location"
                     size={8}
                     color="#FF8C00"
                   />
 
-                  <Text style={styles.local}>
+                  <Text
+                    style={styles.local}
+                  >
                     {item.local}
                   </Text>
                 </View>
 
-                <View style={styles.infoRow}>
+                <View
+                  style={styles.infoRow}
+                >
 
-                  <View style={styles.infoItem}>
+                  <View
+                    style={
+                      styles.infoItem
+                    }
+                  >
                     <Ionicons
                       name="bed-outline"
                       size={10}
                       color="#000"
                     />
 
-                    <Text style={styles.infoText}>
+                    <Text
+                      style={
+                        styles.infoText
+                      }
+                    >
                       {" "}2 quartos
                     </Text>
                   </View>
 
-                  <View style={styles.infoItem}>
+                  <View
+                    style={
+                      styles.infoItem
+                    }
+                  >
                     <Ionicons
                       name="water-outline"
                       size={10}
                       color="#000"
                     />
 
-                    <Text style={styles.infoText}>
+                    <Text
+                      style={
+                        styles.infoText
+                      }
+                    >
                       {" "}1 banheiro
                     </Text>
                   </View>
 
                 </View>
+
               </View>
+
             </TouchableOpacity>
           )}
         />
+
       </View>
 
-      {/* MENU LATERAL COMPARTILHADO */}
+      {/* =====================================================
+          MENU DRAWER
+          
+          O MenuDrawer deve ser renderizado por último.
+          Se ele usar Modal internamente, ficará acima de
+          absolutamente todo o conteúdo desta tela.
+      ====================================================== */}
+
       <MenuDrawer
         visible={menuVisible}
         onClose={fecharMenu}
         onOpen={abrirMenu}
       />
+
     </View>
   );
 }
+
+// =============================================================
+// ESTILOS
+// =============================================================
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#1A5CFF",
   },
+
+  // ===========================================================
+  // TOPO
+  // ===========================================================
 
   topoAzul: {
     backgroundColor: "#1A5CFF",
@@ -306,12 +539,20 @@ const styles = StyleSheet.create({
     backgroundColor: "#1A5CFF",
   },
 
+  // ===========================================================
+  // HAMBÚRGUER
+  // ===========================================================
+
   btnHamburguer: {
     width: 32,
     height: 32,
     justifyContent: "center",
     gap: 5,
     alignItems: "flex-start",
+
+    // Mantém o botão acima de qualquer área de gesto.
+    zIndex: 100,
+    elevation: 10,
   },
 
   traco: {
@@ -320,10 +561,18 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
 
+  // ===========================================================
+  // LOGO
+  // ===========================================================
+
   logoImg: {
     width: 160,
     height: 45,
   },
+
+  // ===========================================================
+  // CONFIGURAÇÕES
+  // ===========================================================
 
   btnEngrenagem: {
     width: 36,
@@ -332,7 +581,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#D9D9D9",
     alignItems: "center",
     justifyContent: "center",
+
+    zIndex: 100,
+    elevation: 10,
   },
+
+  // ===========================================================
+  // FILTROS
+  // ===========================================================
 
   filtrosRow: {
     flexDirection: "row",
@@ -378,6 +634,10 @@ const styles = StyleSheet.create({
     color: "#000",
   },
 
+  // ===========================================================
+  // CONTEÚDO
+  // ===========================================================
+
   contentBox: {
     flex: 1,
     backgroundColor: "#fff",
@@ -405,6 +665,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#000",
   },
+
+  // ===========================================================
+  // CARDS
+  // ===========================================================
 
   card: {
     flex: 1,

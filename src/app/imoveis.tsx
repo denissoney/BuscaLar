@@ -1,16 +1,10 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  FlatList,
-} from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import MenuDrawer from "./componets/MenuDrawer";
+import Svg, { Path } from "react-native-svg";
+import MenuDrawer from "../app/componets/MenuDrawer";
 
 const IMOVEIS = [
   { id: "1", preco: "R$ 1.000/mês", titulo: "Apartamento 2 quartos", local: "Barra de São Miguel, AL", img: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=500" },
@@ -21,18 +15,27 @@ const IMOVEIS = [
   { id: "6", preco: "R$ 1.000/mês", titulo: "Apartamento 2 quartos", local: "Barra de São Miguel, AL", img: "https://images.unsplash.com/photo-1600607688969-a5bfcd646154?w=500" },
 ];
 
+// LINHA LISA IGUAL DO AGENDAR VISITA - SEM DEGRAU
+function LinhaLaranja({ width = 95 }: { width?: number }) {
+  return (
+    <Svg height={4} width={width} viewBox={`0 0 ${width} 4`} style={{ marginTop: 4 }}>
+      {/* UMA FORMA SÓ QUE VAI AFINANDO LISA */}
+      <Path d={`M0 0 L${width} 0 L${width} 1.2 L0 4 Z`} fill="#FF8C00" />
+    </Svg>
+  );
+}
+
 export default function AlugueisDisponiveis() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const [menuVisible, setMenuVisible] = useState(false);
-
   const abrirMenu = () => setMenuVisible(true);
   const fecharMenu = () => setMenuVisible(false);
   const irPara = (rota: string) => { fecharMenu(); router.push(rota as any); };
 
   const renderCard = ({ item }: any) => (
     <TouchableOpacity style={styles.card} activeOpacity={0.8} onPress={() => irPara(`/detalhe/${item.id}`)}>
-      <Image source={{ uri: item.img }} style={styles.cardImg} resizeMode="cover" />
+      <Image source={{ uri: item.img }} style={styles.cardImg} />
       <Text style={styles.cardPreco}>{item.preco}</Text>
       <Text style={styles.cardTitulo}>{item.titulo}</Text>
       <View style={styles.cardLocalRow}>
@@ -49,7 +52,6 @@ export default function AlugueisDisponiveis() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      {/* TOPO - LOGO CENTRALIZADA + HAMBURGUER 3 LINHAS */}
       <View style={styles.topo}>
         <View style={styles.topoLogoRow}>
           <TouchableOpacity style={styles.hamburgerTopo} onPress={abrirMenu} activeOpacity={0.7}>
@@ -57,18 +59,11 @@ export default function AlugueisDisponiveis() {
             <View style={[styles.hLine, { width: 12 }]} />
             <View style={[styles.hLine, { width: 7 }]} />
           </TouchableOpacity>
-
           <View style={styles.logoCentroWrap}>
-            <Image
-              source={require("../../../BuscaLar/assets/images/BuscaLar-preto.png")}
-              style={styles.logoTopo}
-              resizeMode="contain"
-            />
+            <Image source={require("../../assets/images/BuscaLar-preto.png")} style={styles.logoTopo} resizeMode="contain" />
           </View>
-
           <View style={{ width: 28 }} />
         </View>
-
         <View style={styles.filtrosRow}>
           <TouchableOpacity style={styles.filtroLocal}>
             <Ionicons name="location" size={14} color="#000" />
@@ -78,7 +73,6 @@ export default function AlugueisDisponiveis() {
             </View>
             <Ionicons name="chevron-down" size={16} color="#000" />
           </TouchableOpacity>
-
           <TouchableOpacity style={styles.btnFiltros}>
             <Ionicons name="funnel" size={12} color="#fff" />
             <Text style={styles.btnFiltrosText}>Filtros</Text>
@@ -86,23 +80,14 @@ export default function AlugueisDisponiveis() {
         </View>
       </View>
 
-      {/* CONTEUDO */}
       <View style={styles.conteudoBranco}>
         <View style={styles.tituloRow}>
-          <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7}>
-            <Ionicons name="chevron-back" size={22} color="#000" />
-          </TouchableOpacity>
-
+          <TouchableOpacity onPress={() => router.back()}><Ionicons name="chevron-back" size={22} color="#000" /></TouchableOpacity>
           <View>
             <Text style={styles.titulo}>Aluguéis Disponíveis</Text>
-            {/* LINHA LARANJA GROSSA -> FINA */}
-            <View style={styles.linhaLaranjaWrap}>
-              <View style={styles.linhaLaranjaGrossa} />
-              <View style={styles.linhaLaranjaFina} />
-            </View>
+            <LinhaLaranja width={115} />
           </View>
         </View>
-
         <FlatList
           data={IMOVEIS}
           keyExtractor={(item) => item.id}
@@ -113,8 +98,6 @@ export default function AlugueisDisponiveis() {
           showsVerticalScrollIndicator={false}
         />
       </View>
-
-      {/* MENU LATERAL */}
       <MenuDrawer visible={menuVisible} onClose={fecharMenu} onOpen={abrirMenu} />
     </View>
   );
@@ -137,10 +120,6 @@ const styles = StyleSheet.create({
   conteudoBranco: { flex: 1, backgroundColor: "#fff", borderTopLeftRadius: 18, borderTopRightRadius: 18, marginTop: 4, paddingTop: 12 },
   tituloRow: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 14, marginBottom: 12 },
   titulo: { fontSize: 15, fontWeight: "800", color: "#000" },
-  // LINHA LARANJA GROSSA -> FINA LISA
-  linhaLaranjaWrap: { flexDirection: "row", alignItems: "center", marginTop: 5, height: 4 },
-  linhaLaranjaGrossa: { width: 44, height: 4, backgroundColor: "#FF8C00", borderRadius: 10 },
-  linhaLaranjaFina: { width: 48, height: 2, backgroundColor: "#FF8C00", borderTopRightRadius: 10, borderBottomRightRadius: 10, marginLeft: -3, opacity: 0.85 },
   card: { flex: 1, backgroundColor: "#fff", borderRadius: 10, borderWidth: 1, borderColor: "#E0E0E0", overflow: "hidden", paddingBottom: 6 },
   cardImg: { width: "100%", height: 90 },
   cardPreco: { color: "#FF8C00", fontWeight: "800", fontSize: 12, marginTop: 5, marginLeft: 6 },

@@ -8,41 +8,33 @@ import {
   Dimensions,
   Pressable,
   ScrollView,
+  Modal,
 } from "react-native";
-
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 interface MenuDrawerProps {
   visible: boolean;
   onClose: () => void;
   onOpen?: () => void;
 }
-
 const { width } = Dimensions.get("window");
-
 const DRAWER_WIDTH = Math.min(width * 0.82, 320);
-
 export default function MenuDrawer({
   visible,
   onClose,
   onOpen,
 }: MenuDrawerProps) {
   const router = useRouter();
-
   const slideAnim = useRef(
     new Animated.Value(-DRAWER_WIDTH)
   ).current;
-
   const fadeAnim = useRef(
     new Animated.Value(0)
   ).current;
-
   useEffect(() => {
     if (visible) {
       onOpen?.();
-
       Animated.parallel([
         Animated.spring(slideAnim, {
           toValue: 0,
@@ -83,6 +75,14 @@ export default function MenuDrawer({
     }, 260);
   }
 
+  function irInicio() {
+    onClose();
+
+    setTimeout(() => {
+      router.replace("/(tabs)" as any);
+    }, 260);
+  }
+
   async function sair() {
     try {
       await AsyncStorage.removeItem("logado");
@@ -91,7 +91,7 @@ export default function MenuDrawer({
       onClose();
 
       setTimeout(() => {
-        router.replace("/login");
+        router.replace("/login" as any);
       }, 260);
     } catch (error) {
       console.log("Erro ao sair:", error);
@@ -99,310 +99,369 @@ export default function MenuDrawer({
   }
 
   return (
-    <View
-      pointerEvents={visible ? "auto" : "none"}
-      style={StyleSheet.absoluteFill}
+    <Modal
+      visible={visible}
+      transparent
+      animationType="none"
+      statusBarTranslucent
+      onRequestClose={onClose}
     >
-      {/* FUNDO ESCURO */}
-      <Animated.View
-        style={[
-          styles.overlayContainer,
-          {
-            opacity: fadeAnim,
-          },
-        ]}
-      >
-        <Pressable
-          style={styles.overlay}
-          onPress={onClose}
-        />
-      </Animated.View>
+      <View style={styles.modalContainer}>
 
-      {/* MENU */}
-      <Animated.View
-        style={[
-          styles.menuLateral,
-          {
-            width: DRAWER_WIDTH,
-            transform: [
-              {
-                translateX: slideAnim,
-              },
-            ],
-          },
-        ]}
-      >
-        {/* CABEÇALHO */}
-        <View style={styles.headerMenu}>
-          <View style={styles.usuarioArea}>
+        {/* =========================================
+            FUNDO ESCURO
+        ========================================== */}
+
+        <Animated.View
+          style={[
+            styles.overlayContainer,
+            {
+              opacity: fadeAnim,
+            },
+          ]}
+        >
+          <Pressable
+            style={styles.overlay}
+            onPress={onClose}
+          />
+        </Animated.View>
+
+        {/* =========================================
+            MENU LATERAL
+        ========================================== */}
+
+        <Animated.View
+          style={[
+            styles.drawer,
+            {
+              transform: [
+                {
+                  translateX: slideAnim,
+                },
+              ],
+            },
+          ]}
+        >
+
+          {/* =========================================
+              CABEÇALHO
+          ========================================== */}
+
+          <View style={styles.header}>
+
             <View style={styles.avatar}>
-              <Text style={styles.avatarText}>D</Text>
+              <Text style={styles.avatarText}>
+                D
+              </Text>
             </View>
 
-            <View style={styles.usuarioInfo}>
-              <Text style={styles.nomeUsuario}>
+            <View style={styles.userInfo}>
+              <Text style={styles.userName}>
                 Davi Miguel
               </Text>
 
-              <Text
-                style={styles.emailUsuario}
-                numberOfLines={1}
-              >
-                Usuário do BuscaLar
+              <Text style={styles.userEmail}>
+                davi.miguel@gmail.com
               </Text>
             </View>
+
+            {/* X */}
+            <TouchableOpacity
+              onPress={onClose}
+              style={styles.closeButton}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="close"
+                size={28}
+                color="#000"
+              />
+            </TouchableOpacity>
+
           </View>
 
-          <TouchableOpacity
-            style={styles.botaoFechar}
-            onPress={onClose}
-            hitSlop={10}
+          {/* LINHA */}
+
+          <View style={styles.headerLine} />
+
+          {/* =========================================
+              OPÇÕES DO MENU
+          ========================================== */}
+
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.menuContent}
           >
-            <Ionicons
-              name="close"
-              size={25}
-              color="#222"
-            />
-          </TouchableOpacity>
-        </View>
 
-        {/* LINHA */}
-        <View style={styles.linha} />
+            {/* INÍCIO */}
 
-        {/* MENU */}
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.menuScroll}
-        >
-          {/* INÍCIO */}
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => navegar("/(tabs)")}
-          >
-            <Ionicons
-              name="home-outline"
-              size={22}
-              color="#222"
-            />
-
-            <Text style={styles.menuTexto}>
-              Início
-            </Text>
-          </TouchableOpacity>
-
-          {/* EXPLORAR */}
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => navegar("/(tabs)/explorar")}
-          >
-            <Ionicons
-              name="location-outline"
-              size={22}
-              color="#222"
-            />
-
-            <Text style={styles.menuTexto}>
-              Explorar
-            </Text>
-          </TouchableOpacity>
-
-          {/* FILTRO */}
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => navegar("/filtro")}
-          >
-            <Ionicons
-              name="options-outline"
-              size={22}
-              color="#222"
-            />
-
-            <Text style={styles.menuTexto}>
-              Filtro
-            </Text>
-          </TouchableOpacity>
-
-          {/* FAVORITOS */}
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => navegar("/(tabs)/favoritos")}
-          >
-            <Ionicons
-              name="heart-outline"
-              size={22}
-              color="#222"
-            />
-
-            <Text style={styles.menuTexto}>
-              Favoritos
-            </Text>
-          </TouchableOpacity>
-
-          {/* AGENDAMENTOS */}
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => navegar("/(tabs)/agendamento")}
-          >
-            <Ionicons
-              name="calendar-outline"
-              size={22}
-              color="#222"
-            />
-
-            <Text style={styles.menuTexto}>
-              Agendamentos
-            </Text>
-          </TouchableOpacity>
-
-          {/* PAGAMENTOS */}
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => navegar("/pagamentos")}
-          >
-            <Ionicons
-              name="card-outline"
-              size={22}
-              color="#222"
-            />
-
-            <Text style={styles.menuTexto}>
-              Pagamentos
-            </Text>
-          </TouchableOpacity>
-
-          {/* CONTRATO */}
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => navegar("/contrato")}
-          >
-            <Ionicons
-              name="document-text-outline"
-              size={22}
-              color="#222"
-            />
-
-            <Text style={styles.menuTexto}>
-              Contrato
-            </Text>
-          </TouchableOpacity>
-
-          {/* PERFIL */}
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() =>
-              navegar("/perfil-proprietario")
-            }
-          >
-            <Ionicons
-              name="person-outline"
-              size={22}
-              color="#222"
-            />
-
-            <Text style={styles.menuTexto}>
-              Perfil
-            </Text>
-          </TouchableOpacity>
-
-          {/* MEUS IMÓVEIS */}
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => navegar("/imoveis")}
-          >
-            <Ionicons
-              name="business-outline"
-              size={22}
-              color="#222"
-            />
-
-            <Text style={styles.menuTexto}>
-              Meus imóveis
-            </Text>
-          </TouchableOpacity>
-
-          {/* CONFIGURAÇÕES */}
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => navegar("/configuracoes")}
-          >
-            <Ionicons
-              name="settings-outline"
-              size={22}
-              color="#222"
-            />
-
-            <Text style={styles.menuTexto}>
-              Configurações
-            </Text>
-          </TouchableOpacity>
-
-          {/* SEPARADOR */}
-          <View style={styles.separador} />
-
-          {/* SAIR */}
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={sair}
-          >
-            <Ionicons
-              name="log-out-outline"
-              size={22}
-              color="#D32F2F"
-            />
-
-            <Text
-              style={[
-                styles.menuTexto,
-                styles.textoSair,
-              ]}
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={irInicio}
+              activeOpacity={0.7}
             >
-              Sair
-            </Text>
-          </TouchableOpacity>
-        </ScrollView>
+              <Ionicons
+                name="home"
+                size={22}
+                color="#000"
+              />
 
-        {/* RODAPÉ */}
-        <View style={styles.footer}>
-          <Text style={styles.footerTexto}>
-            BuscaLar
-          </Text>
+              <Text style={styles.menuText}>
+                Início
+              </Text>
+            </TouchableOpacity>
 
-          <Text style={styles.footerVersao}>
-            Versão 1.0.0
-          </Text>
-        </View>
-      </Animated.View>
-    </View>
+            <View style={styles.divider} />
+
+            {/* FILTRO */}
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => navegar("/filtro")}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="location"
+                size={22}
+                color="#000"
+              />
+
+              <Text style={styles.menuText}>
+                Filtro
+              </Text>
+            </TouchableOpacity>
+
+            <View style={styles.divider} />
+
+            {/* FAVORITOS */}
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() =>
+                navegar("/(tabs)/favoritos")
+              }
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="heart-outline"
+                size={22}
+                color="#000"
+              />
+
+              <Text style={styles.menuText}>
+                Favoritos
+              </Text>
+            </TouchableOpacity>
+
+            <View style={styles.divider} />
+
+            {/* AGENDAMENTOS */}
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() =>
+                navegar("/(tabs)/agendamento")
+              }
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="calendar"
+                size={22}
+                color="#000"
+              />
+
+              <Text style={styles.menuText}>
+                Agendamentos
+              </Text>
+            </TouchableOpacity>
+
+            <View style={styles.divider} />
+
+            {/* PAGAMENTOS */}
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() =>
+                navegar("/pagamentos")
+              }
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="card"
+                size={22}
+                color="#000"
+              />
+
+              <Text style={styles.menuText}>
+                Pagamentos
+              </Text>
+            </TouchableOpacity>
+
+            <View style={styles.divider} />
+
+            {/* CONTRATO */}
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() =>
+                navegar("/contrato")
+              }
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="document-text"
+                size={22}
+                color="#000"
+              />
+
+              <Text style={styles.menuText}>
+                Contrato
+              </Text>
+            </TouchableOpacity>
+
+            <View style={styles.divider} />
+
+            {/* PERFIL */}
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() =>
+                navegar(
+                  "/(tabs)/perfil-proprietario"
+                )
+              }
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="person"
+                size={22}
+                color="#000"
+              />
+
+              <Text style={styles.menuText}>
+                Perfil
+              </Text>
+            </TouchableOpacity>
+
+            <View style={styles.divider} />
+
+            {/* CASAS */}
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() =>
+                navegar("/imoveis")
+              }
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="home-outline"
+                size={22}
+                color="#000"
+              />
+
+              <Text style={styles.menuText}>
+                Casas
+              </Text>
+            </TouchableOpacity>
+
+            <View style={styles.divider} />
+
+            {/* CONFIGURAÇÕES */}
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() =>
+                navegar("/configuracoes")
+              }
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="settings-outline"
+                size={22}
+                color="#000"
+              />
+
+              <Text style={styles.menuText}>
+                Configurações
+              </Text>
+            </TouchableOpacity>
+
+            <View style={styles.divider} />
+
+            {/* SAIR */}
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={sair}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="exit-outline"
+                size={22}
+                color="#E53935"
+              />
+
+              <Text
+                style={[
+                  styles.menuText,
+                  styles.logoutText,
+                ]}
+              >
+                Sair
+              </Text>
+            </TouchableOpacity>
+
+          </ScrollView>
+        </Animated.View>
+      </View>
+    </Modal>
   );
 }
 
 const styles = StyleSheet.create({
+  /*
+   * MODAL
+   *
+   * Essa é a parte mais importante.
+   *
+   * O Modal cria uma camada nativa acima da tela atual.
+   * Dessa forma o menu não fica atrás da caixa azul,
+   * FlatList, ScrollView ou qualquer outro componente.
+   */
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "transparent",
+  },
+  /*
+   * FUNDO ESCURO
+   */
  overlayContainer: {
   position: "absolute",
   top: 0,
   left: 0,
   right: 0,
   bottom: 0,
-  backgroundColor: "rgba(0,0,0,0.42)",
 },
-
-  overlay: {
-    flex: 1,
-  },
-
-  menuLateral: {
+overlay: {
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "rgba(0, 0, 0, 0.42)",
+},
+  /*
+   * DRAWER
+   */
+  drawer: {
     position: "absolute",
-    left: 0,
     top: 0,
+    left: 0,
     bottom: 0,
-
+    width: DRAWER_WIDTH,
     backgroundColor: "#FFFFFF",
-
-    borderTopRightRadius: 22,
-    borderBottomRightRadius: 22,
-
-    elevation: 20,
-
+    elevation: 30,
     shadowColor: "#000",
     shadowOffset: {
       width: 4,
@@ -411,145 +470,84 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 10,
   },
-
-  headerMenu: {
+  /*
+   * CABEÇALHO
+   */
+  header: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
+    /*
+     * Espaço para a barra de status.
+     */
     paddingTop: 55,
-    paddingBottom: 18,
+    paddingBottom: 16,
+    backgroundColor: "#FFFFFF",
   },
-
-  usuarioArea: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-  },
-
   avatar: {
-    width: 48,
-    height: 48,
-
-    borderRadius: 24,
-
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     backgroundColor: "#FF8C00",
-
     alignItems: "center",
     justifyContent: "center",
-
-    marginRight: 12,
   },
-
   avatarText: {
     color: "#FFFFFF",
     fontSize: 19,
     fontWeight: "800",
   },
-
-  usuarioInfo: {
+  userInfo: {
     flex: 1,
+    marginLeft: 11,
   },
-
-  nomeUsuario: {
-    fontSize: 16,
-    fontWeight: "800",
-    color: "#111",
+  userName: {
+    color: "#000000",
+    fontSize: 15,
+    fontWeight: "700",
   },
-
-  emailUsuario: {
-    marginTop: 3,
-    fontSize: 11,
-    color: "#777",
+  userEmail: {
+    color: "#777777",
+    fontSize: 10.5,
+    marginTop: 2,
   },
-
-  botaoFechar: {
-    width: 38,
-    height: 38,
-
-    borderRadius: 19,
-
-    backgroundColor: "#F1F1F1",
-
+  closeButton: {
+    width: 40,
+    height: 40,
     alignItems: "center",
     justifyContent: "center",
   },
-
-  linha: {
+  headerLine: {
     height: 1,
-    backgroundColor: "#EAEAEA",
-    marginHorizontal: 20,
+    backgroundColor: "#EEEEEE",
   },
-
-  menuScroll: {
-    paddingTop: 12,
-    paddingBottom: 20,
+  menuContent: {
+    paddingBottom: 30,
   },
 
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
-
-    minHeight: 52,
-
-    paddingHorizontal: 22,
-
-    marginHorizontal: 8,
-
-    borderRadius: 12,
+    minHeight: 58,
+    paddingHorizontal: 18,
+    gap: 14,
   },
 
-  menuTexto: {
-    marginLeft: 16,
-
+  menuText: {
+    flex: 1,
+    color: "#000000",
     fontSize: 14,
-    fontWeight: "600",
-
-    color: "#222",
+    fontWeight: "500",
   },
 
-  separador: {
+  logoutText: {
+    color: "#E53935",
+    fontWeight: "600",
+  },
+
+  divider: {
     height: 1,
-    backgroundColor: "#EAEAEA",
-
-    marginHorizontal: 20,
-    marginVertical: 12,
-  },
-
-  textoSair: {
-    color: "#D32F2F",
-  },
-
-  footer: {
-    borderTopWidth: 1,
-    borderTopColor: "#EEEEEE",
-
-    paddingHorizontal: 22,
-    paddingVertical: 16,
-  },
-
-  footerTexto: {
-    fontSize: 12,
-    fontWeight: "800",
-    color: "#FF8C00",
-  },
-
-  footerVersao: {
-    fontSize: 10,
-    color: "#999",
-    marginTop: 2,
-  },
-  item: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-  },
-  itemText: {
-    marginLeft: 16,
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#222",
+    backgroundColor: "#EEEEEE",
+    marginHorizontal: 16,
   },
 });

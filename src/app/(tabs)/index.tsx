@@ -1,9 +1,4 @@
-import React, {
-  useState,
-  useRef,
-  useEffect,
-} from "react";
-
+import React, { useState, useRef, useEffect,} from "react";
 import {
   View,
   Text,
@@ -17,25 +12,17 @@ import {
   Alert,
   PanResponder,
 } from "react-native";
-
 import { Ionicons } from "@expo/vector-icons";
-
 import { useRouter } from "expo-router";
-
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 // =========================================================
 // MENU LATERAL
 // =========================================================
-
 import MenuDrawer from "../../app/componets/MenuDrawer";
-
 // =========================================================
 // BANNERS
 // =========================================================
-
 const BANNERS = [
   {
     id: "1",
@@ -125,50 +112,28 @@ const TODOS_IMOVEIS = [
 
 export default function Home() {
   const router = useRouter();
-
   const { width } = useWindowDimensions();
-
   const insets = useSafeAreaInsets();
-
   const ref = useRef<FlatList<any> | null>(null);
-
   const isTablet = width >= 768;
-
   const filtroPadding = isTablet ? 24 : 16;
-
   const CARD_GAP = 12;
-
   const CARD_WIDTH =
     width - filtroPadding * 2;
-
   // =======================================================
   // ESTADOS
   // =======================================================
 
-  const [menuAberto, setMenuAberto] =
-    useState(false);
-
+  const [menuAberto, setMenuAberto] = useState(false);
   const [ativo, setAtivo] = useState(0);
-
-  const [localizacao, setLocalizacao] =
-    useState("");
-
-  const [valor, setValor] =
-    useState("");
-
-  const [quartos, setQuartos] =
-    useState("");
-
-  const [imoveis, setImoveis] =
-    useState(TODOS_IMOVEIS);
-
-  const [verificandoLogin, setVerificandoLogin] =
-    useState(true);
-
+  const [localizacao, setLocalizacao] = useState("");
+  const [valor, setValor] = useState("");
+  const [quartos, setQuartos] = useState("");
+  const [imoveis, setImoveis] = useState(TODOS_IMOVEIS);
+  const [verificandoLogin, setVerificandoLogin] = useState(true);
   // =========================================================
   // VERIFICAÇÃO DO LOGIN
   // =========================================================
-
   useEffect(() => {
     let ativoComponente = true;
 
@@ -561,16 +526,10 @@ export default function Home() {
             BANNERS
         ================================================= */}
 
-        <View
-          style={{
+        <View style={{
             marginTop: 12,
-          }}
-        >
-          <FlatList
-            ref={ref}
-            data={BANNERS}
-            horizontal
-            showsHorizontalScrollIndicator={
+          }}>
+          <FlatList ref={ref} data={BANNERS} horizontal showsHorizontalScrollIndicator={
               false
             }
             keyExtractor={(item) =>
@@ -581,114 +540,49 @@ export default function Home() {
             }
             snapToAlignment="start"
             decelerationRate="fast"
-            getItemLayout={(
-              _,
-              index
-            ) => ({
-              length:
-                CARD_WIDTH +
-                CARD_GAP,
-
-              offset:
-                (CARD_WIDTH +
-                  CARD_GAP) *
-                index,
-
-              index,
-            })}
-            onMomentumScrollEnd={(
-              e
-            ) => {
-              const newIndex =
-                Math.round(
-                  e.nativeEvent
-                    .contentOffset
-                    .x /
-                    (CARD_WIDTH +
-                      CARD_GAP)
-                );
-
+            getItemLayout={( _, index ) => ({ length: CARD_WIDTH + CARD_GAP,
+              offset: (CARD_WIDTH + CARD_GAP) * index, index, })}
+            onMomentumScrollEnd={( e ) => {
+              const newIndex = Math.round( e.nativeEvent .contentOffset .x / (CARD_WIDTH + CARD_GAP));
               setAtivo(newIndex);
             }}
             contentContainerStyle={{
-              paddingHorizontal:
-                filtroPadding,
-            }}
+              paddingHorizontal: filtroPadding, }}
             ItemSeparatorComponent={() => (
               <View
-                style={{
-                  width: CARD_GAP,
-                }}
-              />
+                style={{ width: CARD_GAP, }}/>
             )}
             renderItem={({ item }) => (
-              <View
-                style={[
-                  styles.bannerSlide,
+              <View style={[ styles.bannerSlide,
                   {
-                    width:
-                      CARD_WIDTH,
-
-                    height:
-                      bannerHeight,
+                    width: CARD_WIDTH,
+                    height: bannerHeight,
                   },
-                ]}
-              >
-                <Image
-                  source={{
-                    uri: item.img,
-                  }}
-                  style={
-                    styles.bannerImgFull
-                  }
-                  resizeMode="cover"
-                />
+                ]}>
+                <Image source={{ uri: item.img }}
+                  style={ styles.bannerImgFull }
+                  resizeMode="cover" />
 
                 <View
-                  style={
-                    styles.overlay
-                  }
-                />
-
+                  style={ styles.overlay } />
                 <View
-                  style={
-                    styles.bannerLeft
-                  }
-                >
+                  style={ styles.bannerLeft } >
                   <Text
-                    style={
-                      styles.emAlta
-                    }
-                  >
+                    style={ styles.emAlta }>
                     Em alta
                   </Text>
-
                   <Text
-                    style={
-                      styles.bannerTitulo
-                    }
-                  >
+                    style={ styles.bannerTitulo }>
                     {item.titulo}
                   </Text>
-
                   <Text
-                    style={
-                      styles.bannerSub
-                    }
-                  >
+                    style={ styles.bannerSub } >
                     {item.sub}
                   </Text>
-
                   <TouchableOpacity
-                    style={
-                      styles.btnExplorar
-                    }
-                  >
+                    style={ styles.btnExplorar } >
                     <Text
-                      style={
-                        styles.btnExplorarTxt
-                      }
-                    >
+                      style={ styles.btnExplorarTxt }>
                       Explorar agora
                     </Text>
                   </TouchableOpacity>
@@ -696,75 +590,44 @@ export default function Home() {
               </View>
             )}
           />
-
           {/* PONTOS */}
-
           <View
-            style={
-              styles.dotsCentro
-            }
-          >
+            style={ styles.dotsCentro }>
             {BANNERS.map(
               (_, i) => (
                 <View
                   key={i.toString()}
-                  style={[
-                    styles.dot,
-
+                  style={[ styles.dot,
                     i === ativo
                       ? styles.dotAtivo
                       : styles.dotInativo,
-                  ]}
-                />
+                  ]}/>
               )
             )}
           </View>
         </View>
-
         {/* =================================================
             FILTROS
         ================================================= */}
-
         <View
-          style={[
-            styles.filtroContainer,
+          style={[ styles.filtroContainer,
             {
-              marginHorizontal:
-                filtroPadding,
+              marginHorizontal: filtroPadding,
             },
-          ]}
-        >
+          ]}>
           {/* LOCALIZAÇÃO */}
-
           <View
-            style={
-              styles.filtroItem
-            }
-          >
+            style={ styles.filtroItem }>
             <View
-              style={
-                styles.filtroLabelRow
-              }
-            >
-              <Ionicons
-                name="location-outline"
-                size={11}
-                color="#000"
-              />
-
+              style={ styles.filtroLabelRow }>
+              <Ionicons name="location-outline" size={11} color="#000" />
               <Text
-                style={
-                  styles.filtroLabel
-                }
-              >
+                style={ styles.filtroLabel } >
                 Localização
               </Text>
             </View>
-
             <TextInput
-              style={
-                styles.filtroInputReal
-              }
+              style={ styles.filtroInputReal }
               placeholder="Maceió-AL"
               value={localizacao}
               onChangeText={
@@ -773,38 +636,19 @@ export default function Home() {
               placeholderTextColor="#999"
             />
           </View>
-
           {/* VALOR */}
-
           <View
-            style={
-              styles.filtroItem
-            }
-          >
+            style={ styles.filtroItem } >
             <View
-              style={
-                styles.filtroLabelRow
-              }
-            >
-              <Ionicons
-                name="cash-outline"
-                size={11}
-                color="#000"
-              />
-
+              style={ styles.filtroLabelRow } >
+              <Ionicons name="cash-outline" size={11} color="#000" />
               <Text
-                style={
-                  styles.filtroLabel
-                }
-              >
+                style={ styles.filtroLabel } >
                 Valor
               </Text>
             </View>
-
             <TextInput
-              style={
-                styles.filtroInputReal
-              }
+              style={ styles.filtroInputReal }
               placeholder="2000"
               keyboardType="numeric"
               value={valor}
@@ -814,38 +658,19 @@ export default function Home() {
               placeholderTextColor="#999"
             />
           </View>
-
           {/* QUARTOS */}
-
           <View
-            style={
-              styles.filtroItem
-            }
-          >
+            style={ styles.filtroItem } >
             <View
-              style={
-                styles.filtroLabelRow
-              }
-            >
-              <Ionicons
-                name="bed-outline"
-                size={11}
-                color="#000"
-              />
-
+              style={ styles.filtroLabelRow } >
+              <Ionicons name="bed-outline" size={11} color="#000" />
               <Text
-                style={
-                  styles.filtroLabel
-                }
-              >
+                style={ styles.filtroLabel } >
                 Quartos
               </Text>
             </View>
-
             <TextInput
-              style={
-                styles.filtroInputReal
-              }
+              style={ styles.filtroInputReal }
               placeholder="01"
               keyboardType="numeric"
               value={quartos}
@@ -856,11 +681,9 @@ export default function Home() {
             />
           </View>
         </View>
-
         {/* =================================================
             TÍTULO
         ================================================= */}
-
         <Text
           style={[
             styles.tituloSecao,
@@ -904,10 +727,7 @@ export default function Home() {
                       : "100%",
                   },
                 ]}
-                onPress={() =>
-                  router.push(
-                    "/perfil-proprietario" as any
-                  )
+                onPress={() => router.push("/perfil-proprietario" as any)
                 }
                 activeOpacity={0.8}
               >

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  PanResponder,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -63,35 +64,22 @@ const DIARIAS = [
 
 export default function Favoritos() {
   const insets = useSafeAreaInsets();
-
   const router = useRouter();
 
   const [menuVisible, setMenuVisible] = useState(false);
 
-  const [aba, setAba] = useState<
-    "Mensal" | "Diarias"
-  >("Mensal");
+  const [aba, setAba] = useState<"Mensal" | "Diarias">("Mensal");
 
-  const [mensal, setMensal] =
-    useState(MENSAL);
+  const [mensal, setMensal] = useState(MENSAL);
+  const [diarias, setDiarias] = useState(DIARIAS);
 
-  const [diarias, setDiarias] =
-    useState(DIARIAS);
-
-  const lista =
-    aba === "Mensal"
-      ? mensal
-      : diarias;
+  const lista = aba === "Mensal" ? mensal : diarias;
 
   function remover(id: string) {
     if (aba === "Mensal") {
-      setMensal((prev) =>
-        prev.filter((f) => f.id !== id)
-      );
+      setMensal((prev) => prev.filter((f) => f.id !== id));
     } else {
-      setDiarias((prev) =>
-        prev.filter((f) => f.id !== id)
-      );
+      setDiarias((prev) => prev.filter((f) => f.id !== id));
     }
   }
 
@@ -103,6 +91,80 @@ export default function Favoritos() {
     setMenuVisible(false);
   }
 
+  /*
+   * GESTO PARA ABRIR O MENU
+   *
+   * O usuário pode começar o movimento em qualquer
+   * ponto da altura da tela, desde que comece próximo
+   * da borda esquerda.
+   *
+   * x0 <= 70 = começou nos primeiros 70px da tela.
+   *
+   * O gesto só é capturado se for claramente horizontal,
+   * para não atrapalhar o ScrollView vertical.
+   */
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => false,
+
+      onStartShouldSetPanResponderCapture: () => false,
+
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        if (menuVisible) return false;
+
+        const { dx, dy, x0 } = gestureState;
+
+        const iniciouNaEsquerda = x0 <= 70;
+
+        const movimentoHorizontal =
+          Math.abs(dx) > Math.abs(dy) * 1.2;
+
+        const puxandoParaDireita = dx > 10;
+
+        return (
+          iniciouNaEsquerda &&
+          movimentoHorizontal &&
+          puxandoParaDireita
+        );
+      },
+
+      /*
+       * O Capture ajuda o gesto a funcionar mesmo quando
+       * o dedo começa sobre o ScrollView.
+       */
+      onMoveShouldSetPanResponderCapture: (_, gestureState) => {
+        if (menuVisible) return false;
+
+        const { dx, dy, x0 } = gestureState;
+
+        const iniciouNaEsquerda = x0 <= 70;
+
+        const movimentoHorizontal =
+          Math.abs(dx) > Math.abs(dy) * 1.2;
+
+        const puxandoParaDireita = dx > 10;
+
+        return (
+          iniciouNaEsquerda &&
+          movimentoHorizontal &&
+          puxandoParaDireita
+        );
+      },
+
+      onPanResponderRelease: (_, gestureState) => {
+        /*
+         * Abre somente quando o usuário realmente
+         * arrastar pelo menos 70px para a direita.
+         */
+        if (gestureState.dx >= 70) {
+          abrirMenu();
+        }
+      },
+
+      onPanResponderTerminate: () => {},
+    })
+  ).current;
+
   return (
     <View
       style={[
@@ -111,8 +173,11 @@ export default function Favoritos() {
           paddingTop: insets.top,
         },
       ]}
+      {...panResponder.panHandlers}
     >
-      {/* TOPO AZUL */}
+      {/* =========================
+          TOPO AZUL
+      ========================== */}
       <View style={styles.topoAzul}>
         <View style={styles.headerAzul}>
           {/* HAMBURGUER */}
@@ -156,6 +221,7 @@ export default function Favoritos() {
             resizeMode="contain"
           />
 
+          {/* ESPAÇO DIREITO */}
           <View
             style={{
               width: 32,
@@ -164,13 +230,16 @@ export default function Favoritos() {
         </View>
       </View>
 
-      {/* CONTEÚDO */}
+      {/* =========================
+          CONTEÚDO
+      ========================== */}
       <View style={styles.content}>
         {/* TÍTULO */}
         <View style={styles.voltarRow}>
           <TouchableOpacity
             onPress={() => router.back()}
             style={styles.btnVoltar}
+            activeOpacity={0.7}
           >
             <Ionicons
               name="chevron-back"
@@ -199,17 +268,17 @@ export default function Favoritos() {
           </View>
         </View>
 
-        {/* ABAS */}
+        {/* =========================
+            ABAS
+        ========================== */}
         <View style={styles.abasContainer}>
           <TouchableOpacity
             style={[
               styles.aba,
-              aba === "Mensal" &&
-                styles.abaAtiva,
+              aba === "Mensal" && styles.abaAtiva,
             ]}
-            onPress={() =>
-              setAba("Mensal")
-            }
+            onPress={() => setAba("Mensal")}
+            activeOpacity={0.8}
           >
             <Text
               style={[
@@ -225,12 +294,10 @@ export default function Favoritos() {
           <TouchableOpacity
             style={[
               styles.aba,
-              aba === "Diarias" &&
-                styles.abaAtiva,
+              aba === "Diarias" && styles.abaAtiva,
             ]}
-            onPress={() =>
-              setAba("Diarias")
-            }
+            onPress={() => setAba("Diarias")}
+            activeOpacity={0.8}
           >
             <Text
               style={[
@@ -244,7 +311,9 @@ export default function Favoritos() {
           </TouchableOpacity>
         </View>
 
-        {/* LISTA */}
+        {/* =========================
+            LISTA
+        ========================== */}
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
@@ -260,6 +329,7 @@ export default function Favoritos() {
                 styles.sombra,
               ]}
             >
+              {/* IMAGEM */}
               <Image
                 source={{
                   uri: item.img,
@@ -267,6 +337,7 @@ export default function Favoritos() {
                 style={styles.cardImg}
               />
 
+              {/* INFORMAÇÕES */}
               <View style={styles.cardInfo}>
                 <Text style={styles.cardTitulo}>
                   {item.titulo}
@@ -299,6 +370,7 @@ export default function Favoritos() {
                 onPress={() =>
                   remover(item.id)
                 }
+                activeOpacity={0.7}
               >
                 <Ionicons
                   name="heart"
@@ -309,7 +381,9 @@ export default function Favoritos() {
             </View>
           ))}
 
-          {/* QUANDO NÃO HOUVER FAVORITOS */}
+          {/* =========================
+              NENHUM FAVORITO
+          ========================== */}
           {lista.length === 0 && (
             <View style={styles.vazio}>
               <Ionicons
@@ -331,7 +405,10 @@ export default function Favoritos() {
         </ScrollView>
       </View>
 
-      {/* MENU LATERAL COMPARTILHADO */}
+      {/* =========================
+          MENU LATERAL
+          FICA ACIMA DE TUDO
+      ========================== */}
       <MenuDrawer
         visible={menuVisible}
         onClose={fecharMenu}
@@ -346,39 +423,41 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#1A5CFF",
   },
-
   topoAzul: {
     backgroundColor: "#1A5CFF",
-    paddingBottom: 10,
+    paddingBottom: 50,
+    justifyContent:"center",
   },
-
   headerAzul: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
-    paddingVertical: 6,
+    paddingVertical: 14,
   },
-
   btnHamburguer: {
     width: 32,
     height: 32,
     justifyContent: "center",
     gap: 5,
     alignItems: "flex-start",
+    /*
+     * Mantém o botão acima dos outros elementos.
+     */
+    zIndex: 100,
+    elevation: 10,
+    marginTop: -90,
   },
-
   traco: {
     height: 2.8,
     backgroundColor: "#fff",
     borderRadius: 10,
   },
-
   logoImg: {
-    width: 170,
-    height: 38,
+    width: 300,
+    height: 110,
+    top: 20,
   },
-
   content: {
     flex: 1,
     backgroundColor: "#FFF",
@@ -386,7 +465,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 18,
     paddingTop: 8,
   },
-
   voltarRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -394,7 +472,6 @@ const styles = StyleSheet.create({
     gap: 6,
     marginTop: 6,
   },
-
   btnVoltar: {
     width: 28,
     height: 28,
@@ -446,6 +523,7 @@ const styles = StyleSheet.create({
       width: 0,
       height: 2,
     },
+
     shadowOpacity: 0.12,
     shadowRadius: 3,
   },
@@ -532,4 +610,3 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
 });
-
