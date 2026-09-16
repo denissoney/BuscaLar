@@ -41,42 +41,49 @@ export default function Cadastro() {
         <Text style={styles.titulo}>criar conta</Text>
         <Text style={styles.subtitulo}>Preencha os dados abaixo para{"\n"}criar sua conta.</Text>
         <View style={styles.form}>
-          <Text style={styles.label}>Nome completo*</Text>
-          <View style={styles.inputContainer}>
-            <Ionicons name="person-outline" size={16} color="#FF8C00" style={styles.icon} />
-            <TextInput placeholder="Digite seu nome completo" value={nome} onChangeText={setNome} style={styles.input} placeholderTextColor="#999" />
-          </View>
-          <Text style={styles.label}>E-mail*</Text>
-          <View style={styles.inputContainer}>
-            <Ionicons name="mail-outline" size={16} color="#FF8C00" style={styles.icon} />
-            <TextInput placeholder="Digite seu e-mail" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" style={styles.input} placeholderTextColor="#999" />
-          </View>
-          <Text style={styles.label}>Telefone*</Text>
-          <View style={styles.inputContainer}>
-            <Ionicons name="call-outline" size={16} color="#FF8C00" style={styles.icon} />
-            <TextInput placeholder="Digite seu telefone" value={telefone} onChangeText={setTelefone} keyboardType="phone-pad" style={styles.input} placeholderTextColor="#999" />
-          </View>
-          <Text style={styles.label}>Senha*</Text>
-          <View style={styles.inputContainer}>
-            <Ionicons name="lock-closed-outline" size={16} color="#FF8C00" style={styles.icon} />
-            <TextInput placeholder="Digite sua senha" value={senha} onChangeText={setSenha} secureTextEntry style={styles.input} placeholderTextColor="#999" />
-          </View>
-          <Text style={styles.label}>Confirmar senha*</Text>
-          <View style={styles.inputContainer}>
-            <Ionicons name="lock-closed-outline" size={16} color="#FF8C00" style={styles.icon} />
-            <TextInput placeholder="confirme sua senha" value={confirmarSenha} onChangeText={setConfirmarSenha} secureTextEntry style={styles.input} placeholderTextColor="#999" />
-          </View>
-          <TouchableOpacity style={styles.termos} onPress={() => setAceitou(!aceitou)}>
-            <View style={[styles.checkbox, aceitou && styles.checkboxAtivo]}>{aceitou && <Ionicons name="checkmark" size={12} color="#fff" />}</View>
-            <Text style={styles.termosTexto}>Ao continuar você concorda com os <Text style={styles.linkLaranja}>Termos de Politica e Privacidade.</Text></Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.botaoAzul} onPress={() => router.push("/cadastroconcluido" as any)}>
-            <Text style={styles.botaoAzulTexto}>Criar conta nova</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.botaoBranco} onPress={() => router.push("/login" as any)}>
-            <Text style={styles.botaoBrancoTexto}>Já tenho uma conta</Text>
-          </TouchableOpacity>
-        </View>
+  <Text style={styles.label}>Nome completo<Text style={styles.asterisco}>*</Text></Text>
+  <View style={styles.inputContainer}>
+    <Ionicons name="person-outline" size={16} color="#FF8C00" style={styles.icon} />
+    <TextInput placeholder="Digite seu nome completo" value={nome} onChangeText={setNome} style={styles.input} placeholderTextColor="#999" />
+  </View>
+
+  <Text style={styles.label}>E-mail<Text style={styles.asterisco}>*</Text></Text>
+  <View style={styles.inputContainer}>
+    <Ionicons name="mail-outline" size={16} color="#FF8C00" style={styles.icon} />
+    <TextInput placeholder="Digite seu e-mail" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" style={styles.input} placeholderTextColor="#999" />
+  </View>
+
+  <Text style={styles.label}>Telefone<Text style={styles.asterisco}>*</Text></Text>
+  <View style={styles.inputContainer}>
+    <Ionicons name="call-outline" size={16} color="#FF8C00" style={styles.icon} />
+    <TextInput placeholder="Digite seu telefone" value={telefone} onChangeText={setTelefone} keyboardType="phone-pad" style={styles.input} placeholderTextColor="#999" />
+  </View>
+
+  <Text style={styles.label}>Senha<Text style={styles.asterisco}>*</Text></Text>
+  <View style={styles.inputContainer}>
+    <Ionicons name="lock-closed-outline" size={16} color="#FF8C00" style={styles.icon} />
+    <TextInput placeholder="Digite sua senha" value={senha} onChangeText={setSenha} secureTextEntry style={styles.input} placeholderTextColor="#999" />
+  </View>
+
+  <Text style={styles.label}>Confirmar senha<Text style={styles.asterisco}>*</Text></Text>
+  <View style={styles.inputContainer}>
+    <Ionicons name="lock-closed-outline" size={16} color="#FF8C00" style={styles.icon} />
+    <TextInput placeholder="confirme sua senha" value={confirmarSenha} onChangeText={setConfirmarSenha} secureTextEntry style={styles.input} placeholderTextColor="#999" />
+  </View>
+
+  <TouchableOpacity style={styles.termos} onPress={() => setAceitou(!aceitou)}>
+    <View style={[styles.checkbox, aceitou && styles.checkboxAtivo]}>{aceitou && <Ionicons name="checkmark" size={12} color="#fff" />}</View>
+    <Text style={styles.termosTexto}>Ao continuar você concorda com os <Text style={styles.linkLaranja}>Termos de Politica e Privacidade.</Text></Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity style={styles.botaoAzul} onPress={() => router.push("/cadastroconcluido" as any)}>
+    <Text style={styles.botaoAzulTexto}>Criar conta nova</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity style={styles.botaoBranco} onPress={() => router.push("/login" as any)}>
+    <Text style={styles.botaoBrancoTexto}>Já tenho uma conta</Text>
+  </TouchableOpacity>
+</View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -102,4 +109,8 @@ const styles = StyleSheet.create({
   botaoAzulTexto: { color: "#fff", fontWeight: "bold", fontSize: 15 },
   botaoBranco: { backgroundColor: "#fff", height: 46, borderRadius: 8, borderWidth: 1, borderColor: "#000", alignItems: "center", justifyContent: "center" },
   botaoBrancoTexto: { color: "#0B5FFF", fontWeight: "bold", fontSize: 15 },
+  asterisco: {
+  color: "#FF0000",
+  fontWeight: "bold",
+},
 });

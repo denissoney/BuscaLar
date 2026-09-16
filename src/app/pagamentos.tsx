@@ -1,21 +1,15 @@
 import { useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  TextInput,
-  Alert,
-  Clipboard,
-  Switch,
+  View, Text, StyleSheet, Image, TouchableOpacity,
+  ScrollView, TextInput, Alert, Clipboard, Switch,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import MenuDrawer from "../app/componets/MenuDrawer";
+
 const PIX_CODE = "00020126580014BR.GOV.BCB.PIX0136a7c9e123-4b5a-9c8d-1e2f3a4b5c6d520400053039865405120.00S802BR5913BUSCALARLTDA6009MACEI062070503***6304A1F2";
+
 export default function Pagamento() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -26,6 +20,7 @@ export default function Pagamento() {
   const [cvv, setCvv] = useState("");
   const [nome, setNome] = useState("");
   const [salvar, setSalvar] = useState(true);
+
   const copiarPix = async () => {
     Clipboard.setString(PIX_CODE);
     Alert.alert("Copiado!", "Chave PIX copiada");
@@ -33,7 +28,6 @@ export default function Pagamento() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      {/* TOPO AZUL MAIOR IGUAL AO PRINT */}
       <View style={styles.topoAzul}>
         <View style={styles.headerAzul}>
           <TouchableOpacity style={styles.btnHamburguer} onPress={() => setMenuVisible(true)}>
@@ -51,25 +45,26 @@ export default function Pagamento() {
 
       <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 30 }} showsVerticalScrollIndicator={false}>
         
-        {/* ABAS - AGORA FICA AZUL CORRETO */}
+        {/* SETA SEM BOLA ADICIONADA */}
+        <View style={styles.voltarRow}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.btnVoltarNovo} activeOpacity={0.7}>
+            <Ionicons name="arrow-back" size={26} color="#000" />
+          </TouchableOpacity>
+          <View style={{ width: 32 }} />
+        </View>
+
         <View style={styles.abasContainer}>
           <View style={styles.abasBg}>
-            <TouchableOpacity 
-              style={[styles.abaBtn, aba === "pix" && styles.abaAtiva]}
-              onPress={() => setAba("pix")}
-            >
+            <TouchableOpacity style={[styles.abaBtn, aba === "pix" && styles.abaAtiva]} onPress={() => setAba("pix")}>
               <Text style={[styles.abaText, aba === "pix" && styles.abaTextAtiva]}>Pix</Text>
             </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.abaBtn, aba === "cartao" && styles.abaAtiva]}
-              onPress={() => setAba("cartao")}
-            >
+            <TouchableOpacity style={[styles.abaBtn, aba === "cartao" && styles.abaAtiva]} onPress={() => setAba("cartao")}>
               <Text style={[styles.abaText, aba === "cartao" && styles.abaTextAtiva]}>Cartão</Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {aba === "pix" ? (
+        {aba === "pix"? (
           <View style={{ paddingHorizontal: 16 }}>
             <TouchableOpacity style={styles.btnQrCode}>
               <Text style={styles.btnQrCodeText}>Pagar com QR CODE</Text>
@@ -116,14 +111,7 @@ export default function Pagamento() {
 
             <Text style={styles.labelInput}>Número do cartão</Text>
             <View style={styles.inputWithIcon}>
-              <TextInput 
-                style={styles.inputInterno} 
-                value={numero} 
-                onChangeText={setNumero} 
-                keyboardType="number-pad" 
-                placeholder="1234 5678 9012 3456"
-                placeholderTextColor="#999"
-              />
+              <TextInput style={styles.inputInterno} value={numero} onChangeText={setNumero} keyboardType="number-pad" placeholder="1234 5678 9012 3456" placeholderTextColor="#999" />
               <View style={styles.bandeiras}>
                 <Text style={styles.visa}>VISA</Text>
                 <View style={styles.master}>
@@ -178,44 +166,21 @@ export default function Pagamento() {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: "#1A5CFF" 
-},
-  // AZUL MAIOR IGUAL AO PRINT
-  topoAzul: { 
-    backgroundColor: "#1A5CFF", 
-    height: 120, 
-    justifyContent: "center", 
-    marginTop: 50,
-},
+  container: { flex: 1, backgroundColor: "#1A5CFF" },
+  topoAzul: { backgroundColor: "#1A5CFF", height: 120, justifyContent: "center", marginTop: -30 },
   headerAzul: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, paddingTop: 10 },
-  btnHamburguer: { 
-    width: 32, 
-    height: 32, 
-    justifyContent: "center", 
-    gap: 5, 
-    alignItems: "flex-start", 
-    marginTop: -180,
-},
+  btnHamburguer: { width: 32, height: 32, justifyContent: "center", gap: 5, alignItems: "flex-start", marginTop: -30 },
   traco: { height: 2.8, backgroundColor: "#fff", borderRadius: 10 },
   tituloHeaderRow: { flexDirection: "row", alignItems: "center", gap: 8 },
-  iconeBox: { 
-    backgroundColor: "#000", 
-    width: 34, 
-    height: 28, 
-    borderRadius: 0, 
-    alignItems: "center", 
-    justifyContent: "center" 
-},
-  tituloHeader: { 
-    fontSize: 22, 
-    fontWeight: "800", 
-    color: "#000" 
-},
+  iconeBox: { backgroundColor: "#000", width: 34, height: 28, borderRadius: 0, alignItems: "center", justifyContent: "center", marginBottom: -20 },
+  tituloHeader: { fontSize: 22, fontWeight: "800", color: "#000", marginBottom: -20 },
   content: { flex: 1, backgroundColor: "#fff", borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingTop: 10, marginTop: 2 },
 
-  abasContainer: { paddingHorizontal: 16, paddingTop: 8 },
+  // SETA NOVA
+  voltarRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 12, marginBottom: 4 },
+  btnVoltarNovo: { width: 32, height: 32, alignItems: "center", justifyContent: "center" },
+
+  abasContainer: { paddingHorizontal: 16, paddingTop: 4 },
   abasBg: { flexDirection: "row", backgroundColor: "#E9E9E9", borderRadius: 20, padding: 3 },
   abaBtn: { flex: 1, height: 34, alignItems: "center", justifyContent: "center", borderRadius: 20 },
   abaAtiva: { backgroundColor: "#3B82FF" },
