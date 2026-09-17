@@ -1,26 +1,26 @@
 {
   "expo": {
-    "name": "",
-    "slug": "buscalar",
+    "name": "BuscaLar",
+    "slug": "BuscaLar",
     "version": "1.0.0",
     "orientation": "portrait",
-    "backgroundColor": "#000000",
-    "userInterfaceStyle": "light",
     "icon": "./assets/images/logo.png",
-    "scheme": "buscalar",
+    "scheme": "myapp",
+    "userInterfaceStyle": "dark",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.BuscaLar"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/logo.png",
-        "backgroundColor": "#000000"
+        "backgroundColor": "#000000",
+        "foregroundImage": "./assets/images/logo.png"
       },
-      "package": "com.anonymous.buscalar",
-      "softwareKeyboardLayoutMode": "pan"
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.BuscaLar"
     },
     "web": {
-      "bundler": "metro",
+      "output": "static",
       "favicon": "./assets/images/logo.png"
     },
     "plugins": [
@@ -28,15 +28,16 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#000000",
           "image": "./assets/images/logo.png",
-          "imageWidth": 220,
-          "resizeMode": "contain"
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#000000",
+          "dark": {
+            "image": "./assets/images/logo.png",
+            "backgroundColor": "#000000"
+          }
         }
       ]
-    ],
-    "experiments": {
-      "typedRoutes": true
-    }
+    ]
   }
 }

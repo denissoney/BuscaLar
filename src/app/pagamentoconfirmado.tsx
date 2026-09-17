@@ -3,24 +3,13 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Modal, Pressable,
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
 export default function ConfirmacaoPagamento() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [menuAberto, setMenuAberto] = useState(false);
   const slideAnim = useRef(new Animated.Value(-300)).current;
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: (e, g) => e.nativeEvent.pageX < 30 && g.dx > 50 && Math.abs(g.dy) < 40,
-      onPanResponderRelease: () => setMenuAberto(true),
-    })
-  ).current;
-
-  useEffect(() => {
-    Animated.timing(slideAnim, { toValue: menuAberto? 0 : -300, duration: 260, useNativeDriver: true }).start();
-  }, [menuAberto]);
-
+  const panResponder = useRef( PanResponder.create({ onMoveShouldSetPanResponder: (e, g) => e.nativeEvent.pageX < 30 && g.dx > 50 && Math.abs(g.dy) < 40, onPanResponderRelease: () => setMenuAberto(true),})).current;
+  useEffect(() => { Animated.timing(slideAnim, { toValue: menuAberto? 0 : -300, duration: 260, useNativeDriver: true }).start();}, [menuAberto]);
   return (
     <View style={[styles.container, { paddingTop: insets.top }]} {...panResponder.panHandlers}>
       <View style={styles.topoAzul}>

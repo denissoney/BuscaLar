@@ -43,8 +43,8 @@ export default function EditarPerfil() {
 
       <View style={styles.conteudoBranco}>
         <View style={styles.tituloRow}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Ionicons name="chevron-back" size={22} color="#000" />
+          <TouchableOpacity onPress={() => router.back()} hitSlop={12} style={styles.botaoVoltar} activeOpacity={0.7}>
+             <Ionicons name="arrow-back" size={22} color="#000" />
           </TouchableOpacity>
           <Text style={styles.titulo}>Editar perfil</Text>
           <View style={{ width: 22 }} />
@@ -204,4 +204,11 @@ const styles = StyleSheet.create({
     fontWeight: "800", 
     fontSize: 15 
   },
+  botaoVoltar: {
+  width: 38,
+  height: 38,
+  borderRadius: 19,
+  alignItems: "center",
+  justifyContent: "center",
+},
 });

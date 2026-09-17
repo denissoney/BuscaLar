@@ -91,7 +91,14 @@ export default function Filtro() {
         </View>
 
         <TouchableOpacity style={styles.btnContinuar} onPress={continuar}><Text style={styles.btnContinuarText}>Continuar</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.btnVoltar} onPress={() => router.push("/(tabs)/index" as any)}><Text style={styles.btnVoltarText}>Voltar</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.btnVoltar} onPress={() => {
+          if (router.canGoBack()) {
+               router.back();
+          } else {
+               router.replace("/(tabs)/index" as any);
+          }
+}}>
+  <Text style={styles.btnVoltarText}>Voltar</Text></TouchableOpacity>
       </ScrollView>
 
       {/* MENU COMPLETO RESTAURADO */}
@@ -112,7 +119,7 @@ export default function Filtro() {
               <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/(tabs)/agendamento")}><Ionicons name="calendar" size={22} color="#000" /><Text style={styles.menuItemText}>Agendamentos</Text></TouchableOpacity><View style={styles.linha} />
               <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/pagamentos")}><Ionicons name="card" size={22} color="#000" /><Text style={styles.menuItemText}>Pagamentos</Text></TouchableOpacity><View style={styles.linha} />
               <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/contrato")}><Ionicons name="document-text" size={22} color="#000" /><Text style={styles.menuItemText}>Contrato</Text></TouchableOpacity><View style={styles.linha} />
-              <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/perfil")}><Ionicons name="person" size={22} color="#000" /><Text style={styles.menuItemText}>Perfil</Text></TouchableOpacity><View style={styles.linha} />
+              <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/perfil-proprietario")}><Ionicons name="person" size={22} color="#000" /><Text style={styles.menuItemText}>Perfil</Text></TouchableOpacity><View style={styles.linha} />
               <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/imoveis")}><Ionicons name="home-outline" size={22} color="#000" /><Text style={styles.menuItemText}>Casas</Text></TouchableOpacity><View style={styles.linha} />
               <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/configuracoes")}><Ionicons name="settings" size={22} color="#000" /><Text style={styles.menuItemText}>Configurações</Text></TouchableOpacity><View style={styles.linha} />
               <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/login")}><Ionicons name="exit-outline" size={22} color="#E53935" /><Text style={[styles.menuItemText, { color: "#E53935" }]}>Sair</Text></TouchableOpacity>

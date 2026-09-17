@@ -16,9 +16,10 @@ import { useRouter } from "expo-router";
 import MenuDrawer from "./componets/MenuDrawer";
 
 function LinhaLaranja({ width = 90 }: { width?: number }) {
+  const d = "M0 0 L" + width + " 0.5 L" + width + " 1.2 L0 3 Z";
   return (
-    <Svg width={width} height={3} viewBox={`0 0 ${width} 3`}>
-      <Path d={`M0 0 L${width} 0.5 L${width} 1.2 L0 3 Z`} fill="#FF8C00" />
+    <Svg width={width} height={3} viewBox={"0 0 " + width + " 3"}>
+      <Path d={d} fill="#FF8C00" />
     </Svg>
   );
 }
@@ -36,8 +37,8 @@ export default function AlterarSenha() {
 
   const panResponder = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponder: (evt, gestureState) => {
-        return evt.nativeEvent.pageX < 35 && gestureState.dx > 60 && Math.abs(gestureState.dy) < 50;
+      onMoveShouldSetPanResponder: (_evt: any, gestureState: any) => {
+        return gestureState.dx > 60 && Math.abs(gestureState.dy) < 50;
       },
       onPanResponderRelease: () => setMenuAberto(true),
     })
@@ -45,7 +46,6 @@ export default function AlterarSenha() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]} {...panResponder.panHandlers}>
-      
       <View style={styles.headerAzul}>
         <TouchableOpacity style={styles.hamburguer} onPress={() => setMenuAberto(true)}>
           <View style={styles.traco} />
@@ -61,13 +61,23 @@ export default function AlterarSenha() {
       <View style={styles.card}>
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
           
-          <View style={{ alignItems: "center" }}>
-            <Text style={styles.titulo}>Alterar Senha</Text>
-            <View style={{ marginTop: 4 }}>
-              <LinhaLaranja width={90} />
+          {/* SETA + TEXTO NA MESMA LINHA */}
+          <View style={styles.topoCard}>
+            <TouchableOpacity onPress={() => router.back()} style={styles.botaoVoltar}>
+              <Ionicons name="arrow-back" size={22} color="#000" />
+            </TouchableOpacity>
+
+            <View style={styles.tituloCentro}>
+              <Text style={styles.titulo}>Alterar Senha</Text>
+              <View style={{ marginTop: 3 }}>
+                <LinhaLaranja width={90} />
+              </View>
             </View>
-            <Text style={styles.subtitulo}>Defina uma nova senha para sua conta</Text>
+
+            <View style={{ width: 38 }} />
           </View>
+
+          <Text style={styles.subtitulo}>Defina uma nova senha para sua conta</Text>
 
           <Text style={styles.label}>Senha atual</Text>
           <View style={styles.inputBox}>
@@ -98,11 +108,9 @@ export default function AlterarSenha() {
             <Text style={styles.avisoTxt}>Use no mínimo 8 caracteres, com letras e números.</Text>
           </View>
 
-          {/* SÓ VAI PRA SENHA SALVA QUANDO APERTA AQUI */}
           <TouchableOpacity style={styles.btnSalvar} onPress={() => router.push("/senhasalva" as any)}>
             <Text style={styles.btnTxt}>Salvar Nova Senha</Text>
           </TouchableOpacity>
-
         </ScrollView>
       </View>
 
@@ -112,26 +120,27 @@ export default function AlterarSenha() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#1A5CFF" },
+  container: { flex: 1, backgroundColor: "#448aff" },
   headerAzul: {
-    backgroundColor: "#1A5CFF",
+    backgroundColor: "#448aff",
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
     paddingHorizontal: 14,
     height: 110,
     paddingTop: 12,
-    borderBottomLeftRadius: 22,
-    borderBottomRightRadius: 22,
   },
-  hamburguer: { gap: 4, width: 40, marginTop: 2, marginBottom: 40 },
+  hamburguer: { gap: 4, width: 40, marginTop: 2 },
   traco: { width: 18, height: 2.5, backgroundColor: "#FFF", borderRadius: 2 },
   logoCentro: { flex: 1, alignItems: "center", justifyContent: "center", paddingTop: 2 },
   logo: { width: 195, height: 150, resizeMode: "contain", marginTop: -8 },
-  card: { flex: 1, backgroundColor: "#FFF", borderTopLeftRadius: 22, borderTopRightRadius: 22, overflow: "hidden" },
-  scroll: { paddingHorizontal: 22, paddingTop: 18, paddingBottom: 30 },
-  titulo: { fontSize: 20, fontWeight: "900", color: "#000", textAlign: "center" },
-  subtitulo: { fontSize: 12, color: "#666", textAlign: "center", marginTop: 8, marginBottom: 20 },
+  card: { flex: 1, backgroundColor: "#FFF", borderTopLeftRadius: 22, borderTopRightRadius: 22 },
+  scroll: { paddingHorizontal: 22, paddingTop: 14, paddingBottom: 30 },
+  topoCard: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  botaoVoltar: { width: 38, height: 38, borderRadius: 19, alignItems: "center", justifyContent: "center" },
+  tituloCentro: { alignItems: "center" },
+  titulo: { fontSize: 19, fontWeight: "900", color: "#000", textAlign: "center" },
+  subtitulo: { fontSize: 12, color: "#666", textAlign: "center", marginTop: 10, marginBottom: 20 },
   label: { fontSize: 12, fontWeight: "700", color: "#000", marginBottom: 6, marginTop: 14 },
   inputBox: {
     flexDirection: "row",
@@ -142,10 +151,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     height: 46,
     backgroundColor: "#fff",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
     elevation: 4,
   },
   input: { flex: 1, fontSize: 14, color: "#000" },

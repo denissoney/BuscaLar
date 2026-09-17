@@ -11,13 +11,11 @@ const MENSAL = [
   { id: "2", titulo: "Casa com Piscina", preco: "R$ 1.300/mês", local: "Ponta Verde, Maceió", img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600" },
   { id: "3", titulo: "Casa com Piscina", preco: "R$ 1.560/mês", local: "Ponta Verde, Maceió", img: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400" },
 ];
-
 const DIARIAS = [
   { id: "1", titulo: "Apartamento 2 quartos", preco: "R$ 250/Dia", local: "Ponta Verde, Maceió", img: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400" },
   { id: "2", titulo: "Casa com Piscina", preco: "R$ 600/Dia", local: "Ponta Verde, Maceió", img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600" },
   { id: "3", titulo: "Casa com Piscina", preco: "R$ 450/Dia", local: "Ponta Verde, Maceió", img: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400" },
 ];
-
 export default function Favoritos() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -33,12 +31,7 @@ export default function Favoritos() {
   }
   function abrirMenu() { setMenuVisible(true); }
   function fecharMenu() { setMenuVisible(false); }
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => false,
-      onStartShouldSetPanResponderCapture: () => false,
-      onMoveShouldSetPanResponder: (_, g) => {
+  const panResponder = useRef( PanResponder.create({ onStartShouldSetPanResponder: () => false, onStartShouldSetPanResponderCapture: () => false, onMoveShouldSetPanResponder: (_, g) => {
         if (menuVisible) return false;
         return g.x0 <= 70 && Math.abs(g.dx) > Math.abs(g.dy) * 1.2 && g.dx > 10;
       },
@@ -48,8 +41,7 @@ export default function Favoritos() {
       },
       onPanResponderRelease: (_, g) => { if (g.dx >= 70) abrirMenu(); },
       onPanResponderTerminate: () => {},
-    })
-  ).current;
+    })).current;
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]} {...panResponder.panHandlers}>
@@ -125,13 +117,22 @@ export default function Favoritos() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#1A5CFF" },
+  container: { 
+    flex: 1, 
+    backgroundColor: "#1A5CFF" 
+  },
   topoAzul: { 
     backgroundColor: "#1A5CFF", 
     paddingBottom: -20, 
     justifyContent: "center" 
   },
-  headerAzul: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, paddingVertical: 8 },
+  headerAzul: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    justifyContent: "space-between", 
+    paddingHorizontal: 16, 
+    paddingVertical: 8 
+  },
   btnHamburguer: { 
     width: 32, 
     height: 32, 
@@ -140,27 +141,81 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     paddingBottom: 80, 
   },
-  traco: { height: 2.8, backgroundColor: "#fff", borderRadius: 10 },
+  traco: { 
+    height: 2.8, 
+    backgroundColor: "#fff", 
+    borderRadius: 10 
+  },
   logoImg: { 
     width: 200, 
     height: 100 
   },
-
-  content: { flex: 1, backgroundColor: "#FFF", borderTopLeftRadius: 18, borderTopRightRadius: 18, paddingTop: 8 },
-
-  voltarRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 12, marginTop: 8, marginBottom: 6 },
-  btnVoltarNovo: { width: 32, height: 32, alignItems: "center", justifyContent: "center" },
-  tituloCentro: { flex: 1, alignItems: "center", justifyContent: "center" },
-  titulo: { fontSize: 17, fontWeight: "800", color: "#000", textAlign: "center" },
-
-  abasContainer: { flexDirection: "row", marginHorizontal: 12, marginTop: 12, backgroundColor: "#E9E9E9", borderRadius: 12, padding: 4 },
-  aba: { flex: 1, height: 36, borderRadius: 10, alignItems: "center", justifyContent: "center" },
-  abaAtiva: { backgroundColor: "#1A5CFF" },
-  abaTexto: { fontSize: 14, fontWeight: "600", color: "#000" },
-  abaTextoAtivo: { color: "#FFF", fontWeight: "700" },
-
-  sombra: { elevation: 3, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.12, shadowRadius: 3 },
-
+  content: { 
+    flex: 1, 
+    backgroundColor: "#FFF", 
+    borderTopLeftRadius: 18, 
+    borderTopRightRadius: 18, 
+    paddingTop: 8 
+  },
+  voltarRow: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    justifyContent: "space-between", 
+    paddingHorizontal: 12, 
+    marginTop: 8, 
+    marginBottom: 6 
+  },
+  btnVoltarNovo: { 
+    width: 32, 
+    height: 32, 
+    alignItems: "center", 
+    justifyContent: "center" 
+  },
+  tituloCentro: { 
+    flex: 1, 
+    alignItems: "center", 
+    justifyContent: "center" 
+  },
+  titulo: { 
+    fontSize: 17, 
+    fontWeight: "800", 
+    color: "#000", 
+    textAlign: "center" 
+  },
+  abasContainer: { 
+    flexDirection: "row", 
+    marginHorizontal: 12, 
+    marginTop: 12, 
+    backgroundColor: "#E9E9E9", 
+    borderRadius: 12, 
+    padding: 4 
+  },
+  aba: { 
+    flex: 1,
+    height: 36, 
+    borderRadius: 10, 
+    alignItems: "center", 
+    justifyContent: "center" 
+  },
+  abaAtiva: { 
+    backgroundColor: "#1A5CFF" 
+  },
+  abaTexto: { 
+    fontSize: 14, 
+    fontWeight: "600", 
+    color: "#000" 
+  },
+  abaTextoAtivo: { 
+    color: "#FFF", 
+    fontWeight: "700" 
+  },
+  sombra: { 
+    elevation: 3, 
+    shadowColor: "#000", 
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.12, 
+    shadowRadius: 3 
+  },
   card: {
     flexDirection: "row",
     marginHorizontal: 12,
@@ -172,15 +227,64 @@ const styles = StyleSheet.create({
     padding: 8,
     alignItems: "center",
   },
-  cardImg: { width: 85, height: 75, borderRadius: 8 },
-  cardInfo: { flex: 1, marginLeft: 10, gap: 2, paddingRight: 30 },
-  cardTitulo: { fontSize: 13, fontWeight: "700", color: "#000" },
-  cardPreco: { fontSize: 14, fontWeight: "800", color: "#FF8C00" },
-  cardLocalRow: { flexDirection: "row", alignItems: "center", gap: 3, marginTop: 2 },
-  cardLocal: { fontSize: 10, color: "#333" },
-  btnHeart: { width: 36, height: 36, borderRadius: 18, backgroundColor: "#FFF", alignItems: "center", justifyContent: "center", position: "absolute", top: 6, right: 6 },
-
-  vazio: { alignItems: "center", justifyContent: "center", paddingHorizontal: 30, paddingTop: 80 },
-  vazioTitulo: { fontSize: 16, fontWeight: "700", color: "#333", marginTop: 12 },
-  vazioTexto: { fontSize: 12, color: "#888", textAlign: "center", marginTop: 6 },
+  cardImg: { 
+    width: 85, 
+    height: 75, 
+    borderRadius: 8 
+  },
+  cardInfo: { 
+    flex: 1, 
+    marginLeft: 10, 
+    gap: 2, 
+    paddingRight: 30 
+  },
+  cardTitulo: { 
+    fontSize: 13, 
+    fontWeight: "700", 
+    color: "#000" 
+  },
+  cardPreco: { 
+    fontSize: 14, 
+    fontWeight: "800", 
+    color: "#FF8C00" 
+  },
+  cardLocalRow: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    gap: 3, 
+    marginTop: 2 
+  },
+  cardLocal: { 
+    fontSize: 10, 
+    color: "#333" 
+  },
+  btnHeart: { 
+    width: 36, 
+    height: 36, 
+    borderRadius: 18, 
+    backgroundColor: "#FFF", 
+    alignItems: "center", 
+    justifyContent: "center", 
+    position: "absolute", 
+    top: 6, 
+    right: 6 
+  },
+  vazio: { 
+    alignItems: "center", 
+    justifyContent: "center", 
+    paddingHorizontal: 30, 
+    paddingTop: 80 
+  },
+  vazioTitulo: { 
+    fontSize: 16, 
+    fontWeight: "700", 
+    color: "#333", 
+    marginTop: 12 
+  },
+  vazioTexto: { 
+    fontSize: 12, 
+    color: "#888", 
+    textAlign: "center", 
+    marginTop: 6 
+  },
 });

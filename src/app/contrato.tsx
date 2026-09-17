@@ -1,15 +1,16 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Modal, Pressable, PanResponder, Animated, Image } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Modal, Pressable, PanResponder, Animated, Image, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import MenuDrawer from "./componets/MenuDrawer";
+
 export default function Contrato() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [menuAberto, setMenuAberto] = useState(false);
   const [aceito, setAceito] = useState(true);
   const slideAnim = useRef(new Animated.Value(-300)).current;
+
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: (e, g) => e.nativeEvent.pageX < 30 && g.dx > 50 && Math.abs(g.dy) < 40,
@@ -21,6 +22,21 @@ export default function Contrato() {
     Animated.timing(slideAnim, { toValue: menuAberto? 0 : -300, duration: 260, useNativeDriver: true }).start();
   }, [menuAberto]);
 
+  const irPara = (rota: string) => {
+    setMenuAberto(false);
+    setTimeout(() => router.push(rota as any), 260);
+  };
+
+  const handleAssinar = () => {
+    Alert.alert(
+      "Contrato assinado!",
+      "Seu contrato foi assinado com sucesso e já foi enviado automaticamente para o proprietário.",
+      [
+        { text: "OK", onPress: () => router.push("/(tabs)" as any) }
+      ]
+    );
+  };
+
   return (
     <View style={[styles.container, { paddingTop: insets.top }]} {...panResponder.panHandlers}>
       <View style={styles.topoAzul}>
@@ -30,26 +46,22 @@ export default function Contrato() {
             <View style={[styles.traco, { width: 12 }]} />
             <View style={[styles.traco, { width: 8 }]} />
           </TouchableOpacity>
-          <View style={styles.logoRow}>
-            <View style={styles.iconCasa}>
-              <Ionicons name="home" size={24} color="#000" />
-              <View style={styles.lupa}><Ionicons name="search" size={10} color="#fff" /></View>
-            </View>
-            <View>
-              <Text style={styles.logoAluguel}>ALUGUEL</Text>
-              <Text style={styles.logoBuscalar}>BUSCALAR</Text>
-              <Text style={styles.logoSub}>ENCONTRE SEU NOVO LAR</Text>
-            </View>
-          </View>
+          <Image source={require("../../assets/images/BuscaLar-preto.png")} style={styles.logoImg} resizeMode="contain" />
           <View style={{ width: 24 }} />
         </View>
       </View>
 
       <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
-        <Text style={styles.titulo}>Assinar Contrato de Aluguel</Text>
+        <View style={styles.tituloRow}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.botaoVoltar}>
+            <Ionicons name="arrow-back" size={22} color="#000" />
+          </TouchableOpacity>
+          <Text style={[styles.titulo, { flex: 1, textAlign: "center" }]}>Assinar Contrato de Aluguel</Text>
+          <View style={{ width: 38 }} />
+        </View>
+
         <Text style={styles.subtitulo}>Revise e assine o contrato para finalizar o aluguel!</Text>
 
-        {/* CARD IMÓVEL */}
         <View style={styles.cardImovel}>
           <Image source={{ uri: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=300" }} style={styles.imgImovel} />
           <View style={{ flex: 1, paddingLeft: 10 }}>
@@ -59,7 +71,6 @@ export default function Contrato() {
           </View>
         </View>
 
-        {/* CLÁUSULAS */}
         <View style={styles.tituloSecaoRow}>
           <Ionicons name="document-text-outline" size={16} color="#1A5CFF" />
           <Text style={styles.tituloSecao}>Cláusulas do contrato</Text>
@@ -102,7 +113,7 @@ export default function Contrato() {
           <Text style={styles.checkText}>Aceito os termos e concordo com as cláusulas do contrato</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.btnLaranja,!aceito && { opacity: 0.6 }]} disabled={!aceito}>
+        <TouchableOpacity style={[styles.btnLaranja,!aceito && { opacity: 0.6 }]} disabled={!aceito} onPress={handleAssinar}>
           <Ionicons name="shield-checkmark" size={16} color="#fff" />
           <Text style={styles.btnLaranjaTxt}>Assinar com certificado digital</Text>
         </TouchableOpacity>
@@ -116,20 +127,33 @@ export default function Contrato() {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* MENU */}
       <Modal visible={menuAberto} transparent animationType="fade" onRequestClose={() => setMenuAberto(false)}>
         <View style={styles.menuOverlay}>
           <Animated.View style={[styles.menu, { transform: [{ translateX: slideAnim }], paddingTop: insets.top + 10 }]}>
-            <View style={styles.menuTopo}>
-              <View style={styles.menuAvatar}><Text style={styles.menuLetra}>D</Text></View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.menuNome}>Davi Miguel</Text>
-                <Text style={styles.menuEmail}>davi.miguel@gmail.com</Text>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <View style={styles.menuTopo}>
+                <View style={styles.menuAvatar}><Text style={styles.menuLetra}>D</Text></View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.menuNome}>Davi Miguel</Text>
+                  <Text style={styles.menuEmail}>davi.miguel@gmail.com</Text>
+                </View>
+                <TouchableOpacity onPress={() => setMenuAberto(false)} style={styles.menuClose}>
+                  <Ionicons name="close" size={22} color="#000" />
+                </TouchableOpacity>
               </View>
-            </View>
-            <TouchableOpacity style={styles.menuItem} onPress={() => { setMenuAberto(false); router.push("/(tabs)" as any); }}><Ionicons name="home" size={20} color="#000" /><Text style={styles.menuTxt}>Início</Text></TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem}><Ionicons name="document-text" size={20} color="#1A5CFF" /><Text style={[styles.menuTxt, { color: "#1A5CFF" }]}>Contrato</Text></TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem}><Ionicons name="exit-outline" size={20} color="#E53935" /><Text style={[styles.menuTxt, { color: "#E53935" }]}>Sair</Text></TouchableOpacity>
+              <View style={styles.divisor} />
+
+              <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/(tabs)/index")}><Ionicons name="home" size={22} color="#000" /><Text style={styles.menuTxt}>Inicio</Text></TouchableOpacity><View style={styles.linha} />
+              <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/filtro")}><Ionicons name="location" size={22} color="#000" /><Text style={styles.menuTxt}>Filtro</Text></TouchableOpacity><View style={styles.linha} />
+              <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/(tabs)/favoritos")}><Ionicons name="heart-outline" size={22} color="#000" /><Text style={styles.menuTxt}>Favorito</Text></TouchableOpacity><View style={styles.linha} />
+              <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/(tabs)/agendamento")}><Ionicons name="calendar" size={22} color="#000" /><Text style={styles.menuTxt}>Agendamentos</Text></TouchableOpacity><View style={styles.linha} />
+              <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/pagamentos")}><Ionicons name="card" size={22} color="#000" /><Text style={styles.menuTxt}>Pagamentos</Text></TouchableOpacity><View style={styles.linha} />
+              <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/contrato")}><Ionicons name="document-text" size={22} color="#1A5CFF" /><Text style={[styles.menuTxt, { color: "#1A5CFF" }]}>Contrato</Text></TouchableOpacity><View style={styles.linha} />
+              <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/perfil-proprietario")}><Ionicons name="person" size={22} color="#000" /><Text style={styles.menuTxt}>Perfil</Text></TouchableOpacity><View style={styles.linha} />
+              <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/imoveis")}><Ionicons name="home-outline" size={22} color="#000" /><Text style={styles.menuTxt}>Casas</Text></TouchableOpacity><View style={styles.linha} />
+              <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/configuracoes")}><Ionicons name="settings" size={22} color="#000" /><Text style={styles.menuTxt}>Configurações</Text></TouchableOpacity><View style={styles.linha} />
+              <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/login")}><Ionicons name="exit-outline" size={22} color="#E53935" /><Text style={[styles.menuTxt, { color: "#E53935" }]}>Sair</Text></TouchableOpacity>
+            </ScrollView>
           </Animated.View>
           <Pressable style={styles.menuFundo} onPress={() => setMenuAberto(false)} />
         </View>
@@ -139,66 +163,88 @@ export default function Contrato() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#1A5CFF" },
-  topoAzul: { backgroundColor: "#1A5CFF", paddingBottom: 12 },
-  topoLinha: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 14, paddingTop: 6 },
-  hamburguer: { width: 30, height: 30, justifyContent: "center", gap: 4 },
+  container: { 
+    flex: 1, 
+    backgroundColor: "#448aff" 
+  },
+  topoAzul: { 
+    backgroundColor: "#448aff", 
+    paddingBottom: 12 
+  },
+  topoLinha: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    justifyContent: "space-between", 
+    paddingHorizontal: 14, 
+    paddingTop: 6 
+  },
+  hamburguer: { 
+    width: 30, 
+    height: 30, 
+    justifyContent: "center", 
+    gap: 4,
+    marginBottom: 60, 
+  },
   traco: { height: 2.5, backgroundColor: "#fff", borderRadius: 2 },
-  logoRow: { flexDirection: "row", alignItems: "center", gap: 8 },
-  iconCasa: { width: 36, height: 36, backgroundColor: "#fff", borderRadius: 6, alignItems: "center", justifyContent: "center" },
-  lupa: { position: "absolute", bottom: -3, right: -5, backgroundColor: "#FF8C00", width: 14, height: 14, borderRadius: 7, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "#fff" },
-  logoAluguel: { color: "#000", fontSize: 9, fontWeight: "bold", lineHeight: 9 },
-  logoBuscalar: { color: "#000", fontSize: 16, fontWeight: "900", lineHeight: 16 },
-  logoSub: { color: "#000", fontSize: 6, fontWeight: "600" },
-
+  logoImg: { width: 200, height: 70, marginTop: -2 },
   content: { flex: 1, backgroundColor: "#fff", borderTopLeftRadius: 18, borderTopRightRadius: 18, paddingHorizontal: 14, paddingTop: 14 },
-  titulo: { fontSize: 17, fontWeight: "800", textAlign: "center", color: "#000" },
+  tituloRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 4 },
+  botaoVoltar: { width: 38, height: 38, borderRadius: 19, alignItems: "center", justifyContent: "center" },
+  titulo: { fontSize: 17, fontWeight: "800", color: "#000" },
   subtitulo: { fontSize: 11, textAlign: "center", color: "#555", marginTop: 2, marginBottom: 12 },
-
-  cardImovel: { flexDirection: "row", borderWidth: 1, borderColor: "#DDD", borderRadius: 10, padding: 6, alignItems: "center" },
+  cardImovel: {
+    flexDirection: "row",
+    borderWidth: 1.5,
+    borderColor: "#000",
+    borderRadius: 12,
+    padding: 8,
+    alignItems: "center",
+    backgroundColor: "#FFF",
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+  },
   imgImovel: { width: 68, height: 68, borderRadius: 8 },
   cidade: { fontSize: 12, fontWeight: "700", color: "#000" },
   desc: { fontSize: 10, color: "#555", marginTop: 2, lineHeight: 12 },
   precoBadge: { backgroundColor: "#FF8C00", alignSelf: "flex-start", paddingHorizontal: 10, paddingVertical: 2, borderRadius: 10, marginTop: 4 },
   precoTxt: { color: "#fff", fontSize: 10, fontWeight: "700" },
-
   tituloSecaoRow: { flexDirection: "row", alignItems: "center", gap: 6, justifyContent: "center", marginTop: 14, marginBottom: 8 },
   tituloSecao: { fontSize: 13, fontWeight: "800", color: "#000" },
   clausula: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 8 },
   num: { width: 18, height: 18, borderRadius: 9, backgroundColor: "#1A5CFF", alignItems: "center", justifyContent: "center" },
   numTxt: { color: "#fff", fontSize: 10, fontWeight: "700" },
   clausulaTxt: { fontSize: 11, color: "#222", flex: 1 },
-
   cardParte: { flexDirection: "row", alignItems: "center", gap: 10, borderWidth: 1, borderColor: "#DDD", borderRadius: 10, padding: 10, marginTop: 8 },
   iconPessoa: { width: 28, height: 28, borderRadius: 14, borderWidth: 1.5, borderColor: "#000", alignItems: "center", justifyContent: "center" },
   avatarProp: { width: 26, height: 26, borderRadius: 13 },
   parteNome: { fontSize: 11, fontWeight: "700", color: "#000" },
   parteInfo: { fontSize: 9, color: "#555", marginTop: 1 },
-
   assinaturaBox: { borderWidth: 1, borderColor: "#AAA", borderStyle: "dashed", borderRadius: 10, height: 70, alignItems: "center", justifyContent: "center", marginTop: 10 },
   assinaturaNome: { fontSize: 22, fontFamily: "serif", fontStyle: "italic", color: "#444" },
   assinaturaLegenda: { fontSize: 9, color: "#777", marginTop: 2 },
-
   checkRow: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 14 },
   checkBox: { width: 14, height: 14, borderWidth: 1, borderColor: "#999", borderRadius: 2, alignItems: "center", justifyContent: "center" },
   checkBoxAtivo: { backgroundColor: "#1A5CFF", borderColor: "#1A5CFF" },
   checkText: { fontSize: 9, color: "#000", flex: 1 },
-
   btnLaranja: { backgroundColor: "#FF8C00", height: 40, borderRadius: 10, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 12 },
   btnLaranjaTxt: { color: "#fff", fontWeight: "700", fontSize: 12 },
-
   seguroRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4, marginTop: 8 },
   seguroTxt: { fontSize: 8, color: "#555" },
   baixarTxt: { fontSize: 10, color: "#1A5CFF", textDecorationLine: "underline" },
-
   menuOverlay: { flex: 1, flexDirection: "row", backgroundColor: "rgba(0,0,0,0.45)" },
-  menu: { width: 280, backgroundColor: "#fff", height: "100%", paddingHorizontal: 16 },
-  menuTopo: { flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: "#EEE", marginBottom: 8 },
-  menuAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: "#FF8C00", alignItems: "center", justifyContent: "center" },
-  menuLetra: { color: "#fff", fontWeight: "bold" },
+  menu: { width: 300, backgroundColor: "#fff", height: "100%", paddingHorizontal: 20, borderTopRightRadius: 20, borderBottomRightRadius: 20 },
+  menuTopo: { flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 14 },
+  menuAvatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: "#FF8C00", alignItems: "center", justifyContent: "center" },
+  menuLetra: { color: "#fff", fontWeight: "bold", fontSize: 16 },
   menuNome: { fontSize: 14, fontWeight: "700", color: "#000" },
   menuEmail: { fontSize: 10, color: "#777" },
+  menuClose: { width: 32, height: 32, borderRadius: 16, backgroundColor: "#F2F2F2", alignItems: "center", justifyContent: "center" },
+  divisor: { height: 1, backgroundColor: "#EEE", marginVertical: 10 },
+  linha: { height: 0.8, backgroundColor: "#EEE", marginHorizontal: 4 },
   menuItem: { flexDirection: "row", alignItems: "center", gap: 14, paddingVertical: 13 },
-  menuTxt: { fontSize: 13, color: "#000" },
+  menuTxt: { fontSize: 14, fontWeight: "500", color: "#000" },
   menuFundo: { flex: 1 },
 });
