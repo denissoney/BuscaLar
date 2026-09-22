@@ -1,84 +1,58 @@
 import React, { useState, useRef, useEffect } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Modal,
-  Pressable,
-  PanResponder,
-  Animated,
-  Image,
-  Alert,
-  Clipboard,
-  Share,
-} from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Modal, Pressable, PanResponder, Animated, Image, Alert, Clipboard, Share, TextInput,} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
 export default function Pagamentos() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [menuAberto, setMenuAberto] = useState(false);
+  const [abaAtiva, setAbaAtiva] = useState<"pix" | "cartao">("pix");
   const slideAnim = useRef(new Animated.Value(-300)).current;
-
   const [tempo, setTempo] = useState(900);
   const [pago, setPago] = useState(false);
   const [expirado, setExpirado] = useState(false);
-  const chavePix =
-    "00020126580014BR.GOV.BCB.PIX0136a7c9e123-4b5a-9c8d-1e2f3a4b5c6d5204000053039865405120.005802BR5913BUSCALARLTDA6009MACEIO62070503***6304A1F2";
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: (e, g) =>
-        e.nativeEvent.pageX < 30 && g.dx > 50 && Math.abs(g.dy) < 40,
-      onPanResponderRelease: () => setMenuAberto(true),
-    })
-  ).current;
-
-  useEffect(() => {
-    Animated.timing(slideAnim, {
-      toValue: menuAberto? 0 : -300,
-      duration: 260,
-      useNativeDriver: true,
-    }).start();
-  }, [menuAberto]);
-
+  const [numeroCartao, setNumeroCartao] = useState("");
+  const [nomeCartao, setNomeCartao] = useState("");
+  const [validadeCartao, setValidadeCartao] = useState("");
+  const [cvvCartao, setCvvCartao] = useState("");
+  const [foco, setFoco] = useState<"numero" | "nome" | "validade" | "cvv" | null>(null);
+  const chavePix = "00020126580014BR.GOV.BCB.PIX0136a7c9e123-4b5a-9c8d-1e2f3a4b5c6d5204000053039865405120.005802BR5913BUSCALARLTDA6009MACEIO62070503***6304A1F2";
+  const panResponder = useRef( PanResponder.create({ onMoveShouldSetPanResponder: (e, g) => e.nativeEvent.pageX < 30 && g.dx > 50 && Math.abs(g.dy) < 40, onPanResponderRelease: () => setMenuAberto(true),})).current;
+  useEffect(() => { Animated.timing(slideAnim, { toValue: menuAberto? 0 : -300, duration: 260, useNativeDriver: true,}).start();}, [menuAberto]);
   useEffect(() => {
     let interval: any;
-    if (tempo > 0 &&!pago &&!expirado) {
-      interval = setInterval(() => setTempo((p) => p - 1), 1000);
-    }
+    if (tempo > 0 &&!pago &&!expirado) { interval = setInterval(() => setTempo((p) => p - 1), 1000);}
     if (tempo === 0) setExpirado(true);
     return () => clearInterval(interval);
   }, [tempo, pago, expirado]);
-
   const irPara = (rota: string) => {
     setMenuAberto(false);
-    setTimeout(() => router.push(rota as any), 260);
-  };
-
+    setTimeout(() => {
+      if (rota === "/" || rota === "inicio") { router.push("/" as any);
+      } else { router.push(rota as any);}}, 150);};
   const copiarChave = () => {
     Clipboard.setString(chavePix);
     Alert.alert("Copiado!", "Chave PIX copiada");
     setTimeout(() => setPago(true), 1000);
   };
-
   const compartilhar = async () => {
-    await Share.share({
-      message: `Pagamento Confirmado - BuscaLar Imobiliária\nValor: R$ 1.000,00\nID: PIX123456789203\nData: 14/08/2026 - 15:42\nDescrição: Locação - Agosto 2026`,
-    });
+    await Share.share({ message: `Pagamento Confirmado - BuscaLar Imobiliária\nValor: R$ 1.000,00\nID: PIX123456789203\nData: 14/08/2026 - 15:42\nDescrição: Locação - Agosto 2026`,});
   };
-
   const formatarTempo = () => {
     const m = Math.floor(tempo / 60);
     const s = tempo % 60;
     return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
   };
-
-  // TELA DE COMPROVANTE IDÊNTICA A FOTO
+  const formatarNumero = (text: string) => {
+    const clean = text.replace(/\D/g, "").slice(0, 16);
+    const formatted = clean.replace(/(.{4})/g, "$1 ").trim(); setNumeroCartao(formatted);
+  };
+  const formatarValidade = (text: string) => {
+    const clean = text.replace(/\D/g, "").slice(0, 4);
+    if (clean.length >= 3) { setValidadeCartao(clean.slice(0, 2) + "/" + clean.slice(2));
+    } else { setValidadeCartao(clean);}
+  };
   if (pago) {
     return (
       <View style={[styles.container, { paddingTop: insets.top }]} {...panResponder.panHandlers}>
@@ -88,11 +62,7 @@ export default function Pagamentos() {
             <View style={[styles.traco, { width: 12 }]} />
             <View style={[styles.traco, { width: 8 }]} />
           </TouchableOpacity>
-          <Image
-            source={require("../../assets/images/BuscaLar-preto.png")}
-            style={{ width: 180, height: 60 }}
-            resizeMode="contain"
-          />
+          <Image source={require("../../assets/images/BuscaLar-preto.png")} style={{ width: 180, height: 60 }} resizeMode="contain"/>
           <View style={{ width: 30 }} />
         </View>
 
@@ -114,45 +84,30 @@ export default function Pagamentos() {
                 <Ionicons name="receipt" size={18} color="#000" />
                 <Text style={styles.detalhesTitle}>Detalhes do pagamento</Text>
               </View>
-
               <View style={styles.detalhesRow}>
                 <Text style={styles.detalhesLabel}>Destinatário</Text>
                 <Text style={styles.detalhesValorBold}>BuscaLar Imobiliária</Text>
               </View>
-
               <View style={styles.detalhesRow}>
                 <Text style={styles.detalhesLabel}>Método</Text>
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-                  <Text style={styles.detalhesValorBold}>Pix</Text>
-                  <Text style={{ fontSize: 10, color: "#00BFBF" }}>◆ pix</Text>
-                </View>
+                <Text style={styles.detalhesValorBold}>{abaAtiva === "pix"? "Pix" : "Cartão"}</Text>
               </View>
-
               <View style={styles.detalhesRow}>
                 <Text style={styles.detalhesLabel}>ID da transação</Text>
                 <Text style={styles.detalhesValorBold}>PIX123456789203</Text>
               </View>
-
               <View style={styles.detalhesRow}>
                 <Text style={styles.detalhesLabel}>Data e hora</Text>
                 <Text style={styles.detalhesValorBold}>14/08/2026 - 15:42</Text>
               </View>
             </View>
 
-            <View style={styles.descricaoBox}>
-              <Text style={styles.detalhesLabel}>Descrição</Text>
-              <Text style={styles.detalhesValorBold}>Locação - Agosto 2026</Text>
-            </View>
-
             <TouchableOpacity style={styles.btnCompartilhar} onPress={compartilhar}>
               <Text style={styles.btnCompartilharTxt}>Compartilhar comprovante</Text>
             </TouchableOpacity>
-
-            <TouchableOpacity style={styles.btnVoltarBranco} onPress={() => router.push("/(tabs)" as any)}>
+            <TouchableOpacity style={styles.btnVoltarBranco} onPress={() => irPara("/")}>
               <Text style={styles.btnVoltarBrancoTxt}>Voltar ao inicio</Text>
             </TouchableOpacity>
-
-            <Text style={styles.rodape}>Guarde este recibo para seus registros</Text>
           </ScrollView>
         </View>
 
@@ -171,7 +126,7 @@ export default function Pagamentos() {
                   </TouchableOpacity>
                 </View>
                 <View style={styles.divisor} />
-                <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/(tabs)/index")}><Ionicons name="home" size={22} color="#000" /><Text style={styles.menuTxt}>Inicio</Text></TouchableOpacity><View style={styles.linha} />
+                <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/")}><Ionicons name="home" size={22} color="#000" /><Text style={styles.menuTxt}>Inicio</Text></TouchableOpacity><View style={styles.linha} />
                 <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/filtro")}><Ionicons name="location" size={22} color="#000" /><Text style={styles.menuTxt}>Filtro</Text></TouchableOpacity><View style={styles.linha} />
                 <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/(tabs)/favoritos")}><Ionicons name="heart-outline" size={22} color="#000" /><Text style={styles.menuTxt}>Favorito</Text></TouchableOpacity><View style={styles.linha} />
                 <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/(tabs)/agendamento")}><Ionicons name="calendar" size={22} color="#000" /><Text style={styles.menuTxt}>Agendamentos</Text></TouchableOpacity><View style={styles.linha} />
@@ -210,26 +165,108 @@ export default function Pagamentos() {
           <Ionicons name="arrow-back" size={22} color="#000" />
         </TouchableOpacity>
 
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ alignItems: "center", paddingBottom: 20, width: "100%" }}>
-          <View style={styles.tabsContainer}>
-            <View style={[styles.tab, styles.tabAtiva]}><Text style={[styles.tabText, styles.tabTextAtiva]}>Pix</Text></View>
-            <TouchableOpacity style={styles.tab}><Text style={styles.tabText}>Cartão</Text></TouchableOpacity>
-          </View>
-          <TouchableOpacity style={styles.btnQrTopo}><Text style={styles.btnQrTopoText}>Pagar com QR CODE</Text></TouchableOpacity>
-          <View style={styles.qrWrapper}>
-            <Image source={{ uri: `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${chavePix}` }} style={styles.qrImage} />
-          </View>
-          <Text style={styles.ouCopie}>Ou copie o codigo pix:</Text>
-          <View style={styles.codigoBox}>
-            <Text style={styles.codigoTexto} numberOfLines={3}>{chavePix}</Text>
-            <TouchableOpacity onPress={copiarChave}><Ionicons name="copy-outline" size={18} color="#000" /></TouchableOpacity>
-          </View>
-          <Text style={styles.instrucao}>Aponte a câmera do seu banco para o QR Code</Text>
-          <Text style={styles.validade}>O código é válido por {expirado? "00:00 expirado" : formatarTempo() + " minutos"}</Text>
-          <TouchableOpacity style={styles.btnCopiarLaranja} onPress={copiarChave}>
-            <Ionicons name="copy-outline" size={18} color="#fff" />
-            <Text style={styles.btnCopiarLaranjaText}>Copiar chave pix</Text>
+        <View style={styles.tabsContainer}>
+          <TouchableOpacity style={[styles.tab, abaAtiva === "pix" && styles.tabAtiva]} onPress={() => setAbaAtiva("pix")}>
+            <Text style={[styles.tabText, abaAtiva === "pix" && styles.tabTextAtiva]}>Pix</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={[styles.tab, abaAtiva === "cartao" && styles.tabAtiva]} onPress={() => setAbaAtiva("cartao")}>
+            <Text style={[styles.tabText, abaAtiva === "cartao" && styles.tabTextAtiva]}>Cartão</Text>
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ alignItems: "center", paddingBottom: 20, width: "100%" }}>
+          {abaAtiva === "pix"? (
+            <>
+              <TouchableOpacity style={styles.btnQrTopo}><Text style={styles.btnQrTopoText}>Pagar com QR CODE</Text></TouchableOpacity>
+              <View style={styles.qrWrapper}>
+                <Image source={{ uri: `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${chavePix}` }} style={styles.qrImage} />
+              </View>
+              <Text style={styles.ouCopie}>Ou copie o codigo pix:</Text>
+              <View style={styles.codigoBox}>
+                <Text style={styles.codigoTexto} numberOfLines={3}>{chavePix}</Text>
+                <TouchableOpacity onPress={copiarChave}><Ionicons name="copy-outline" size={18} color="#000" /></TouchableOpacity>
+              </View>
+              <Text style={styles.instrucao}>Aponte a câmera do seu banco para o QR Code</Text>
+              <Text style={styles.validade}>O código é válido por {expirado? "00:00 expirado" : formatarTempo() + " minutos"}</Text>
+              <TouchableOpacity style={styles.btnCopiarLaranja} onPress={copiarChave}>
+                <Ionicons name="copy-outline" size={18} color="#fff" />
+                <Text style={styles.btnCopiarLaranjaText}>Copiar chave pix</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <View style={[styles.cartaoVisual, foco === "cvv" && styles.cartaoVisualVerso]}>
+                {foco === "cvv"? (
+                  <>
+                    <View style={styles.faixaPreta} />
+                    <View style={styles.cvvBox}>
+                      <Text style={styles.cvvLabel}>CVV</Text>
+                      <Text style={styles.cvvValor}>{cvvCartao || "***"}</Text>
+                    </View>
+                  </>
+                ) : (
+                  <>
+                    <View style={styles.cartaoTopo}>
+                      <View style={styles.chip}><View style={styles.chipLinha} /><View style={styles.chipLinha} /></View>
+                      <Ionicons name="wifi" size={22} color="#fff" style={{ transform: [{ rotate: "90deg" }] }} />
+                    </View>
+                    <Text style={[styles.cartaoNumero, foco === "numero" && styles.textoFocado]}>
+                      {numeroCartao || "•••• •••• •••• ••••"}
+                    </Text>
+                    <View style={styles.cartaoRodape}>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.cartaoLabel}>NOME</Text>
+                        <Text style={[styles.cartaoValor, foco === "nome" && styles.textoFocado]} numberOfLines={1}>
+                          {nomeCartao.toUpperCase() || "SEU NOME AQUI"}
+                        </Text>
+                      </View>
+                      <View>
+                        <Text style={styles.cartaoLabel}>VALIDADE</Text>
+                        <Text style={[styles.cartaoValor, foco === "validade" && styles.textoFocado]}>
+                          {validadeCartao || "MM/AA"}
+                        </Text>
+                      </View>
+                      <View style={styles.bandeira}>
+                        <View style={styles.bolaVermelha} />
+                        <View style={styles.bolaLaranja} />
+                      </View>
+                    </View>
+                  </>
+                )}
+              </View>
+
+              <Text style={styles.labelInput}>Número do cartão</Text>
+              <View style={[styles.inputBox, foco === "numero" && styles.inputFocado]}>
+                <Ionicons name="card-outline" size={18} color="#888" />
+                <TextInput placeholder="0000 0000 0000 0000" style={styles.input} keyboardType="numeric" value={numeroCartao} onChangeText={formatarNumero} onFocus={() => setFoco("numero")} onBlur={() => setFoco(null)} />
+              </View>
+
+              <View style={{ flexDirection: "row", gap: 10, width: "100%" }}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.labelInput}>Validade</Text>
+                  <View style={[styles.inputBox, foco === "validade" && styles.inputFocado]}>
+                    <TextInput placeholder="MM/AA" style={styles.input} keyboardType="numeric" value={validadeCartao} onChangeText={formatarValidade} onFocus={() => setFoco("validade")} onBlur={() => setFoco(null)} />
+                  </View>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.labelInput}>CVV</Text>
+                  <View style={[styles.inputBox, foco === "cvv" && styles.inputFocado]}>
+                    <TextInput placeholder="123" style={styles.input} keyboardType="numeric" maxLength={3} value={cvvCartao} onChangeText={setCvvCartao} onFocus={() => setFoco("cvv")} onBlur={() => setFoco(null)} />
+                  </View>
+                </View>
+              </View>
+
+              <Text style={styles.labelInput}>Nome no cartão</Text>
+              <View style={[styles.inputBox, foco === "nome" && styles.inputFocado]}>
+                <Ionicons name="person-outline" size={18} color="#888" />
+                <TextInput placeholder="Nome completo" style={styles.input} autoCapitalize="characters" value={nomeCartao} onChangeText={setNomeCartao} onFocus={() => setFoco("nome")} onBlur={() => setFoco(null)} />
+              </View>
+
+              <TouchableOpacity style={styles.btnCopiarLaranja} onPress={() => setPago(true)}>
+                <Text style={styles.btnCopiarLaranjaText}>Pagar R$ 1.000,00</Text>
+              </TouchableOpacity>
+            </>
+          )}
         </ScrollView>
       </View>
 
@@ -248,7 +285,7 @@ export default function Pagamentos() {
                 </TouchableOpacity>
               </View>
               <View style={styles.divisor} />
-              <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/(tabs)/index")}><Ionicons name="home" size={22} color="#000" /><Text style={styles.menuTxt}>Inicio</Text></TouchableOpacity><View style={styles.linha} />
+              <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/")}><Ionicons name="home" size={22} color="#000" /><Text style={styles.menuTxt}>Inicio</Text></TouchableOpacity><View style={styles.linha} />
               <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/filtro")}><Ionicons name="location" size={22} color="#000" /><Text style={styles.menuTxt}>Filtro</Text></TouchableOpacity><View style={styles.linha} />
               <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/(tabs)/favoritos")}><Ionicons name="heart-outline" size={22} color="#000" /><Text style={styles.menuTxt}>Favorito</Text></TouchableOpacity><View style={styles.linha} />
               <TouchableOpacity style={styles.menuItem} onPress={() => irPara("/(tabs)/agendamento")}><Ionicons name="calendar" size={22} color="#000" /><Text style={styles.menuTxt}>Agendamentos</Text></TouchableOpacity><View style={styles.linha} />
@@ -268,39 +305,324 @@ export default function Pagamentos() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#448aff" },
-  topoAzul: { backgroundColor: "#448aff", flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 14, paddingBottom: 14, paddingTop: 6 },
-  topoAzulComprovante: { backgroundColor: "#4A8AF4", flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 14, paddingBottom: 14, paddingTop: 6 },
+  container: { 
+    flex: 1, 
+    backgroundColor: "#448aff" 
+  },
+  topoAzul: { 
+    backgroundColor: "#448aff", 
+    flexDirection: "row", 
+    alignItems: "center", 
+    justifyContent: "space-between", 
+    paddingHorizontal: 14, 
+    paddingBottom: 14, 
+    paddingTop: 6 
+  },
+  topoAzulComprovante: { 
+    backgroundColor: "#4A8AF4", 
+    flexDirection: "row", 
+    alignItems: "center", 
+    justifyContent: "space-between", 
+    paddingHorizontal: 14, 
+    paddingBottom: 14, 
+    paddingTop: 6 
+  },
   hamburguer: { 
     width: 30, 
     height: 30, 
     justifyContent: "center", 
-    gap: 4,
-    marginBottom: 60, 
+    gap: 4, 
+    marginBottom: 60 
   },
-  traco: { height: 2.5, backgroundColor: "#fff", borderRadius: 2 },
-  tituloAzul: { flexDirection: "row", alignItems: "center", gap: 6 },
-  tituloAzulTxt: { fontSize: 18, fontWeight: "800", color: "#000" },
-  content: { flex: 1, backgroundColor: "#fff", borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 16 },
-  contentComprovante: { flex: 1, backgroundColor: "#fff", borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 20 },
-  btnBackSemBola: { alignSelf: "flex-start", padding: 4, marginBottom: 12 },
-  tabsContainer: { flexDirection: "row", backgroundColor: "#F1F1F1", borderRadius: 20, padding: 4, width: "100%", marginBottom: 12 },
-  tab: { flex: 1, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center" },
-  tabAtiva: { backgroundColor: "#6CA6FF" },
-  tabText: { fontWeight: "600", color: "#000" },
-  tabTextAtiva: { color: "#fff", fontWeight: "800" },
-  btnQrTopo: { borderWidth: 1, borderColor: "#6CA6FF", borderRadius: 18, paddingVertical: 8, paddingHorizontal: 18, marginBottom: 14 },
-  btnQrTopoText: { fontSize: 12, fontWeight: "700", color: "#000" },
-  qrWrapper: { borderWidth: 4, borderColor: "#FF8C00", borderRadius: 18, padding: 8, marginBottom: 14 },
-  qrImage: { width: 200, height: 200, borderRadius: 8 },
-  ouCopie: { fontSize: 12, fontWeight: "700", color: "#000", alignSelf: "flex-start", marginBottom: 6 },
-  codigoBox: { flexDirection: "row", backgroundColor: "#F5F5F5", borderRadius: 8, padding: 10, width: "100%", justifyContent: "space-between", alignItems: "center", borderWidth: 1, borderColor: "#000" },
-  codigoTexto: { fontSize: 10, color: "#333", flex: 1, marginRight: 8 },
-  instrucao: { fontSize: 12, fontWeight: "600", color: "#000", marginTop: 14 },
-  validade: { fontSize: 11, color: "#555", marginTop: 2, marginBottom: 18 },
-  btnCopiarLaranja: { backgroundColor: "#FF8C00", width: "100%", height: 48, borderRadius: 10, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 },
-  btnCopiarLaranjaText: { color: "#fff", fontWeight: "800", fontSize: 14 },
-  checkCard: { backgroundColor: "#fff", borderRadius: 12, padding: 16, alignItems: "center", elevation: 2, shadowColor: "#000", shadowOpacity: 0.1, shadowRadius: 4, marginTop: 10, width: 110 },
+  traco: { 
+    height: 2.5, 
+    backgroundColor: "#fff", 
+    borderRadius: 2 
+  },
+  tituloAzul: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    gap: 6 
+  },
+  tituloAzulTxt: { 
+    fontSize: 18, 
+    fontWeight: "800", 
+    color: "#000" 
+  },
+  content: { 
+    flex: 1,
+    backgroundColor: "#fff", 
+    borderTopLeftRadius: 22, 
+    borderTopRightRadius: 22, 
+    padding: 16 
+  },
+  contentComprovante: { 
+    flex: 1, 
+    backgroundColor: "#fff", 
+    borderTopLeftRadius: 22, 
+    borderTopRightRadius: 22, 
+    padding: 20 
+  },
+  btnBackSemBola: {
+    alignSelf: "flex-start", 
+    padding: 4, 
+    marginBottom: 12 
+  },
+  tabsContainer: { 
+    flexDirection: "row", 
+    backgroundColor: "#F1F1F1", 
+    borderRadius: 20, 
+    padding: 4, 
+    width: "100%", 
+    marginBottom: 12 
+  },
+  tab: { 
+    flex: 1, 
+    height: 36, 
+    borderRadius: 18, 
+    alignItems: "center", 
+    justifyContent: "center" 
+  },
+  tabAtiva: { 
+    backgroundColor: "#6CA6FF" 
+  },
+  tabText: { 
+    fontWeight: "600", 
+    color: "#000" 
+  },
+  tabTextAtiva: { 
+    color: "#fff", 
+    fontWeight: "800" 
+  },
+  btnQrTopo: { 
+    borderWidth: 1, 
+    borderColor: "#6CA6FF", 
+    borderRadius: 18, 
+    paddingVertical: 8, 
+    paddingHorizontal: 18, 
+    marginBottom: 14 
+  },
+  btnQrTopoText: { 
+    fontSize: 12, 
+    fontWeight: "700", 
+    color: "#000" 
+  },
+  qrWrapper: { 
+    borderWidth: 4, 
+    borderColor: "#FF8C00", 
+    borderRadius: 18, 
+    padding: 8, 
+    marginBottom: 14 
+  },
+  qrImage: { 
+    width: 200, 
+    height: 200, 
+    borderRadius: 8 
+  },
+  ouCopie: { 
+    fontSize: 12, 
+    fontWeight: "700", 
+    color: "#000", 
+    alignSelf: "flex-start", 
+    marginBottom: 6 
+  },
+  codigoBox: { 
+    flexDirection: "row", 
+    backgroundColor: "#F5F5F5", 
+    borderRadius: 8, 
+    padding: 10, 
+    width: "100%", 
+    justifyContent: "space-between", 
+    alignItems: "center", 
+    borderWidth: 1, 
+    borderColor: "#000" 
+  },
+  codigoTexto: { 
+    fontSize: 10, 
+    color: "#333", 
+    flex: 1, 
+    marginRight: 8 
+  },
+  instrucao: { 
+    fontSize: 12, 
+    fontWeight: "600", 
+    color: "#000", 
+    marginTop: 14 
+  },
+  validade: { 
+    fontSize: 11, 
+    color: "#555", 
+    marginTop: 2, 
+    marginBottom: 18 
+  },
+  btnCopiarLaranja: { 
+    backgroundColor: "#FF8C00", 
+    width: "100%", 
+    height: 48, 
+    borderRadius: 10, 
+    flexDirection: "row", 
+    alignItems: "center", 
+    justifyContent: "center", 
+    gap: 8, 
+    marginTop: 16 
+  },
+  btnCopiarLaranjaText: { 
+    color: "#fff", 
+    fontWeight: "800", 
+    fontSize: 14 
+  },
+  cartaoVisual: { 
+    width: "100%", 
+    height: 190, 
+    borderRadius: 16, 
+    backgroundColor: "#1A1A2E", 
+    padding: 20, 
+    justifyContent: "space-between", 
+    marginBottom: 20, 
+    elevation: 8, 
+    shadowColor: "#000", 
+    shadowOpacity: 0.3, 
+    shadowRadius: 10
+  },
+  cartaoVisualVerso: { 
+    backgroundColor: "#2D2D44", 
+    justifyContent: "flex-start", 
+    padding: 0, 
+    paddingTop: 20 
+  },
+  faixaPreta: { 
+    width: "100%", 
+    height: 40, 
+    backgroundColor: "#000", 
+    marginBottom: 20 
+  },
+  cvvBox: { 
+    backgroundColor: "#fff", 
+    marginHorizontal: 20, 
+    borderRadius: 6, 
+    padding: 10, 
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    alignItems: "center" 
+  },
+  cvvLabel: { 
+    fontSize: 10, 
+    color: "#888" 
+  },
+  cvvValor: { 
+    fontSize: 16, 
+    fontWeight: "800", 
+    color: "#000", 
+    letterSpacing: 2 
+  },
+  cartaoTopo: { 
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    alignItems: "center" 
+  },
+  chip: { 
+    width: 36, 
+    height: 26, 
+    backgroundColor: "#FFD700", 
+    borderRadius: 4, 
+    padding: 3, 
+    gap: 3 
+  },
+  chipLinha: { 
+    height: 2, 
+    backgroundColor: "#B8960C", 
+    borderRadius: 1 
+  },
+  cartaoNumero: { 
+    fontSize: 20, 
+    fontWeight: "700", 
+    color: "#fff", 
+    letterSpacing: 2, 
+    marginTop: 10 
+  },
+  cartaoRodape: { 
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    alignItems: "flex-end", 
+    marginTop: 10 
+  },
+  cartaoLabel: { 
+    fontSize: 8, 
+    color: "#AAA", 
+    fontWeight: "600", 
+    letterSpacing: 1 
+  },
+  cartaoValor: { 
+    fontSize: 11, 
+    color: "#fff", 
+    fontWeight: "700", 
+    marginTop: 2 
+  },
+  textoFocado: { 
+    color: "#FF8C00" 
+  },
+  bandeira: { 
+    flexDirection: "row", 
+    marginLeft: 10 
+  },
+  bolaVermelha: { 
+    width: 22, 
+    height: 22, 
+    borderRadius: 11, 
+    backgroundColor: "#EB001B", 
+    marginRight: -8, 
+    opacity: 0.9 
+  },
+  bolaLaranja: { 
+    width: 22, 
+    height: 22, 
+    borderRadius: 11, 
+    backgroundColor: "#F79E1B", 
+    opacity: 0.9 
+  },
+  labelInput: { 
+    fontSize: 12, 
+    fontWeight: "600", 
+    color: "#000", 
+    marginTop: 10, 
+    marginBottom: 4, 
+    alignSelf: "flex-start", 
+    width: "100%" 
+  },
+  inputBox: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    backgroundColor: "#F5F5F5", 
+    borderRadius: 10, 
+    borderWidth: 1, 
+    borderColor: "#DDD", 
+    paddingHorizontal: 12, 
+    height: 48, 
+    gap: 8, 
+    width: "100%" 
+  },
+  inputFocado: { 
+    borderColor: "#0B5FFF", 
+    borderWidth: 1.5, 
+    backgroundColor: "#fff" 
+  },
+  input: { 
+    flex: 1, 
+    fontSize: 14, 
+    color: "#000" 
+  },
+  checkCard: { 
+    backgroundColor: "#fff", 
+    borderRadius: 12, 
+    padding: 16, 
+    alignItems: "center", 
+    elevation: 2, 
+    shadowColor: "#000", 
+    shadowOpacity: 0.1, 
+    shadowRadius: 4, 
+    marginTop: 10, 
+    width: 110 
+  },
   checkCirculo: { width: 60, height: 60, borderRadius: 30, backgroundColor: "#4CAF50", alignItems: "center", justifyContent: "center" },
   confirmedText: { fontSize: 10, color: "#888", marginTop: 6 },
   pagamentoConfirmadoTitle: { fontSize: 20, fontWeight: "900", color: "#000", marginTop: 14 },
@@ -317,16 +639,6 @@ const styles = StyleSheet.create({
   btnCompartilharTxt: { color: "#fff", fontWeight: "800", fontSize: 14 },
   btnVoltarBranco: { backgroundColor: "#fff", width: "100%", height: 48, borderRadius: 10, borderWidth: 1.5, borderColor: "#000", alignItems: "center", justifyContent: "center", marginTop: 10 },
   btnVoltarBrancoTxt: { color: "#FF8C00", fontWeight: "800", fontSize: 14 },
-  rodape: { fontSize: 10, color: "#888", marginTop: 10 },
-  comprovante: { backgroundColor: "#fff", borderRadius: 16, padding: 20, alignItems: "center" },
-  tituloPago: { fontSize: 20, fontWeight: "900", color: "#2E7D32", marginTop: 10 },
-  subPago: { fontSize: 12, color: "#555", marginTop: 4, marginBottom: 12 },
-  linhaDiv: { width: "100%", height: 1, backgroundColor: "#EEE", marginVertical: 12 },
-  row: { flexDirection: "row", justifyContent: "space-between", width: "100%", marginBottom: 8 },
-  label: { fontSize: 12, color: "#777" },
-  valor: { fontSize: 12, fontWeight: "700", color: "#000" },
-  btnVoltar: { backgroundColor: "#000", height: 44, borderRadius: 10, width: "100%", alignItems: "center", justifyContent: "center", marginTop: 18 },
-  btnVoltarTxt: { color: "#FFF", fontWeight: "700" },
   menuOverlay: { flex: 1, flexDirection: "row", backgroundColor: "rgba(0,0,0,0.45)" },
   menu: { width: 300, backgroundColor: "#fff", height: "100%", paddingHorizontal: 20, borderTopRightRadius: 20, borderBottomRightRadius: 20 },
   menuTopo: { flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 14 },

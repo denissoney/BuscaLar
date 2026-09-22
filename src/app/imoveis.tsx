@@ -11,6 +11,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import MenuDrawer from "./componets/MenuDrawer";
 
 const IMOVEIS = [
   {
@@ -61,6 +62,7 @@ export default function Imoveis() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const [cidadeFiltro, setCidadeFiltro] = useState("Barra de São Miguel");
+  const [menuAberto, setMenuAberto] = useState(false); // controla o drawer
 
   const imoveisFiltrados = useMemo(() => {
     if (!cidadeFiltro.trim()) return IMOVEIS;
@@ -71,57 +73,35 @@ export default function Imoveis() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      {/* Topo / Header */}
       <View style={styles.topo}>
         <View style={styles.topoLogoRow}>
-          <TouchableOpacity
-            style={styles.hamburgerTopo}
-            onPress={() => router.push("/menu" as any)}
-          >
+          <TouchableOpacity style={styles.hamburgerTopo} onPress={() => setMenuAberto(true)}>
             <View style={[styles.hLine, { width: 18 }]} />
             <View style={[styles.hLine, { width: 12 }]} />
             <View style={[styles.hLine, { width: 7 }]} />
           </TouchableOpacity>
 
-          <Image
-            source={require("../../assets/images/BuscaLar-preto.png")}
-            style={styles.logoTopo}
-            resizeMode="contain"
-          />
+          <Image source={require("/home/usuario/Desktop/BuscaLar/assets/images/BuscaLar-preto.png")} style={styles.logoTopo} resizeMode="contain"/>
           <View style={{ width: 28 }} />
         </View>
 
-        {/* Filtros */}
         <View style={styles.filtrosRow}>
           <View style={styles.filtroLocal}>
             <Ionicons name="location" size={14} color="#000" />
             <View style={{ flex: 1 }}>
               <Text style={styles.filtroLabel}>Filtrar por localização</Text>
-              <TextInput
-                value={cidadeFiltro}
-                onChangeText={setCidadeFiltro}
-                placeholder="Digite a cidade"
-                placeholderTextColor="#999"
-                style={styles.filtroInput}
-              />
+              <TextInput value={cidadeFiltro} onChangeText={setCidadeFiltro} placeholder="Digite a cidade" placeholderTextColor="#999" style={styles.filtroInput}/>
             </View>
           </View>
-          <TouchableOpacity
-            style={styles.btnFiltros}
-            onPress={() => setCidadeFiltro("")}
-          >
+          <TouchableOpacity style={styles.btnFiltros} onPress={() => setCidadeFiltro("")}>
             <Text style={styles.btnFiltrosText}>Limpar</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* Conteúdo Principal */}
       <View style={styles.conteudoBranco}>
         <View style={styles.tituloRowCentro}>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={styles.btnVoltarNovo}
-          >
+          <TouchableOpacity onPress={() => router.back()} style={styles.btnVoltarNovo}>
             <Ionicons name="arrow-back" size={24} color="#000" />
           </TouchableOpacity>
           <View style={styles.tituloCentro}>
@@ -131,55 +111,54 @@ export default function Imoveis() {
           <View style={{ width: 28 }} />
         </View>
 
-        {/* Lista de Imóveis */}
-        <FlatList
-          data={imoveisFiltrados}
-          keyExtractor={(item) => item.id}
-          numColumns={2}
-          columnWrapperStyle={{ gap: 10 }}
-          contentContainerStyle={{
-            paddingHorizontal: 12,
-            paddingBottom: 20,
-            gap: 10,
-          }}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.card}
-              activeOpacity={0.8}
-              onPress={() => {
-                router.push({
-                  pathname: "/detalhe",
-                  params: { id: item.id },
-                } as any);
-              }}
-            >
+        <FlatList data={imoveisFiltrados} keyExtractor={(item) => item.id} numColumns={2} columnWrapperStyle={{ gap: 10 }} contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 20, gap: 10,}} renderItem={({ item }) => (
+            <TouchableOpacity style={styles.card} activeOpacity={0.8} onPress={() => { router.push({ pathname: "/detalhe", params: { id: item.id },} as any);}}>
               <Image source={{ uri: item.img }} style={styles.cardImg} />
               <Text style={styles.cardPreco}>{item.preco}</Text>
               <Text style={styles.cardTitulo}>{item.titulo}</Text>
               <View style={styles.cardLocalRow}>
-                <Ionicons name="location" size={9} color="#FF8C00" />
-                <Text style={styles.cardLocal}>{item.local}</Text>
+              <Ionicons name="location" size={9} color="#FF8C00" />
+              <Text style={styles.cardLocal}>{item.local}</Text>
               </View>
-            </TouchableOpacity>
-          )}
-        />
+            </TouchableOpacity>)}/>
       </View>
+      {/* DRAWER */}
+      <MenuDrawer visible={menuAberto} onClose={() => setMenuAberto(false)} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0B5FFF" },
-  topo: { backgroundColor: "#0B5FFF", paddingHorizontal: 14, paddingBottom: 12 },
+  container: { 
+    flex: 1, 
+    backgroundColor: "#0B5FFF" 
+  },
+  topo: { 
+    backgroundColor: "#0B5FFF", 
+    paddingHorizontal: 14, 
+    paddingBottom: 12 
+  },
   topoLogoRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginTop: 4,
   },
-  logoTopo: { width: 175, height: 42 },
-  hLine: { height: 2.5, backgroundColor: "#fff", borderRadius: 2 },
-  hamburgerTopo: { width: 28, height: 28, justifyContent: "center", gap: 5 },
+  logoTopo: { 
+    width: 175, 
+    height: 42 
+  },
+  hLine: { 
+    height: 2.5, 
+    backgroundColor: "#fff", 
+    borderRadius: 2 
+  },
+  hamburgerTopo: { 
+    width: 28, 
+    height: 28, 
+    justifyContent: "center", 
+    gap: 5 
+  },
   filtrosRow: {
     flexDirection: "row",
     gap: 8,
@@ -196,7 +175,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     gap: 6,
   },
-  filtroLabel: { fontSize: 7, color: "#888" },
+  filtroLabel: { 
+    fontSize: 7, 
+    color: "#888" 
+  },
   filtroInput: {
     fontSize: 11,
     fontWeight: "700",
@@ -212,7 +194,11 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: "center",
   },
-  btnFiltrosText: { color: "#fff", fontSize: 11, fontWeight: "600" },
+  btnFiltrosText: { 
+    color: "#fff", 
+    fontSize: 11, 
+    fontWeight: "600" 
+  },
   conteudoBranco: {
     flex: 1,
     backgroundColor: "#fff",
@@ -234,8 +220,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  tituloCentro: { flex: 1, alignItems: "center" },
-  titulo: { fontSize: 15, fontWeight: "800", color: "#000", textAlign: "center" },
+  tituloCentro: { 
+    flex: 1, 
+    alignItems: "center" 
+  },
+  titulo: { 
+    fontSize: 15, 
+    fontWeight: "800", 
+    color: "#000", 
+    textAlign: "center" 
+  },
   card: {
     flex: 1,
     backgroundColor: "#2A2A2A",
@@ -245,7 +239,10 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     paddingBottom: 8,
   },
-  cardImg: { width: "100%", height: 90 },
+  cardImg: {
+    width: "100%", 
+    height: 90 
+  },
   cardPreco: {
     color: "#FF8C00",
     fontWeight: "800",
@@ -253,7 +250,12 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginLeft: 6,
   },
-  cardTitulo: { fontSize: 10, fontWeight: "600", color: "#fff", marginLeft: 6 },
+  cardTitulo: { 
+    fontSize: 10, 
+    fontWeight: "600", 
+    color: "#fff", 
+    marginLeft: 6 
+  },
   cardLocalRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -261,5 +263,8 @@ const styles = StyleSheet.create({
     marginLeft: 6,
     marginTop: 2,
   },
-  cardLocal: { fontSize: 7, color: "#FF8C00" },
+  cardLocal: { 
+    fontSize: 7, 
+    color: "#FF8C00" 
+  },
 });

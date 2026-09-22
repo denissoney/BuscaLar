@@ -105,7 +105,7 @@ export default function DetalheImovel() {
             <View style={[styles.hLine, { width: 12 }]} />
             <View style={[styles.hLine, { width: 7 }]} />
           </TouchableOpacity>
-          <Image source={require("../assets/images/BuscaLar-preto.png")} style={styles.logoTopo} resizeMode="contain" />
+          <Image source={require("/home/usuario/Desktop/BuscaLar/assets/images/BuscaLar-preto.png")} style={styles.logoTopo} resizeMode="contain" />
           <View style={{ width: 28 }} />
         </View>
       </View>
