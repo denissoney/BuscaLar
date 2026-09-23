@@ -1,23 +1,24 @@
 {
   "expo": {
-    "name": "BuscaLar",
+    "name": "",
     "slug": "BuscaLar",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/logo.png",
-    "scheme": "myapp",
+    "backgroundColor": "#000000",
+    "icon": "/home/usuario/Desktop/BuscaLar/assets/images/logo.png",
+    "scheme": "buscarl",
     "userInterfaceStyle": "dark",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.BuscaLar"
     },
     "android": {
+      "package": "com.anonymous.BuscaLar",
       "adaptiveIcon": {
         "backgroundColor": "#000000",
         "foregroundImage": "./assets/images/logo.png"
       },
-      "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.BuscaLar"
+      "predictiveBackGestureEnabled": false
     },
     "web": {
       "output": "static",
@@ -28,16 +29,14 @@
       [
         "expo-splash-screen",
         {
+          "backgroundColor": "#000000",
           "image": "./assets/images/logo.png",
           "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#000000",
-          "dark": {
-            "image": "./assets/images/logo.png",
-            "backgroundColor": "#000000"
-          }
+          "resizeMode": "contain"
         }
-      ]
+      ],
+      "expo-image",
+      "expo-web-browser"
     ]
   }
 }
