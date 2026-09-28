@@ -120,7 +120,10 @@ export default function AlterarSenha() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#448aff" },
+  container: { 
+    flex: 1, 
+    backgroundColor: "#448aff" 
+  },
   headerAzul: {
     backgroundColor: "#448aff",
     flexDirection: "row",

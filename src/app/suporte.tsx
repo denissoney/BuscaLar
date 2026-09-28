@@ -251,9 +251,12 @@ export default function AjudaSuporte() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#1A5CFF" },
+  container: { 
+    flex: 1, 
+    backgroundColor: "#488aff" 
+  },
   headerAzul: {
-    backgroundColor: "#1A5CFF",
+    backgroundColor: "#488aff",
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",

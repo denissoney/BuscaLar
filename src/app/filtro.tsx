@@ -133,7 +133,10 @@ export default function Filtro() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FFF" },
+  container: { 
+    flex: 1, 
+    backgroundColor: "#FFF" 
+  },
   topo: { paddingHorizontal: 16, paddingTop: 6 },
   hamburguer: { width: 32, height: 32, justifyContent: "center", gap: 5, alignItems: "flex-start" },
   traco: { height: 2.8, backgroundColor: "#000", borderRadius: 10 },

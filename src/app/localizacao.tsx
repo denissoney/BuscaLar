@@ -130,8 +130,15 @@ export default function Localizacao() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#1A5CFF" },
-  topoAzul: { backgroundColor: "#1A5CFF", paddingHorizontal: 12, paddingBottom: 10 },
+  container: { 
+    flex: 1, 
+    backgroundColor: "#488aff" 
+  },
+  topoAzul: { 
+    backgroundColor: "#488aff", 
+    paddingHorizontal: 12, 
+    paddingBottom: 10 
+  },
   topoHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 8 },
   hamburguer: { width: 30, height: 30, justifyContent: "center", gap: 4 },
   traco: { height: 2.5, backgroundColor: "#fff", borderRadius: 2 },

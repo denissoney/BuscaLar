@@ -89,10 +89,10 @@ export default function EditarPerfil() {
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 
-    backgroundColor: "#2F6BFF" 
+    backgroundColor: "#488aff" 
   },
   headerAzul: { 
-    backgroundColor: "#2F6BFF", 
+    backgroundColor: "#488aff", 
     paddingHorizontal: 14, 
     paddingBottom: 10, 
     height: 110 

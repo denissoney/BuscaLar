@@ -131,10 +131,10 @@ export default function Imoveis() {
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 
-    backgroundColor: "#0B5FFF" 
+    backgroundColor: "#488aff" 
   },
   topo: { 
-    backgroundColor: "#0B5FFF", 
+    backgroundColor: "#488aff", 
     paddingHorizontal: 14, 
     paddingBottom: 12 
   },

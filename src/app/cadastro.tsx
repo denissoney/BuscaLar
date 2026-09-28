@@ -90,7 +90,9 @@ export default function Cadastro() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  container: { 
+    flex: 1, 
+    backgroundColor: "#fff" },
   scroll: { padding: 24, alignItems: "center" },
   logo: { width: 220, height: 70, marginTop: 10 },
   titulo: { fontSize: 26, color: "#FF8C00", fontWeight: "400", marginTop: 10, textTransform: "lowercase" },

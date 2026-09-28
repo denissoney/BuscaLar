@@ -1,3 +1,4 @@
+
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState, useEffect } from "react";
@@ -14,7 +15,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import { useTheme } from "../contexts/ThemeContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 export default function Configuracoes() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -28,20 +28,31 @@ export default function Configuracoes() {
   useEffect(() => {
     async function carregarPush() {
       const salvo = await AsyncStorage.getItem("pushAtivo");
+
       if (salvo !== null) {
         setPushAtivo(salvo === "true");
       }
     }
+
     carregarPush();
   }, []);
 
   const togglePush = async (valor: boolean) => {
     setPushAtivo(valor);
+
     await AsyncStorage.setItem("pushAtivo", String(valor));
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top, backgroundColor: headerBg }]}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop: insets.top,
+          backgroundColor: headerBg,
+        },
+      ]}
+    >
       <View style={[styles.headerAzul, { backgroundColor: headerBg }]}>
         <View style={styles.logoRow}>
           <Image
@@ -52,7 +63,14 @@ export default function Configuracoes() {
         </View>
       </View>
 
-      <View style={[styles.conteudoBranco, { backgroundColor: bg }]}>
+      <View
+        style={[
+          styles.conteudoBranco,
+          {
+            backgroundColor: bg,
+          },
+        ]}
+      >
         <View style={styles.tituloRow}>
           <TouchableOpacity
             onPress={() => router.back()}
@@ -64,9 +82,15 @@ export default function Configuracoes() {
           </TouchableOpacity>
 
           <View style={styles.tituloCentral}>
-            <Text style={[styles.titulo, { color: text }]}>Configurações</Text>
+            <Text style={[styles.titulo, { color: text }]}>
+              Configurações
+            </Text>
+
             <Svg width={110} height={6} style={{ marginTop: 3 }}>
-              <Path d="M0 0.8 L0 4 L90 2.5 L90 0.8 Z" fill="#FF8C00" />
+              <Path
+                d="M0 0.8 L0 4 L90 2.5 L90 0.8 Z"
+                fill="#FF8C00"
+              />
             </Svg>
           </View>
 
@@ -75,72 +99,235 @@ export default function Configuracoes() {
 
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 20, paddingTop: 8 }}
+          contentContainerStyle={{
+            paddingBottom: 20,
+            paddingTop: 8,
+          }}
         >
+          {/* EDITAR PERFIL */}
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => router.push("/editarperfil" as any)}
-            style={[styles.item, { backgroundColor: bg, borderColor: border }]}
+            style={[
+              styles.item,
+              {
+                backgroundColor: bg,
+                borderColor: border,
+              },
+            ]}
           >
-            <Ionicons name="people" size={20} color={text} style={styles.icone} />
-            <Text style={[styles.itemText, { color: text }]}>Editar perfil</Text>
-            <Ionicons name="chevron-forward" size={16} color={text} style={{ marginLeft: "auto" }} />
+            <Ionicons
+              name="people"
+              size={20}
+              color={text}
+              style={styles.icone}
+            />
+
+            <Text style={[styles.itemText, { color: text }]}>
+              Editar perfil
+            </Text>
+
+            <Ionicons
+              name="chevron-forward"
+              size={16}
+              color={text}
+              style={{ marginLeft: "auto" }}
+            />
           </TouchableOpacity>
 
-          <View style={[styles.item, { backgroundColor: bg, borderColor: border }]}>
-            <Ionicons name="moon" size={20} color={text} style={styles.icone} />
-            <Text style={[styles.itemText, { color: text }]}>Tema escuro</Text>
+          {/* TEMA ESCURO */}
+          <View
+            style={[
+              styles.item,
+              {
+                backgroundColor: bg,
+                borderColor: border,
+              },
+            ]}
+          >
+            <Ionicons
+              name="moon"
+              size={20}
+              color={text}
+              style={styles.icone}
+            />
+
+            <Text style={[styles.itemText, { color: text }]}>
+              Tema escuro
+            </Text>
+
             <Switch
               value={dark}
               onValueChange={setDark}
-              trackColor={{ false: "#CCC", true: "#FF8C00" }}
+              trackColor={{
+                false: "#CCC",
+                true: "#FF8C00",
+              }}
               thumbColor="#FFF"
               style={{ marginLeft: "auto" }}
             />
           </View>
 
+          {/* PRIVACIDADE */}
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => router.push("/privacidade" as any)}
-            style={[styles.item, { backgroundColor: bg, borderColor: border }]}
+            style={[
+              styles.item,
+              {
+                backgroundColor: bg,
+                borderColor: border,
+              },
+            ]}
           >
-            <Ionicons name="shield" size={20} color={text} style={styles.icone} />
-            <Text style={[styles.itemText, { color: text }]}>Privacidade</Text>
-            <Ionicons name="chevron-forward" size={16} color={text} style={{ marginLeft: "auto" }} />
+            <Ionicons
+              name="shield"
+              size={20}
+              color={text}
+              style={styles.icone}
+            />
+
+            <Text style={[styles.itemText, { color: text }]}>
+              Privacidade
+            </Text>
+
+            <Ionicons
+              name="chevron-forward"
+              size={16}
+              color={text}
+              style={{ marginLeft: "auto" }}
+            />
           </TouchableOpacity>
 
+          {/* ALTERAR SENHA */}
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => router.push("/alterarsenha" as any)}
-            style={[styles.item, { backgroundColor: bg, borderColor: border }]}
+            style={[
+              styles.item,
+              {
+                backgroundColor: bg,
+                borderColor: border,
+              },
+            ]}
           >
-            <Ionicons name="lock-closed-outline" size={20} color={text} style={styles.icone} />
-            <Text style={[styles.itemText, { color: text }]}>Alterar senha</Text>
-            <Ionicons name="chevron-forward" size={16} color={text} style={{ marginLeft: "auto" }} />
+            <Ionicons
+              name="lock-closed-outline"
+              size={20}
+              color={text}
+              style={styles.icone}
+            />
+
+            <Text style={[styles.itemText, { color: text }]}>
+              Alterar senha
+            </Text>
+
+            <Ionicons
+              name="chevron-forward"
+              size={16}
+              color={text}
+              style={{ marginLeft: "auto" }}
+            />
           </TouchableOpacity>
 
-          <View style={[styles.item, { backgroundColor: bg, borderColor: border }]}>
-            <Ionicons name="notifications" size={20} color={text} style={styles.icone} />
-            <Text style={[styles.itemText, { color: text }]}>Notificações push</Text>
+          {/* NOTIFICAÇÕES PUSH */}
+          <View
+            style={[
+              styles.item,
+              {
+                backgroundColor: bg,
+                borderColor: border,
+              },
+            ]}
+          >
+            <Ionicons
+              name="notifications"
+              size={20}
+              color={text}
+              style={styles.icone}
+            />
+
+            <Text style={[styles.itemText, { color: text }]}>
+              Notificações push
+            </Text>
+
             <Switch
               value={pushAtivo}
               onValueChange={togglePush}
-              trackColor={{ false: "#CCC", true: "#FF8C00" }}
+              trackColor={{
+                false: "#CCC",
+                true: "#FF8C00",
+              }}
               thumbColor="#FFF"
               style={{ marginLeft: "auto" }}
             />
           </View>
 
+          {/* AJUDA E SUPORTE */}
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => router.push("/suporte" as any)}
-            style={[styles.item, { backgroundColor: bg, borderColor: border }]}
+            style={[
+              styles.item,
+              {
+                backgroundColor: bg,
+                borderColor: border,
+              },
+            ]}
           >
-            <View style={[styles.icone, styles.circulo, { borderColor: border }]}>
+            <View
+              style={[
+                styles.icone,
+                styles.circulo,
+                {
+                  borderColor: border,
+                },
+              ]}
+            >
               <Text style={[styles.q, { color: text }]}>?</Text>
             </View>
-            <Text style={[styles.itemText, { color: text }]}>Ajuda e suporte</Text>
-            <Ionicons name="chevron-forward" size={16} color={text} style={{ marginLeft: "auto" }} />
+
+            <Text style={[styles.itemText, { color: text }]}>
+              Ajuda e suporte
+            </Text>
+
+            <Ionicons
+              name="chevron-forward"
+              size={16}
+              color={text}
+              style={{ marginLeft: "auto" }}
+            />
+          </TouchableOpacity>
+
+          {/* SOBRE */}
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => router.push("/sobre" as any)}
+            style={[
+              styles.item,
+              {
+                backgroundColor: bg,
+                borderColor: border,
+              },
+            ]}
+          >
+            <Ionicons
+              name="information-circle"
+              size={20}
+              color={text}
+              style={styles.icone}
+            />
+
+            <Text style={[styles.itemText, { color: text }]}>
+              Sobre
+            </Text>
+
+            <Ionicons
+              name="chevron-forward"
+              size={16}
+              color={text}
+              style={{ marginLeft: "auto" }}
+            />
           </TouchableOpacity>
         </ScrollView>
       </View>
@@ -151,23 +338,27 @@ export default function Configuracoes() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#2F6BFF",
+    backgroundColor: "#488aff",
   },
+
   headerAzul: {
     paddingHorizontal: 14,
     paddingTop: 4,
     paddingBottom: 10,
     height: 110,
   },
+
   logoRow: {
     flexDirection: "row",
     alignItems: "center",
   },
+
   logoImg: {
     width: 220,
     height: 110,
     marginLeft: 50,
   },
+
   conteudoBranco: {
     flex: 1,
     borderTopLeftRadius: 18,
@@ -175,6 +366,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingTop: 8,
   },
+
   tituloRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -182,13 +374,16 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     paddingTop: 4,
   },
+
   tituloCentral: {
     alignItems: "center",
   },
+
   titulo: {
     fontSize: 19,
     fontWeight: "800",
   },
+
   item: {
     flexDirection: "row",
     alignItems: "center",
@@ -198,9 +393,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginTop: 10,
   },
+
   icone: {
     width: 28,
   },
+
   circulo: {
     width: 20,
     height: 20,
@@ -210,14 +407,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 8,
   },
+
   q: {
     fontSize: 12,
     fontWeight: "900",
   },
+
   itemText: {
     fontSize: 13.5,
     fontWeight: "700",
   },
+
   botaoVoltar: {
     width: 38,
     height: 38,
@@ -226,3 +426,4 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
+

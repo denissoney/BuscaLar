@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-
 import {
   View,
   Text,
@@ -13,12 +12,10 @@ import {
   Alert,
   PanResponder,
 } from "react-native";
-
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import MenuDrawer from "../../app/componets/MenuDrawer";
 
 const BANNERS = [
@@ -106,36 +103,21 @@ const TODOS_IMOVEIS = [
 
 export default function Home() {
   const router = useRouter();
-
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-
   const ref = useRef<FlatList<any> | null>(null);
-
   const isTablet = width >= 768;
-
   const filtroPadding = isTablet ? 24 : 16;
-
   const CARD_GAP = 10;
-
   const CARD_WIDTH = width - filtroPadding * 2;
-
   const params = useLocalSearchParams();
-
   const [menuAberto, setMenuAberto] = useState(false);
-
   const [ativo, setAtivo] = useState(0);
-
   const [buscaGeral, setBuscaGeral] = useState("");
-
   const [localizacao, setLocalizacao] = useState("");
-
   const [valor, setValor] = useState("");
-
   const [quartos, setQuartos] = useState("");
-
   const [imoveis, setImoveis] = useState(TODOS_IMOVEIS);
-
   const [verificandoLogin, setVerificandoLogin] = useState(true);
 
   // =========================================================
@@ -652,7 +634,6 @@ export default function Home() {
         </View>
 
         {/* FILTROS */}
-
         <View
           style={[
             styles.filtroContainer,
@@ -776,11 +757,9 @@ export default function Home() {
           Lugares em destaque (
           {imoveis.length})
         </Text>
-
         {/* =====================================================
             CARDS
         ===================================================== */}
-
         <View
           style={[
             styles.grid,
@@ -814,22 +793,12 @@ export default function Home() {
                 resizeMode="cover"
               />
 
-              <View
-                style={
-                  styles.cardInfoNovo
-                }
-              >
-                <Text
-                  style={styles.cardNome}
-                  numberOfLines={1}
-                >
+              <View style={ styles.cardInfoNovo }>
+                <Text style={styles.cardNome} numberOfLines={1}>
                   {item.nome}
                 </Text>
 
-                <Text
-                  style={styles.cardPreco}
-                  numberOfLines={2}
-                >
+                <Text style={styles.cardPreco} numberOfLines={2}>
                   R$ {item.valor} -{" "}
                   {item.quartos}q •{" "}
                   {item.local}
@@ -839,18 +808,8 @@ export default function Home() {
           ))}
         </View>
       </ScrollView>
-
       {/* MENU */}
-
-      <MenuDrawer
-        visible={menuAberto}
-        onClose={() =>
-          setMenuAberto(false)
-        }
-        onOpen={() =>
-          setMenuAberto(true)
-        }
-      />
+      <MenuDrawer visible={menuAberto} onClose={() => setMenuAberto(false)} onOpen={() => setMenuAberto(true)}/>
     </View>
   );
 }
@@ -933,10 +892,7 @@ const styles = StyleSheet.create({
     height: 46,
     overflow: "hidden",
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
+    shadowOffset: { width: 0, height: 3,},
     shadowOpacity: 0.15,
     shadowRadius: 5,
     elevation: 6,
@@ -987,8 +943,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor:
-      "rgba(0,0,0,0.38)",
+    backgroundColor: "rgba(0,0,0,0.38)",
   },
 
   bannerLeft: {
@@ -1076,10 +1031,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.2,
     borderColor: "#000",
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2,},
     shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 5,
@@ -1151,10 +1103,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.2,
     borderColor: "#000",
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
+    shadowOffset: { width: 0, height: 3,},
     shadowOpacity: 0.18,
     shadowRadius: 5,
     elevation: 6,

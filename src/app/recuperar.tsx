@@ -52,18 +52,87 @@ export default function Recuperar() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", padding: 24, alignItems: "center" },
-  logoTopo: { width: 220, height: 80, marginTop: 40, marginBottom: 20 },
-  titulo: { fontSize: 22, fontWeight: "bold", color: "#000", marginTop: 10 },
-  subtitulo: { fontSize: 13, color: "#666", textAlign: "center", marginTop: 8, marginBottom: 10 },
-  iconeMeio: { width: 140, height: 140, marginVertical: 20 },
-  label: { alignSelf: "flex-start", fontWeight: "600", marginBottom: 6, marginTop: 10 },
-  inputContainer: { flexDirection: "row", alignItems: "center", borderWidth: 1, borderColor: "#000", borderRadius: 10, width: "100%", paddingHorizontal: 12, height: 50 },
-  inputIcon: { fontSize: 16, marginRight: 8 },
-  input: { flex: 1, fontSize: 14 },
-  botao: { backgroundColor: "#0B5FFF", width: "100%", height: 50, borderRadius: 10, justifyContent: "center", alignItems: "center", marginTop: 20 },
-  botaoTexto: { color: "#fff", fontWeight: "bold", fontSize: 16 },
-  linkLaranja: { color: "#FF8C00", fontWeight: "600", marginTop: 20, fontSize: 13 },
-  voltar: { flexDirection: "row", alignItems: "center", marginTop: 24 },
-  voltarTexto: { fontWeight: "600", color: "#000" },
+  container: { 
+    flex: 1, 
+    backgroundColor: "#fff", 
+    padding: 24, 
+    alignItems: "center" 
+  },
+  logoTopo: { 
+    width: 220, 
+    height: 80, 
+    marginTop: 40, 
+    marginBottom: 20 
+  },
+  titulo: { 
+    fontSize: 22, 
+    fontWeight: "bold", 
+    color: "#000", 
+    marginTop: 10 
+  },
+  subtitulo: { 
+    fontSize: 13, 
+    color: "#666", 
+    textAlign: "center", 
+    marginTop: 8, 
+    marginBottom: 10 
+  },
+  iconeMeio: { 
+    width: 140, 
+    height: 140, 
+    marginVertical: 20 
+  },
+  label: { 
+    alignSelf: "flex-start", 
+    fontWeight: "600", 
+    marginBottom: 6, 
+    marginTop: 10 
+  },
+  inputContainer: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    borderWidth: 1, 
+    borderColor: "#000", 
+    borderRadius: 10, 
+    width: "100%", 
+    paddingHorizontal: 12, 
+    height: 50 
+  },
+  inputIcon: { 
+    fontSize: 16, 
+    marginRight: 8 
+  },
+  input: { 
+    flex: 1, 
+    fontSize: 14
+  },
+  botao: { 
+    backgroundColor: "#0B5FFF",
+    width: "100%", 
+    height: 50, 
+    borderRadius: 10,
+    justifyContent: "center", 
+    alignItems: "center", 
+    marginTop: 20 
+  },
+  botaoTexto: { 
+    color: "#fff", 
+    fontWeight: "bold", 
+    fontSize: 16 
+  },
+  linkLaranja: { 
+    color: "#FF8C00", 
+    fontWeight: "600", 
+    marginTop: 20, 
+    fontSize: 13
+  },
+  voltar: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    marginTop: 24 
+  },
+  voltarTexto: { 
+    fontWeight: "600", 
+    color: "#000" 
+  },
 });

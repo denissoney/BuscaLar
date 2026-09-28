@@ -100,8 +100,14 @@ export default function ConfirmacaoPagamento() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#1A5CFF" },
-  topoAzul: { backgroundColor: "#1A5CFF", paddingBottom: 18 },
+  container: { 
+    flex: 1, 
+    backgroundColor: "#488aff" 
+  },
+  topoAzul: { 
+    backgroundColor: "#488aff", 
+    paddingBottom: 18 
+  },
   topoLinha: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 14, paddingTop: 6 },
   hamburguer: { width: 30, height: 30, justifyContent: "center", gap: 4 },
   traco: { height: 2.5, backgroundColor: "#fff", borderRadius: 2 },

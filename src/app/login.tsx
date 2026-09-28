@@ -243,7 +243,10 @@ export default function Login() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  container: { 
+    flex: 1, 
+    backgroundColor: "#fff" 
+  },
   scroll: { padding: 24, alignItems: "center", paddingBottom: 40 },
   scrollRecuperar: { padding: 24, alignItems: "center", paddingBottom: 40 },
   logo: { width: 220, height: 80, marginTop: 20, backgroundColor: "transparent" },
