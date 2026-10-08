@@ -20,8 +20,7 @@ function TabBar({ state, descriptors, navigation }: any) {
           const isFocused = state.index === realIndex;
           const onPress = () => {
           const event = navigation.emit({ type: "tabPress", target: route.key, canPreventDefault: true });
-            if (!isFocused && !event.defaultPrevented) { navigation.navigate(route.name);}
-          };
+            if (!isFocused && !event.defaultPrevented) { navigation.navigate(route.name);}};
           let iconName: any = "home";
           let label = "INICIO";
           if (route.name === "perfil-proprietario") { iconName = isFocused ? "person" : "person-outline"; label = "PERFIL"; }

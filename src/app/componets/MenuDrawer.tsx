@@ -85,6 +85,7 @@ export default function MenuDrawer({ visible, onClose, onOpen,}: MenuDrawerProps
                 Início
               </Text>
             </TouchableOpacity>
+
             <View style={styles.divider} />
             {/* FILTRO */}
             <TouchableOpacity style={styles.menuItem} onPress={() => navegar("/filtro")} activeOpacity={0.7}>
@@ -93,6 +94,7 @@ export default function MenuDrawer({ visible, onClose, onOpen,}: MenuDrawerProps
                 Filtro
               </Text>
             </TouchableOpacity>
+
             <View style={styles.divider} />
             {/* FAVORITOS */}
             <TouchableOpacity style={styles.menuItem} onPress={() =>
@@ -102,6 +104,7 @@ export default function MenuDrawer({ visible, onClose, onOpen,}: MenuDrawerProps
                 Favoritos
               </Text>
             </TouchableOpacity>
+
             <View style={styles.divider} />
             {/* AGENDAMENTOS */}
             <TouchableOpacity style={styles.menuItem} onPress={() =>
@@ -111,6 +114,7 @@ export default function MenuDrawer({ visible, onClose, onOpen,}: MenuDrawerProps
                 Agendamentos
               </Text>
             </TouchableOpacity>
+
             <View style={styles.divider} />
             {/* PAGAMENTOS */}
             <TouchableOpacity style={styles.menuItem} onPress={() =>
@@ -120,6 +124,7 @@ export default function MenuDrawer({ visible, onClose, onOpen,}: MenuDrawerProps
                 Pagamentos
               </Text>
             </TouchableOpacity>
+
             <View style={styles.divider} />
             {/* CONTRATO */}
             <TouchableOpacity style={styles.menuItem} onPress={() =>
@@ -129,6 +134,7 @@ export default function MenuDrawer({ visible, onClose, onOpen,}: MenuDrawerProps
                 Contrato
               </Text>
             </TouchableOpacity>
+
             <View style={styles.divider} />
             {/* PERFIL */}
             <TouchableOpacity style={styles.menuItem} onPress={() =>
@@ -136,6 +142,16 @@ export default function MenuDrawer({ visible, onClose, onOpen,}: MenuDrawerProps
               <Ionicons name="person" size={22} color="#000"/>
               <Text style={styles.menuText}>
                 Perfil
+              </Text>
+            </TouchableOpacity>
+
+             <View style={styles.divider} />
+            {/* USUÁRIO */}
+            <TouchableOpacity style={styles.menuItem} onPress={() =>
+                navegar("/usuario")} activeOpacity={0.7}>
+              <Ionicons name="person" size={22} color="#000"/>
+              <Text style={styles.menuText}>
+                Usuario
               </Text>
             </TouchableOpacity>
             <View style={styles.divider} />

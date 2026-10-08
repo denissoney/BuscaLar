@@ -4,7 +4,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import MenuDrawer from "../componets/MenuDrawer";
-
 export default function PerfilProprietario() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -16,11 +15,9 @@ export default function PerfilProprietario() {
   }
   function abrirMenu() { setMenuVisible(true); }
   function fecharMenu() { setMenuVisible(false); }
-
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      
-      {/* HAMBURGUER FORA DE TUDO - SEM CAIXA */}
+      {/* HAMBURGUER  */}
       <View style={styles.hamburguerFora}>
         <TouchableOpacity style={styles.hamburger} onPress={abrirMenu} activeOpacity={0.7}>
           <View style={[styles.hamburgerLine, { width: 18 }]} />
@@ -31,7 +28,7 @@ export default function PerfilProprietario() {
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 90 }}>
         <View style={styles.card}>
-          {/* TITULO COM SETA NA MESMA LINHA DENTRO DA CAIXA BRANCA */}
+          {/* TITULO COM SETA  */}
           <View style={styles.tituloPerfilRow}>
             <TouchableOpacity onPress={() => router.back()} style={styles.setaVoltar}>
               <Ionicons name="arrow-back" size={20} color="#111" />
@@ -58,11 +55,13 @@ export default function PerfilProprietario() {
               <Text style={styles.statNumber}>3</Text>
               <Text style={styles.statLabel}>Imóvel</Text>
             </View>
+
             <View style={styles.statDivider} />
             <View style={styles.statBox}>
               <Text style={[styles.statNumber, { color: "#1A5CFF" }]}>98%</Text>
               <Text style={styles.statLabel}>Resposta</Text>
             </View>
+
             <View style={styles.statDivider} />
             <View style={styles.statBox}>
               <Text style={styles.statNumber}>2h</Text>
@@ -70,7 +69,11 @@ export default function PerfilProprietario() {
               <Text style={styles.statSubLabel}>Tempo de resposta</Text>
             </View>
           </View>
-
+              <TouchableOpacity style={styles.btnAdicionar} onPress={() => router.push("/adicionar-imovel" as any)} activeOpacity={0.8}>
+                  <Ionicons name="add-circle-outline" size={20} color="#FFF" />
+                  <Text style={styles.btnAdicionarText}>Adicionar Imóvel</Text>
+              </TouchableOpacity> 
+        </View> 
           <View style={styles.sobreContainer}>
             <Text style={styles.sobreTitle}>Sobre</Text>
             <View style={styles.linhaAzul} />
@@ -83,7 +86,7 @@ export default function PerfilProprietario() {
           <View style={styles.caixaImoveis}>
             <View style={styles.imoveisHeader}>
               <Text style={styles.imoveisTitle}>Meus Imóveis</Text>
-              <TouchableOpacity onPress={() => irPara("/meus-imoveis")}>
+              <TouchableOpacity onPress={() => router.push("/meus-imoveis")} activeOpacity={0.7}>
                 <Text style={styles.verTodos}>Ver todos (3) &gt;</Text>
               </TouchableOpacity>
             </View>
@@ -96,6 +99,7 @@ export default function PerfilProprietario() {
                   <Text style={styles.imovelPreco}>R$ 1.200/mês</Text>
                 </View>
               </TouchableOpacity>
+
               <TouchableOpacity style={styles.imovelCard} activeOpacity={0.85}>
                 <Image source={{ uri: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400" }} style={styles.imovelImg} />
                 <View style={styles.imovelInfo}>
@@ -103,6 +107,7 @@ export default function PerfilProprietario() {
                   <Text style={styles.imovelPreco}>R$ 1.000/mês</Text>
                 </View>
               </TouchableOpacity>
+
               <TouchableOpacity style={styles.imovelCard} activeOpacity={0.85}>
                 <Image source={{ uri: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400" }} style={styles.imovelImg} />
                 <View style={styles.imovelInfo}>
@@ -110,6 +115,7 @@ export default function PerfilProprietario() {
                   <Text style={styles.imovelPreco}>R$ 1.500/mês</Text>
                 </View>
               </TouchableOpacity>
+              
             </ScrollView>
 
             <View style={styles.avaliacoesContainer}>
@@ -146,7 +152,6 @@ export default function PerfilProprietario() {
               <Text style={styles.btnContatoText}>Entrar em contato</Text>
             </TouchableOpacity>
           </View>
-        </View>
       </ScrollView>
 
       <MenuDrawer visible={menuVisible} onClose={fecharMenu} onOpen={abrirMenu} />
@@ -155,9 +160,10 @@ export default function PerfilProprietario() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F5F5F5" },
-
-  // HAMBURGUER TOTALMENTE FORA - SEM FUNDO, SEM BORDA
+  container: { 
+    flex: 1, 
+    backgroundColor: "#F5F5F5" 
+  },
   hamburguerFora: {
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -175,7 +181,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#111", 
     borderRadius: 2 
   },
-  
   tituloPerfilRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -185,9 +190,17 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#F0F0F0",
   },
-  setaVoltar: { width: 28, height: 28, alignItems: "center", justifyContent: "center" },
-  headerTitle: { fontSize: 15, fontWeight: "700", color: "#111" },
-
+  setaVoltar: { 
+    width: 28, 
+    height: 28, 
+    alignItems: "center", 
+    justifyContent: "center" 
+  },
+  headerTitle: { 
+    fontSize: 15, 
+    fontWeight: "700", 
+    color: "#111" 
+  },
   card: {
     backgroundColor: "#FFFFFF",
     marginHorizontal: 8,
@@ -202,28 +215,111 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 4,
   },
-
-  avatar: { width: 70, height: 70, borderRadius: 35, alignSelf: "center" },
-  nome: { fontSize: 17, fontWeight: "700", textAlign: "center", color: "#000", marginTop: 5 },
-  badge: { backgroundColor: "#FF8C00", alignSelf: "center", paddingHorizontal: 9, paddingVertical: 3, borderRadius: 12, marginTop: 3 },
-  badgeText: { color: "#FFF", fontSize: 12, fontWeight: "700" },
-  locationRow: { flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 3, marginTop: 5 },
-  locationText: { fontSize: 10, color: "#666" },
-  ratingRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4, marginTop: 2 },
-  stars: { color: "#FF8C00", fontSize: 9 },
-  ratingText: { fontSize: 10, color: "#333" },
-  statsRow: { height: 56, flexDirection: "row", backgroundColor: "#E5E5E5", borderRadius: 7, marginTop: 7 },
-  statBox: { flex: 1, alignItems: "center", justifyContent: "center" },
-  statNumber: { fontSize: 21, fontWeight: "800", color: "#1A5CFF" },
-  statLabel: { fontSize: 10, color: "#222" },
-  statSubLabel: { fontSize: 6, color: "#777" },
-  statDivider: { width: 1, height: "70%", backgroundColor: "#888", alignSelf: "center" },
-
-  sobreContainer: { marginTop: 10 },
-  sobreTitle: { fontSize: 14, fontWeight: "700", color: "#111" },
-  linhaAzul: { width: 32, height: 3, backgroundColor: "#1A5CFF", borderRadius: 2, marginTop: 4, marginBottom: 6 },
-  sobreText: { fontSize: 9, color: "#333", lineHeight: 12, marginTop: 2 },
-
+  avatar: { 
+    width: 70, 
+    height: 70, 
+    borderRadius: 35, 
+    alignSelf: "center" 
+  },
+  nome: { 
+    fontSize: 17, 
+    fontWeight: "700", 
+    textAlign: "center", 
+    color: "#000", 
+    marginTop: 5 
+  },
+  badge: { 
+    backgroundColor: "#FF8C00", 
+    alignSelf: "center", 
+    paddingHorizontal: 9, 
+    paddingVertical: 3, 
+    borderRadius: 12, 
+    marginTop: 3 
+  },
+  badgeText: { 
+    color: "#FFF", 
+    fontSize: 12, 
+    fontWeight: "700" 
+  },
+  locationRow: { 
+    flexDirection: "row", 
+    justifyContent: "center", 
+    alignItems: "center", 
+    gap: 3, 
+    marginTop: 5 
+  },
+  locationText: { 
+    fontSize: 10, 
+    color: "#666" 
+  },
+  ratingRow: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    justifyContent: "center", 
+    gap: 4, 
+    marginTop: 2 
+  },
+  stars: { 
+    color: "#FF8C00", 
+    fontSize: 9 
+  },
+  ratingText: { 
+    fontSize: 10, 
+    color: "#333" 
+  },
+  statsRow: { 
+    height: 56, 
+    flexDirection: "row", 
+    backgroundColor: "#E5E5E5", 
+    borderRadius: 7, 
+    marginTop: 7 
+  },
+  statBox: { 
+    flex: 1, 
+    alignItems: "center", 
+    justifyContent: "center" 
+  },
+  statNumber: { 
+    fontSize: 21, 
+    fontWeight: "800", 
+    color: "#1A5CFF" 
+  },
+  statLabel: { 
+    fontSize: 10, 
+    color: "#222" 
+  },
+  statSubLabel: { 
+    fontSize: 6, 
+    color: "#777" 
+  },
+  statDivider: { 
+    width: 1, 
+    height: "70%", 
+    backgroundColor: "#888", 
+    alignSelf: "center" 
+  },
+  sobreContainer: {
+    marginTop: 10 
+  },
+  sobreTitle: { 
+    fontSize: 14, 
+    fontWeight: "700", 
+    color: "#111" 
+  },
+  linhaAzul: { 
+    width: 32, 
+    height: 3, 
+    backgroundColor: "#1A5CFF", 
+    borderRadius: 2, 
+    marginTop: 4, 
+    marginBottom: 6 
+  },
+  sobreText: { 
+    fontSize: 9, 
+    color: "#333", 
+    lineHeight: 12, 
+    marginTop: 2 
+  },
   caixaImoveis: {
     marginTop: 12,
     backgroundColor: "#F9F9F9",
@@ -237,11 +333,21 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 6,
   },
-
-  imoveisHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  imoveisTitle: { fontSize: 14, fontWeight: "700", color: "#111" },
-  verTodos: { fontSize: 10, color: "#1A5CFF", fontWeight: "600" },
-
+  imoveisHeader: { 
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    alignItems: "center" 
+  },
+  imoveisTitle: { 
+    fontSize: 14, 
+    fontWeight: "700", 
+    color: "#111" 
+  },
+  verTodos: { 
+    fontSize: 10, 
+    color: "#1A5CFF", 
+    fontWeight: "600" 
+  },
   imovelCard: {
     width: 118,
     backgroundColor: "#FFF",
@@ -256,21 +362,73 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#EEE",
   },
-  imovelImg: { width: "100%", height: 68 },
-  imovelInfo: { padding: 6 },
-  imovelNome: { fontSize: 7, lineHeight: 9, color: "#111", fontWeight: "500" },
-  imovelPreco: { fontSize: 8, fontWeight: "700", color: "#FF8C00", marginTop: 4, textAlign: "center" },
-
-  avaliacoesContainer: { marginTop: 14 },
-  avaliacaoCard: { marginTop: 8, backgroundColor: "#FFF", borderRadius: 8, padding: 8, elevation: 1 },
-  avaliacaoHeader: { flexDirection: "row", alignItems: "center", gap: 6 },
-  avaliacaoAvatar: { width: 22, height: 22, borderRadius: 11, backgroundColor: "#FF8C00", alignItems: "center", justifyContent: "center" },
-  avaliacaoAvatarText: { color: "#FFF", fontSize: 9, fontWeight: "700" },
-  avaliacaoNome: { fontSize: 9, fontWeight: "700", color: "#111" },
-  avaliacaoEstrelas: { fontSize: 7, color: "#FF8C00" },
-  avaliacaoTempo: { fontSize: 7, color: "#777" },
-  avaliacaoTexto: { fontSize: 8, color: "#333", lineHeight: 10, marginTop: 4 },
-
+  imovelImg: { 
+    width: "100%", 
+    height: 68 
+  },
+  imovelInfo: { 
+    padding: 6 
+  },
+  imovelNome: { 
+    fontSize: 7, 
+    lineHeight: 9, 
+    color: "#111", 
+    fontWeight: "500" 
+  },
+  imovelPreco: { 
+    fontSize: 8, 
+    fontWeight: "700", 
+    color: "#FF8C00", 
+    marginTop: 4, 
+    textAlign: "center" 
+  },
+  avaliacoesContainer: { 
+    marginTop: 14 
+  },
+  avaliacaoCard: { 
+    marginTop: 8, 
+    backgroundColor: "#FFF", 
+    borderRadius: 8, 
+    padding: 8, 
+    elevation: 1 
+  },
+  avaliacaoHeader: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    gap: 6 
+  },
+  avaliacaoAvatar: { 
+    width: 22, 
+    height: 22, 
+    borderRadius: 11, 
+    backgroundColor: "#FF8C00", 
+    alignItems: "center", 
+    justifyContent: "center" 
+  },
+  avaliacaoAvatarText: { 
+    color: "#FFF", 
+    fontSize: 9, 
+    fontWeight: "700" 
+  },
+  avaliacaoNome: { 
+    fontSize: 9, 
+    fontWeight: "700", 
+    color: "#111" 
+  },
+  avaliacaoEstrelas: { 
+    fontSize: 7, 
+    color: "#FF8C00" 
+  },
+  avaliacaoTempo: { 
+    fontSize: 7, 
+    color: "#777" 
+  },
+  avaliacaoTexto: { 
+    fontSize: 8, 
+    color: "#333", 
+    lineHeight: 10, 
+    marginTop: 4 
+  },
   btnContato: {
     height: 42,
     backgroundColor: "#FF8C00",
@@ -281,5 +439,24 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 7,
   },
-  btnContatoText: { color: "#FFF", fontSize: 13, fontWeight: "700" },
+  btnContatoText: { 
+    color: "#FFF", 
+    fontSize: 13, 
+    fontWeight: "700" 
+  },
+  btnAdicionar: {
+    height: 42,
+    backgroundColor: "#ff8c00",
+    marginTop: 14,
+    borderRadius: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 7,
+  },
+  btnAdicionarText: { 
+    color: "#FFF", 
+    fontSize: 13, 
+    fontWeight: "700" 
+  },
 });
