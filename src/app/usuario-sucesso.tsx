@@ -9,32 +9,16 @@ export default function SalvoSucesso() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.content}>
-        
         {/* 1 - LOGO AQUI */}
-        <Image 
-          source={require("/home/usuario/Desktop/BuscaLar/assets/images/logo.png")} 
-          style={styles.logo}
-          resizeMode="contain"
-        />
-
+        <Image  source={require("/home/usuario/Desktop/BuscaLar/assets/images/logo.png")}  style={styles.logo} resizeMode="contain"/>
         {/* 2 - CHECK AQUI */}
-        <Image 
-          source={require("/home/usuario/Desktop/BuscaLar/assets/images/check_sucesso.png")} 
-          style={styles.check}
-          resizeMode="contain"
-        />
-
+        <Image  source={require("/home/usuario/Desktop/BuscaLar/assets/images/check_sucesso.png")}  style={styles.check} resizeMode="contain"/>
         <Text style={styles.title}>Usuario salvo com sucesso!</Text>
         <Text style={styles.subTitle}>
           Seu perfil foi atualizado com sucesso. Agora você pode explorar milhares de imóveis para alugar!
         </Text>
-
         {/* 3 -  CASA COM CHAVES AQUI */}
-        <Image 
-          source={require("/home/usuario/Desktop/BuscaLar/assets/images/casa_chaves.png")} 
-          style={styles.casa}
-          resizeMode="contain"
-        />
+        <Image  source={require("/home/usuario/Desktop/BuscaLar/assets/images/casa_chaves.png")}  style={styles.casa} resizeMode="contain"/>
 
         <TouchableOpacity  style={styles.btn}  activeOpacity={0.8}  onPress={() => router.replace("/usuario" as any)}>
           <Text style={styles.btnText}>Voltar para o perfil</Text>

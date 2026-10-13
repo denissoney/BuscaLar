@@ -46,24 +46,13 @@ const IMOVEIS = [
 
 function LinhaLaranja({ width = 95 }: { width?: number }) {
   return (
-    <View
-      style={{
-        width,
-        height: 3,
-        backgroundColor: "#FF8C00",
-        borderRadius: 2,
-        marginTop: 4,
-      }}
-    />
-  );
+    <View style={{ width, height: 3, backgroundColor: "#FF8C00", borderRadius: 2, marginTop: 4, }}/>);
 }
-
 export default function Imoveis() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const [cidadeFiltro, setCidadeFiltro] = useState("Barra de São Miguel");
   const [menuAberto, setMenuAberto] = useState(false); // controla o drawer
-
   const imoveisFiltrados = useMemo(() => {
     if (!cidadeFiltro.trim()) return IMOVEIS;
     return IMOVEIS.filter((item) =>

@@ -561,199 +561,100 @@ export default function Home() {
                     width: CARD_WIDTH,
                     height: bannerHeight,
                   },
-                ]}
-              >
-                <Image
-                  source={{
-                    uri: item.img,
-                  }}
-                  style={
-                    styles.bannerImgFull
-                  }
-                  resizeMode="cover"
-                />
-
-                <View
-                  style={styles.overlay}
-                />
-
-                <View
-                  style={styles.bannerLeft}
-                >
-                  <Text
-                    style={styles.emAlta}
-                  >
+                ]}>
+                <Image source={{ uri: item.img,}} style={ styles.bannerImgFull} resizeMode="cover"/>
+                <View style={styles.overlay}/>
+                <View style={styles.bannerLeft}>
+                  <Text style={styles.emAlta}>
                     Em alta
                   </Text>
-
-                  <Text
-                    style={styles.bannerTitulo}
-                  >
+                  <Text style={styles.bannerTitulo}>
                     {item.titulo}
                   </Text>
-
-                  <Text
-                    style={styles.bannerSub}
-                  >
+                  <Text style={styles.bannerSub}>
                     {item.sub}
                   </Text>
-
-                  <TouchableOpacity
-                    style={
-                      styles.btnExplorar
-                    }
-                  >
-                    <Text
-                      style={
-                        styles.btnExplorarTxt
-                      }
-                    >
+                  <TouchableOpacity style={ styles.btnExplorar}>
+                    <Text style={ styles.btnExplorarTxt}>
                       Explorar agora
                     </Text>
                   </TouchableOpacity>
                 </View>
               </View>
-            )}
-          />
-
-          <View
-            style={styles.dotsCentro}
-          >
+            )}/>
+          <View style={styles.dotsCentro}>
             {BANNERS.map((_, i) => (
-              <View
-                key={i.toString()}
-                style={[
-                  styles.dot,
-                  i === ativo
+              <View key={i.toString()} style={[ styles.dot, i === ativo
                     ? styles.dotAtivo
                     : styles.dotInativo,
-                ]}
-              />
+                ]}/>
             ))}
           </View>
         </View>
 
         {/* FILTROS */}
         <View
-          style={[
-            styles.filtroContainer,
-            {
+          style={[ styles.filtroContainer,{
               marginHorizontal:
                 filtroPadding,
             },
-          ]}
-        >
+          ]}>
           <View style={styles.filtroItem}>
-            <View
-              style={styles.filtroLabelRow}
-            >
-              <Ionicons
-                name="location-outline"
-                size={11}
-                color="#000"
-              />
-
-              <Text
-                style={styles.filtroLabel}
-              >
+            <View style={styles.filtroLabelRow}>
+              <Ionicons name="location-outline" size={11} color="#000"/>
+              <Text style={styles.filtroLabel}>
                 Localização
               </Text>
             </View>
-
-            <TextInput
-              style={
-                styles.filtroInputReal
-              }
-              placeholder="Maceió-AL"
-              value={localizacao}
+            <TextInput style={ styles.filtroInputReal}
+              placeholder="Maceió-AL" value={localizacao}
               onChangeText={
                 setLocalizacao
               }
-              placeholderTextColor="#999"
-            />
+              placeholderTextColor="#999"/>
           </View>
 
           <View style={styles.filtroItem}>
-            <View
-              style={styles.filtroLabelRow}
-            >
-              <Ionicons
-                name="cash-outline"
-                size={11}
-                color="#000"
-              />
-
-              <Text
-                style={styles.filtroLabel}
-              >
+            <View style={styles.filtroLabelRow}>
+              <Ionicons name="cash-outline" size={11} color="#000"/>
+              <Text style={styles.filtroLabel}>
                 Valor
               </Text>
             </View>
 
-            <TextInput
-              style={
-                styles.filtroInputReal
-              }
-              placeholder="2000"
-              keyboardType="numeric"
+            <TextInput style={ styles.filtroInputReal}
+              placeholder="2000" keyboardType="numeric"
               value={valor}
               onChangeText={setValor}
-              placeholderTextColor="#999"
-            />
+              placeholderTextColor="#999"/>
           </View>
 
           <View style={styles.filtroItem}>
-            <View
-              style={styles.filtroLabelRow}
-            >
-              <Ionicons
-                name="bed-outline"
-                size={11}
-                color="#000"
-              />
-
-              <Text
-                style={styles.filtroLabel}
-              >
+            <View style={styles.filtroLabelRow}>
+              <Ionicons name="bed-outline" size={11} color="#000"/>
+              <Text style={styles.filtroLabel}>
                 Quartos
               </Text>
             </View>
 
-            <TextInput
-              style={
-                styles.filtroInputReal
-              }
+            <TextInput style={ styles.filtroInputReal}
               placeholder="01"
               keyboardType="numeric"
               value={quartos}
               onChangeText={setQuartos}
-              placeholderTextColor="#999"
-            />
+              placeholderTextColor="#999"/>
           </View>
 
-          <TouchableOpacity
-            style={styles.btnAplicar}
-            onPress={buscar}
-          >
-            <Text
-              style={styles.btnAplicarText}
-            >
+          <TouchableOpacity style={styles.btnAplicar} onPress={buscar}>
+            <Text style={styles.btnAplicarText}>
               Aplicar
             </Text>
           </TouchableOpacity>
         </View>
-
         {/* TÍTULO */}
-
-        <Text
-          style={[
-            styles.tituloSecao,
-            {
-              marginHorizontal:
+        <Text style={[ styles.tituloSecao,{ marginHorizontal:
                 filtroPadding,
-            },
-          ]}
-        >
+            },]}>
           Lugares em destaque (
           {imoveis.length})
         </Text>

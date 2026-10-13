@@ -3,11 +3,9 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, TextInput 
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-
 export default function EditarPerfil() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-
   const [nome, setNome] = useState("Davi Miguel");
   const [email, setEmail] = useState("davi.miguel@gmail.com");
   const [local, setLocal] = useState("Maceió - AL");

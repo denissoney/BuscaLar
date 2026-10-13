@@ -69,7 +69,7 @@ export default function PerfilProprietario() {
               <Text style={styles.statSubLabel}>Tempo de resposta</Text>
             </View>
           </View>
-              <TouchableOpacity style={styles.btnAdicionar} onPress={() => router.push("/adicionar-imovel" as any)} activeOpacity={0.8}>
+              <TouchableOpacity style={styles.btnAdicionar} onPress={() => router.push("/adicionar-imoveis" as any)} activeOpacity={0.8}>
                   <Ionicons name="add-circle-outline" size={20} color="#FFF" />
                   <Text style={styles.btnAdicionarText}>Adicionar Imóvel</Text>
               </TouchableOpacity> 
