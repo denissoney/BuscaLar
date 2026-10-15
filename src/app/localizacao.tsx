@@ -34,7 +34,7 @@ export default function Localizacao() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]} {...panResponder.panHandlers}>
-      {/* HEADER AZUL IGUAL PRINT */}
+      {/* HEADER AZUL */}
       <View style={styles.topoAzul}>
         <View style={styles.topoHeader}>
           <TouchableOpacity onPress={() => setMenuAberto(true)} style={styles.hamburguer}>
