@@ -136,22 +136,8 @@ export default function Configuracoes() {
           </TouchableOpacity>
 
           {/* TEMA ESCURO */}
-          <View
-            style={[
-              styles.item,
-              {
-                backgroundColor: bg,
-                borderColor: border,
-              },
-            ]}
-          >
-            <Ionicons
-              name="moon"
-              size={20}
-              color={text}
-              style={styles.icone}
-            />
-
+          <View style={[ styles.item,{ backgroundColor: bg, borderColor: border, }, ]}>
+            <Ionicons name="moon" size={20} color={text} style={styles.icone}/>
             <Text style={[styles.itemText, { color: text }]}>
               Tema escuro
             </Text>
@@ -231,36 +217,12 @@ export default function Configuracoes() {
           </TouchableOpacity>
 
           {/* NOTIFICAÇÕES PUSH */}
-          <View
-            style={[
-              styles.item,
-              {
-                backgroundColor: bg,
-                borderColor: border,
-              },
-            ]}
-          >
-            <Ionicons
-              name="notifications"
-              size={20}
-              color={text}
-              style={styles.icone}
-            />
-
+          <View style={[ styles.item, { backgroundColor: bg, borderColor: border,}, ]}>
+            <Ionicons name="notifications" size={20} color={text} style={styles.icone}/>
             <Text style={[styles.itemText, { color: text }]}>
               Notificações push
             </Text>
-
-            <Switch
-              value={pushAtivo}
-              onValueChange={togglePush}
-              trackColor={{
-                false: "#CCC",
-                true: "#FF8C00",
-              }}
-              thumbColor="#FFF"
-              style={{ marginLeft: "auto" }}
-            />
+            <Switch value={pushAtivo} onValueChange={togglePush} trackColor={{ false: "#CCC", true: "#FF8C00", }} thumbColor="#FFF" style={{ marginLeft: "auto" }}/>
           </View>
 
           {/* AJUDA E SUPORTE */}

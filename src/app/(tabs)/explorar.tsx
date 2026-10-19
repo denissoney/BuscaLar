@@ -1,732 +1,287 @@
 import React, { useRef, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  FlatList,
-  PanResponder,
-} from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, PanResponder } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import MenuDrawer from "../../app/componets/MenuDrawer";
+import MenuDrawer from "../componets/MenuDrawer";
 
 const IMOVEIS = [
-  {
-    id: "1",
-    preco: "R$ 1.000/mês",
-    desc: "Apartamento 2 quartos",
-    local: "Barra de São Miguel, AL",
-    img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400",
-  },
-
-  {
-    id: "2",
-    preco: "R$ 1.000/mês",
-    desc: "Apartamento 2 quartos",
-    local: "Barra de São Miguel, AL",
-    img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400",
-  },
-
-  {
-    id: "3",
-    preco: "R$ 1.000/mês",
-    desc: "Apartamento 2 quartos",
-    local: "Barra de São Miguel, AL",
-    img: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400",
-  },
-
-  {
-    id: "4",
-    preco: "R$ 1.000/mês",
-    desc: "Apartamento 2 quartos",
-    local: "Barra de São Miguel, AL",
-    img: "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?w=400",
-  },
-
-  {
-    id: "5",
-    preco: "R$ 1.000/mês",
-    desc: "Apartamento 2 quartos",
-    local: "Barra de São Miguel, AL",
-    img: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400",
-  },
-
-  {
-    id: "6",
-    preco: "R$ 1.000/mês",
-    desc: "Apartamento 2 quartos",
-    local: "Barra de São Miguel, AL",
-    img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400",
-  },
+  { id: "1", nome: "Casa próxima à praia", preco: "R$ 1.000/mês", valor: "1000", desc: "Casa com 2 quartos", local: "Barra de São Miguel, AL", quartos: "2", banheiros: "1", tipo: "Casa", img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800" },
+  { id: "2", nome: "Casa moderna", preco: "R$ 1.500/mês", valor: "1500", desc: "Casa com 3 quartos", local: "Barra de São Miguel, AL", quartos: "3", banheiros: "2", tipo: "Casa", img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800" },
+  { id: "3", nome: "Apartamento aconchegante", preco: "R$ 1.200/mês", valor: "1200", desc: "Apartamento com 2 quartos", local: "Ponta Verde, Maceió, AL", quartos: "2", banheiros: "1", tipo: "Apartamento", img: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800" },
+  { id: "4", nome: "Apartamento espaçoso", preco: "R$ 1.800/mês", valor: "1800", desc: "Apartamento com 3 quartos", local: "Jatiúca, Maceió, AL", quartos: "3", banheiros: "2", tipo: "Apartamento", img: "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?w=800" },
+  { id: "5", nome: "Casa com jardim", preco: "R$ 2.000/mês", valor: "2000", desc: "Casa com 4 quartos", local: "Cruz das Almas, Maceió, AL", quartos: "4", banheiros: "2", tipo: "Casa", img: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800" },
+  { id: "6", nome: "Apartamento compacto", preco: "R$ 900/mês", valor: "900", desc: "Apartamento com 1 quarto", local: "Farol, Maceió, AL", quartos: "1", banheiros: "1", tipo: "Apartamento", img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800" },
 ];
 
 export default function Explorar() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-
   const [menuVisible, setMenuVisible] = useState(false);
 
-  // =========================================================
-  // MENU
-  // =========================================================
-
-  function abrirMenu() {
-    setMenuVisible(true);
-  }
-
-  function fecharMenu() {
-    setMenuVisible(false);
-  }
-
-  // =========================================================
-  // NAVEGAÇÃO
-  // =========================================================
-
+  function abrirMenu() { setMenuVisible(true); }
+  function fecharMenu() { setMenuVisible(false); }
   function irPara(rota: string) {
     setMenuVisible(false);
-
-    setTimeout(() => {
-      router.push(rota as any);
-    }, 260);
+    setTimeout(() => { router.push(rota as any); }, 260);
   }
-
-  // =========================================================
-  // GESTO DA LATERAL ESQUERDA
-  //
-  // O usuário pode começar o movimento em qualquer altura
-  // da tela, desde que comece nos primeiros 70px da esquerda.
-  //
-  // O botão do hambúrguer continua funcionando porque o
-  // responder NÃO captura o toque no início. Ele só assume
-  // o controle quando detecta um arrasto horizontal.
-  // =========================================================
+  function abrirDetalhes(item: (typeof IMOVEIS)[number]) {
+    setMenuVisible(false);
+    router.push({
+      pathname: "/detalhe",
+      params: { id: item.id, nome: item.nome, local: item.local, valor: item.valor, quartos: item.quartos, banheiros: item.banheiros, tipo: item.tipo, img: item.img },
+    } as any);
+  }
 
   const panResponder = useRef(
     PanResponder.create({
-      // Não captura um toque simples.
-      // Isso permite que o TouchableOpacity do hambúrguer
-      // continue recebendo o onPress normalmente.
       onStartShouldSetPanResponder: () => false,
-
       onStartShouldSetPanResponderCapture: () => false,
-
-      // Só assume o gesto quando realmente começar a arrastar.
-      onMoveShouldSetPanResponder: (
-        _,
-        gestureState
-      ) => {
-        if (menuVisible) {
-          return false;
-        }
-
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        if (menuVisible) return false;
         const { dx, dy, x0 } = gestureState;
-
-        // O dedo precisa começar na lateral esquerda.
-        const iniciouNaEsquerda = x0 <= 70;
-
-        // Movimento precisa ser predominantemente horizontal.
-        const movimentoHorizontal =
-          Math.abs(dx) >
-          Math.abs(dy) * 1.2;
-
-        // Precisa estar puxando para a direita.
-        const puxandoParaDireita = dx > 10;
-
-        return (
-          iniciouNaEsquerda &&
-          movimentoHorizontal &&
-          puxandoParaDireita
-        );
+        return x0 <= 70 && Math.abs(dx) > Math.abs(dy) * 1.2 && dx > 10;
       },
-
-      // Capture é importante porque a tela possui FlatList.
-      // Assim o gesto lateral não fica sendo "roubado"
-      // pela lista de imóveis.
-      onMoveShouldSetPanResponderCapture: (
-        _,
-        gestureState
-      ) => {
-        if (menuVisible) {
-          return false;
-        }
-
+      onMoveShouldSetPanResponderCapture: (_, gestureState) => {
+        if (menuVisible) return false;
         const { dx, dy, x0 } = gestureState;
-
-        const iniciouNaEsquerda = x0 <= 70;
-
-        const movimentoHorizontal =
-          Math.abs(dx) >
-          Math.abs(dy) * 1.2;
-
-        const puxandoParaDireita = dx > 10;
-
-        return (
-          iniciouNaEsquerda &&
-          movimentoHorizontal &&
-          puxandoParaDireita
-        );
+        return x0 <= 70 && Math.abs(dx) > Math.abs(dy) * 1.2 && dx > 10;
       },
-
-      // Quando o usuário soltar o dedo,
-      // abre o menu.
-      onPanResponderRelease: (
-        _,
-        gestureState
-      ) => {
-        if (
-          gestureState.dx >= 70
-        ) {
-          abrirMenu();
-        }
-      },
-
-      onPanResponderTerminate: () => {
-        // Não faz nada.
-        // O menu só abre se o gesto atingir o limite.
+      onPanResponderRelease: (_, gestureState) => {
+        if (gestureState.dx >= 70) abrirMenu();
       },
     })
   ).current;
 
-  // =========================================================
-  // TELA
-  // =========================================================
-
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          paddingTop: insets.top,
-        },
-      ]}
-      {...panResponder.panHandlers}
-    >
-
-      {/* =====================================================
-          TOPO AZUL
-      ====================================================== */}
-
+    <View style={[styles.container, { paddingTop: insets.top }]} {...panResponder.panHandlers}>
       <View style={styles.topoAzul}>
-
         <View style={styles.headerAzul}>
-
-          {/* HAMBÚRGUER */}
-
-          <TouchableOpacity
-            style={styles.btnHamburguer}
-            onPress={abrirMenu}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[
-                styles.traco,
-                { width: 18 },
-              ]}
-            />
-
-            <View
-              style={[
-                styles.traco,
-                { width: 12 },
-              ]}
-            />
-
-            <View
-              style={[
-                styles.traco,
-                { width: 7 },
-              ]}
-            />
+          <TouchableOpacity style={styles.btnHamburguer} onPress={abrirMenu} activeOpacity={0.7}>
+            <View style={[styles.traco, { width: 18 }]} />
+            <View style={[styles.traco, { width: 12 }]} />
+            <View style={[styles.traco, { width: 7 }]} />
           </TouchableOpacity>
-
-          {/* LOGO */}
-
-          <Image
-            source={require(
-              "../../../assets/images/BuscaLar-preto.png"
-            )}
-            style={styles.logoImg}
-            resizeMode="contain"
-          />
-
-          {/* CONFIGURAÇÕES */}
-
-          <TouchableOpacity
-            style={styles.btnEngrenagem}
-            onPress={() =>
-              irPara("/configuracoes")
-            }
-            activeOpacity={0.8}
-          >
-            <Ionicons
-              name="settings"
-              size={18}
-              color="#000"
-            />
+          <Image source={require("/home/usuario/Desktop/BuscaLar/assets/images/BuscaLar-preto.png")} style={styles.logoImg} resizeMode="contain" />
+          <TouchableOpacity style={styles.btnEngrenagem} onPress={() => irPara("/configuracoes")} activeOpacity={0.8}>
+            <Ionicons name="settings" size={18} color="#000" />
           </TouchableOpacity>
-
         </View>
-
-        {/* ===================================================
-            FILTROS
-        ==================================================== */}
-
         <View style={styles.filtrosRow}>
-
-          <TouchableOpacity
-            style={styles.filtroLocal}
-            activeOpacity={0.8}
-          >
-            <Ionicons
-              name="location"
-              size={14}
-              color="#000"
-              style={{
-                marginRight: 4,
-              }}
-            />
-
-            <View
-              style={{
-                flex: 1,
-              }}
-            >
-              <Text
-                style={
-                  styles.filtroLabel
-                }
-              >
-                Filtrar por localização
-              </Text>
-
-              <Text
-                style={
-                  styles.filtroValue
-                }
-              >
-                Barra de São Miguel
-              </Text>
+          <TouchableOpacity style={styles.filtroLocal} activeOpacity={0.8}>
+            <Ionicons name="location" size={14} color="#000" style={{ marginRight: 4 }} />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.filtroLabel}>Filtrar por localização</Text>
+              <Text style={styles.filtroValue}>Barra de São Miguel</Text>
             </View>
-
-            <Ionicons
-              name="chevron-down"
-              size={16}
-              color="#000"
-            />
+            <Ionicons name="chevron-down" size={16} color="#000" />
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.btnFiltros}
-            activeOpacity={0.8}
-          >
-            <Ionicons
-              name="options"
-              size={14}
-              color="#000"
-            />
-
-            <Text
-              style={
-                styles.btnFiltrosText
-              }
-            >
-              Filtros
-            </Text>
+          <TouchableOpacity style={styles.btnFiltros} activeOpacity={0.8}>
+            <Ionicons name="options" size={14} color="#000" />
+            <Text style={styles.btnFiltrosText}>Filtros</Text>
           </TouchableOpacity>
-
         </View>
       </View>
 
-      {/* =====================================================
-          CONTEÚDO
-      ====================================================== */}
-
       <View style={styles.contentBox}>
-
-        {/* TÍTULO */}
-
         <View style={styles.titleRow}>
-
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={styles.backBtn}
-            activeOpacity={0.7}
-          >
-            <Ionicons
-              name="chevron-back"
-              size={22}
-              color="#000"
-            />
+          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
+            <Ionicons name="chevron-back" size={22} color="#000" />
           </TouchableOpacity>
-
-          <Text style={styles.title}>
-            Aluguéis Disponíveis
-          </Text>
-
+          <Text style={styles.title}>Aluguéis Disponíveis</Text>
         </View>
 
-        {/* ===================================================
-            LISTA
-        ==================================================== */}
-
-        <FlatList
-          data={IMOVEIS}
-          numColumns={2}
-          keyExtractor={(item) =>
-            item.id
-          }
-          columnWrapperStyle={{
-            gap: 10,
-          }}
-          contentContainerStyle={{
-            paddingBottom: 130,
-            gap: 10,
-          }}
-          showsVerticalScrollIndicator={
-            false
-          }
-          renderItem={({ item }) => (
-
-            <TouchableOpacity
-              style={styles.card}
-              activeOpacity={0.8}
-              onPress={() =>
-                router.push(
-                  "/perfil-proprietario" as any
-                )
-              }
-            >
-
-              {/* FOTO */}
-
-              <Image
-                source={{
-                  uri: item.img,
-                }}
-                style={styles.cardImg}
-              />
-
-              {/* INFORMAÇÕES */}
-
+        <FlatList data={IMOVEIS} numColumns={2} keyExtractor={(item) => item.id} columnWrapperStyle={styles.colunas} contentContainerStyle={styles.lista} showsVerticalScrollIndicator={false} renderItem={({ item }) => (
+            <TouchableOpacity style={styles.card} activeOpacity={0.8} onPress={() => abrirDetalhes(item)}>
+              <Image source={{ uri: item.img }} style={styles.cardImg} resizeMode="cover" />
               <View style={styles.cardBody}>
-
-                <Text style={styles.preco}>
-                  {item.preco}
-                </Text>
-
-                <Text style={styles.desc}>
-                  {item.desc}
-                </Text>
-
-                <View
-                  style={
-                    styles.localRow
-                  }
-                >
-                  <Ionicons
-                    name="location"
-                    size={8}
-                    color="#FF8C00"
-                  />
-
-                  <Text
-                    style={styles.local}
-                  >
-                    {item.local}
-                  </Text>
+                <Text style={styles.preco}>{item.preco}</Text>
+                <Text style={styles.desc}>{item.desc}</Text>
+                <View style={styles.localRow}>
+                  <Ionicons name="location" size={10} color="#FF8C00" />
+                  <Text style={styles.local}>{item.local}</Text>
                 </View>
-
-                <View
-                  style={styles.infoRow}
-                >
-
-                  <View
-                    style={
-                      styles.infoItem
-                    }
-                  >
-                    <Ionicons
-                      name="bed-outline"
-                      size={10}
-                      color="#000"
-                    />
-
-                    <Text
-                      style={
-                        styles.infoText
-                      }
-                    >
-                      {" "}2 quartos
-                    </Text>
-                  </View>
-
-                  <View
-                    style={
-                      styles.infoItem
-                    }
-                  >
-                    <Ionicons
-                      name="water-outline"
-                      size={10}
-                      color="#000"
-                    />
-
-                    <Text
-                      style={
-                        styles.infoText
-                      }
-                    >
-                      {" "}1 banheiro
-                    </Text>
-                  </View>
-
+                <View style={styles.infoRow}>
+                  <View style={styles.infoItem}><Ionicons name="bed-outline" size={12} color="#000" /><Text style={styles.infoText}>{item.quartos} quartos</Text></View>
+                  <View style={styles.infoItem}><Ionicons name="water-outline" size={12} color="#000" /><Text style={styles.infoText}>{item.banheiros} banheiro(s)</Text></View>
                 </View>
-
               </View>
-
             </TouchableOpacity>
           )}
         />
-
       </View>
 
-      {/* =====================================================
-          MENU DRAWER
-          
-          O MenuDrawer deve ser renderizado por último.
-          Se ele usar Modal internamente, ficará acima de
-          absolutamente todo o conteúdo desta tela.
-      ====================================================== */}
-
-      <MenuDrawer
-        visible={menuVisible}
-        onClose={fecharMenu}
-        onOpen={abrirMenu}
-      />
-
+      <MenuDrawer visible={menuVisible} onClose={fecharMenu} onNavigate={irPara} />
     </View>
   );
 }
 
-// =============================================================
-// ESTILOS
-// =============================================================
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#1A5CFF",
+  container: { 
+    flex: 1, 
+    backgroundColor: "#F5F6FA" 
   },
-
-  // ===========================================================
-  // TOPO
-  // ===========================================================
-
-  topoAzul: {
-    backgroundColor: "#1A5CFF",
-    paddingBottom: 16,
+  topoAzul: { 
+    backgroundColor: "#208AEF", 
+    paddingHorizontal: 16, 
+    paddingTop: 6, 
+    paddingBottom: 16, 
+    borderBottomLeftRadius: 22, 
+    borderBottomRightRadius: 22 
   },
-
-  headerAzul: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: "#1A5CFF",
+  headerAzul: { 
+    height: 52, 
+    flexDirection: "row", 
+    alignItems: "center", 
+    justifyContent: "space-between" 
   },
-
-  // ===========================================================
-  // HAMBÚRGUER
-  // ===========================================================
-
-  btnHamburguer: {
-    width: 32,
-    height: 32,
+  btnHamburguer: { 
+    width: 36, 
+    height: 40, 
     justifyContent: "center",
-    gap: 5,
-    alignItems: "flex-start",
-
-    // Mantém o botão acima de qualquer área de gesto.
-    zIndex: 100,
-    elevation: 10,
+    alignItems: "flex-start", 
+    gap: 4 
   },
-
-  traco: {
-    height: 2.8,
-    backgroundColor: "#fff",
-    borderRadius: 10,
+  traco: { 
+    height: 3, 
+    borderRadius: 3, 
+    backgroundColor: "#000" 
   },
-
-  // ===========================================================
-  // LOGO
-  // ===========================================================
-
-  logoImg: {
-    width: 160,
-    height: 45,
+  logoImg: { 
+    width: 145, 
+    height: 42 
   },
-
-  // ===========================================================
-  // CONFIGURAÇÕES
-  // ===========================================================
-
-  btnEngrenagem: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#D9D9D9",
-    alignItems: "center",
-    justifyContent: "center",
-
-    zIndex: 100,
-    elevation: 10,
+  btnEngrenagem: { 
+    width: 36, 
+    height: 36, 
+    alignItems: "center", 
+    justifyContent: "center" 
   },
-
-  // ===========================================================
-  // FILTROS
-  // ===========================================================
-
-  filtrosRow: {
-    flexDirection: "row",
-    gap: 8,
-    paddingHorizontal: 16,
-    marginTop: 8,
+  filtrosRow: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    gap: 8, 
+    marginTop: 6 
   },
-
-  filtroLocal: {
-    flex: 1,
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    flexDirection: "row",
-    alignItems: "center",
+  filtroLocal: { 
+    flex: 1, 
+    minHeight: 52, 
+    backgroundColor: "#FFF", 
+    borderRadius: 10, 
+    paddingHorizontal: 10, 
+    flexDirection: "row", 
+    alignItems: "center" 
   },
-
-  filtroLabel: {
-    fontSize: 8,
-    color: "#888",
+  filtroLabel: { 
+    color: "#666", 
+    fontSize: 10 
   },
-
-  filtroValue: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: "#000",
+  filtroValue: { 
+    color: "#000", 
+    fontSize: 12, 
+    fontWeight: "600", 
+    marginTop: 2 
   },
-
-  btnFiltros: {
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
+  btnFiltros: { 
+    minHeight: 52, 
+    paddingHorizontal: 14, 
+    borderRadius: 10, 
+    backgroundColor: "#FFF", 
+    flexDirection: "row", 
+    alignItems: "center", 
+    justifyContent: "center", 
+    gap: 5 
   },
-
-  btnFiltrosText: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: "#000",
+  btnFiltrosText: { 
+    fontSize: 11, 
+    color: "#000", 
+    fontWeight: "600" 
   },
-
-  // ===========================================================
-  // CONTEÚDO
-  // ===========================================================
-
-  contentBox: {
-    flex: 1,
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingTop: 14,
-    paddingHorizontal: 12,
+  contentBox: { 
+    flex: 1, 
+    paddingHorizontal: 14,
+    paddingTop: 14 
   },
-
-  titleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 12,
-    gap: 6,
+  titleRow: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    marginBottom: 14 
   },
-
-  backBtn: {
-    width: 24,
-    height: 24,
-    justifyContent: "center",
+  backBtn: { 
+    width: 32, 
+    height: 34, 
+    alignItems: "center", 
+    justifyContent: "center", 
+    marginRight: 5 
   },
-
-  title: {
-    fontWeight: "700",
-    fontSize: 14,
-    color: "#000",
+  title: { 
+    fontSize: 19, 
+    fontWeight: "700", 
+    color: "#111" 
   },
-
-  // ===========================================================
-  // CARDS
-  // ===========================================================
-
-  card: {
-    flex: 1,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#EEE",
-    overflow: "hidden",
+  colunas: { 
+    justifyContent: "space-between", 
+    gap: 10 
   },
-
-  cardImg: {
-    width: "100%",
-    height: 90,
+  lista: { 
+    paddingBottom: 130, 
+    gap: 12 
   },
-
-  cardBody: {
-    padding: 8,
+  card: { 
+    flex: 1, 
+    backgroundColor: "#FFF", 
+    borderRadius: 12, 
+    overflow: "hidden", 
+    marginBottom: 2, 
+    elevation: 3, 
+    shadowColor: "#000", 
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.12, 
+    shadowRadius: 4 
   },
-
-  preco: {
-    color: "#FF8C00",
-    fontWeight: "800",
-    fontSize: 11,
+  cardImg: { 
+    width: "100%", 
+    height: 125, 
+    backgroundColor: "#DDD" 
   },
-
-  desc: {
-    fontSize: 9,
-    color: "#000",
-    marginTop: 2,
-    fontWeight: "500",
+  cardBody: { 
+    padding: 9 
   },
-
-  localRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 2,
-    marginTop: 3,
+  preco: { 
+    color: "#1A5CFF", 
+    fontSize: 13, 
+    fontWeight: "700", 
+    marginBottom: 5 
   },
-
-  local: {
-    fontSize: 7,
-    color: "#555",
+  desc: { 
+    color: "#111", 
+    fontSize: 11, 
+    fontWeight: "600", 
+    marginBottom: 6 
   },
-
-  infoRow: {
-    flexDirection: "row",
-    gap: 8,
-    marginTop: 6,
+  localRow: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    gap: 3, 
+    marginBottom: 8 
   },
-
-  infoItem: {
-    flexDirection: "row",
-    alignItems: "center",
+  local: { 
+    flex: 1, 
+    color: "#666", 
+    fontSize: 9 
   },
-
-  infoText: {
-    fontSize: 7,
-    color: "#000",
+  infoRow: { 
+    flexDirection: "row", 
+    flexWrap: "wrap", 
+    gap: 8 
+  },
+  infoItem: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    gap: 3 
+  },
+  infoText: { 
+    color: "#333", 
+    fontSize: 9 
   },
 });
-

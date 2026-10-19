@@ -1,167 +1,70 @@
 
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-  Linking,
-} from "react-native";
-
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Linking, Alert,} from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import MenuDrawer from "./componets/MenuDrawer";
 // ============================================================
-// DADOS DOS IMÓVEIS
+// TELA DE DETALHES DO IMÓVEL
 // ============================================================
-export const IMOVEIS_DATA = [
-  {
-    id: "1",
-    titulo: "Apartamento 2 quartos",
-    local: "Barra de São Miguel, AL",
-    precoMensal: "R$ 1.000",
-    precoDiario: "R$ 150",
-    quartos: 2,
-    banheiros: 1,
-    area: "58m²",
-
-    img: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800",
-
-    mapaPlantaImg:
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
-
-    descricao:
-      "Excelente apartamento totalmente mobiliado, localizado a poucos metros da praia. Ambientes amplos e bem ventilados.",
-
-    proprietario: {
-      nome: "Carlos Silva",
-      telefone: "5582999999999",
-      foto:
-        "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200",
-    },
-  },
-
-  {
-    id: "2",
-    titulo: "Apartamento 2 quartos",
-    local: "Barra de São Miguel, AL",
-    precoMensal: "R$ 1.000",
-    precoDiario: "R$ 140",
-    quartos: 2,
-    banheiros: 2,
-    area: "62m²",
-
-    img: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800",
-
-    mapaPlantaImg:
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
-
-    descricao:
-      "Apartamento aconchegante, ideal para temporadas ou contrato anual. Condomínio fechado com segurança.",
-
-    proprietario: {
-      nome: "Maria Oliveira",
-      telefone: "5582988888888",
-      foto:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200",
-    },
-  },
-
-  {
-    id: "3",
-    titulo: "Apartamento 2 quartos",
-    local: "Ponta Verde, Maceió, AL",
-    precoMensal: "R$ 1.500",
-    precoDiario: "R$ 200",
-    quartos: 2,
-    banheiros: 1,
-    area: "65m²",
-
-    img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
-
-    mapaPlantaImg:
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
-
-    descricao:
-      "Localização privilegiada no coração da Ponta Verde. Próximo a supermercados, farmácias e a 2 quadras da orla.",
-
-    proprietario: {
-      nome: "João Pedro",
-      telefone: "5582977777777",
-      foto:
-        "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=200",
-    },
-  },
-
-  {
-    id: "4",
-    titulo: "Apartamento 2 quartos",
-    local: "Jatiúca, Maceió, AL",
-    precoMensal: "R$ 2.000",
-    precoDiario: "R$ 250",
-    quartos: 2,
-    banheiros: 2,
-    area: "70m²",
-
-    img: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800",
-
-    mapaPlantaImg:
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
-
-    descricao:
-      "Apartamento alto padrão na Jatiúca. Varanda com vista ampla, armários embutidos e vaga de garagem inclusa.",
-
-    proprietario: {
-      nome: "Ana Souza",
-      telefone: "5582966666666",
-      foto:
-        "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200",
-    },
-  },
-];
-
-// ============================================================
-// LINHA LARANJA
-// ============================================================
-
-function LinhaLaranja({
-  width = 95,
-}: {
-  width?: number;
-}) {
-  return (
-    <View
-      style={{
-        width,
-        height: 3,
-        backgroundColor: "#FF8C00",
-        borderRadius: 2,
-        marginTop: 4,
-      }}
-    />
-  );
-}
-
-// ============================================================
-// TELA DE DETALHE
-// ============================================================
-
 export default function DetalheImovel() {
   const insets = useSafeAreaInsets();
-
   const router = useRouter();
-
-  const { id } = useLocalSearchParams();
-
-  // ============================================================
-  // CONTROLE DO MENU
-  // ============================================================
+  const params = useLocalSearchParams<{
+    id?: string | string[];
+    nome?: string | string[];
+    local?: string | string[];
+    valor?: string | string[];
+    quartos?: string | string[];
+    tipo?: string | string[];
+    img?: string | string[];
+  }>();
 
   const [menuVisible, setMenuVisible] = useState(false);
+  // Converte os parâmetros da rota para texto.
+  // O Expo Router pode receber um parâmetro como string ou array.
+  function pegarParametro(
+    parametro?: string | string[]
+  ): string {
+    if (Array.isArray(parametro)) {
+      return parametro[0] ?? "";
+    }
 
+    return parametro ?? "";
+  }
+
+  const id = pegarParametro(params.id);
+  const nome = pegarParametro(params.nome);
+  const local = pegarParametro(params.local);
+  const valor = pegarParametro(params.valor);
+  const quartosParam = pegarParametro(params.quartos);
+  const tipo = pegarParametro(params.tipo);
+  const img = pegarParametro(params.img);
+  // ============================================================
+  // DADOS RECEBIDOS DA HOME
+  // ============================================================
+  const numeroValor = Number(valor);
+  const numeroQuartos = Number(quartosParam);
+  const precoMensal = valor !== "" && Number.isFinite(numeroValor)
+      ? numeroValor.toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+          maximumFractionDigits: 0,
+        })
+      : "Consulte";
+
+  const quantidadeQuartos = quartosParam !== "" && Number.isFinite(numeroQuartos)
+      ? numeroQuartos
+      : null;
+  const titulo = tipo && nome
+      ? `${tipo} - ${nome}`
+      : nome || tipo || "Detalhes do imóvel";
+  const imagemImovel = img ||
+    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800";
+  // ============================================================
+  // MENU
+  // ============================================================
   function abrirMenu() {
     setMenuVisible(true);
   }
@@ -169,304 +72,213 @@ export default function DetalheImovel() {
   function fecharMenu() {
     setMenuVisible(false);
   }
-
   // ============================================================
-  // IMÓVEL
+  // VOLTAR
   // ============================================================
-
-  const imovel =
-    IMOVEIS_DATA.find((item) => item.id === id) ||
-    IMOVEIS_DATA[0];
-
+  function voltar() {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/(tabs)" as any);
+    }
+  }
   // ============================================================
-  // WHATSAPP
+  // CONTATO
   // ============================================================
-
-  const abrirWhatsApp = () => {
-    const mensagem = `Olá ${imovel.proprietario.nome}, vi o anúncio do "${imovel.titulo}" no BuscaLar e gostaria de mais informações!`;
-
-    const url = `https://wa.me/${imovel.proprietario.telefone}?text=${encodeURIComponent(
-      mensagem
-    )}`;
-
-    Linking.openURL(url);
-  };
-
+  async function abrirWhatsApp() {
+    Alert.alert(
+      "Contato do proprietário",
+      "O telefone do proprietário ainda não foi cadastrado para este imóvel."
+    );
+  }
+  // ============================================================
+  // TELA
+  // ============================================================
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          paddingTop: insets.top,
-        },
-      ]}
-    >
-      {/* ======================================================
-          TOPO AZUL
-      ====================================================== */}
+    <View style={[ styles.container, { paddingTop: insets.top },]}>
+      {/* TOPO AZUL */}
       <View style={styles.topo}>
         <View style={styles.topoLogoRow}>
-          {/* HAMBÚRGUER */}
-          <TouchableOpacity
-            style={styles.hamburgerTopo}
-            onPress={abrirMenu}
-            activeOpacity={0.7}>
-            <View style={[styles.hLine, { width: 18 }]} />
-            <View style={[styles.hLine, { width: 12 }]} />
-            <View style={[styles.hLine, { width: 7 }]} />
+          <TouchableOpacity style={styles.hamburgerTopo} onPress={abrirMenu} activeOpacity={0.7}>
+            <View style={[styles.hLine, { width: 22 }]} />
+            <View style={[styles.hLine, { width: 16 }]} />
+            <View style={[styles.hLine, { width: 10 }]} />
           </TouchableOpacity>
-
-          {/* LOGO */}
-
           <Image source={require("/home/usuario/Desktop/BuscaLar/assets/images/BuscaLar-preto.png")} style={styles.logoTopo} resizeMode="contain"/>
           <View style={{ width: 28 }} />
         </View>
       </View>
-      {/* ======================================================
-          CONTEÚDO BRANCO
-      ====================================================== */}
+      {/* CONTEÚDO BRANCO */}
       <View style={styles.conteudoBranco}>
-        {/* HEADER */}
+        {/* CABEÇALHO */}
         <View style={styles.header}>
-          {/* VOLTAR */}
-
-          <TouchableOpacity
-            style={styles.btnVoltar}
-            onPress={() => {
-              if (router.canGoBack()) {
-                router.back();
-              } else {
-                router.replace("/(tabs)" as any);
-              }
-            }}
-            activeOpacity={0.7}
-          >
-            <Ionicons
-              name="arrow-back"
-              size={24}
-              color="#000"
-            />
+          <TouchableOpacity style={styles.btnVoltar} onPress={voltar} activeOpacity={0.7}>
+            <Ionicons name="arrow-back" size={24} color="#000"/>
           </TouchableOpacity>
 
-          {/* TÍTULO */}
-
-          <View style={{ alignItems: "center" }}>
+          <View style={styles.headerCentro}>
             <Text style={styles.headerTitulo}>
               Detalhes do Imóvel
             </Text>
 
-            <LinhaLaranja width={115} />
+            <View style={styles.linhaLaranja} />
           </View>
 
           <View style={{ width: 32 }} />
         </View>
 
-        {/* ====================================================
-            SCROLL
-        ==================================================== */}
-
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* IMAGEM PRINCIPAL */}
-
-          <Image
-            source={{ uri: imovel.img }}
-            style={styles.imagemPrincipal}
-          />
-
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          {/* IMAGEM DO IMÓVEL */}
+          <Image source={{ uri: imagemImovel }} style={styles.imagemPrincipal} resizeMode="cover"/>
           <View style={styles.conteudo}>
             {/* TÍTULO */}
-
             <Text style={styles.titulo}>
-              {imovel.titulo}
+              {titulo}
             </Text>
-
-            {/* LOCAL */}
-
+            {/* LOCALIZAÇÃO */}
             <View style={styles.localRow}>
-              <Ionicons
-                name="location"
-                size={16}
-                color="#FF8C00"
-              />
-
+              <Ionicons name="location" size={17} color="#FF8C00"/>
               <Text style={styles.localText}>
-                {imovel.local}
+                {local || "Localização não informada"}
               </Text>
             </View>
-
-            {/* ==================================================
-                VALORES
-            ================================================== */}
-
+            {/* IDENTIFICAÇÃO */}
+            {id ? (
+              <Text style={styles.codigoImovel}>
+                Código do imóvel: {id}
+              </Text>
+            ) : null}
+            {/* PREÇOS */}
             <View style={styles.valoresContainer}>
               <View style={styles.valorCard}>
                 <Text style={styles.valorLabel}>
-                  Aluguel Mensal
+                  Aluguel mensal
                 </Text>
 
                 <Text style={styles.valorDestaque}>
-                  {imovel.precoMensal}
-
-                  <Text style={styles.valorSub}>
-                    /mês
-                  </Text>
+                  {precoMensal}
                 </Text>
               </View>
 
               <View style={styles.divisorVertical} />
-
               <View style={styles.valorCard}>
                 <Text style={styles.valorLabel}>
-                  Diária
+                  Aluguel por diária
                 </Text>
 
                 <Text style={styles.valorDestaque}>
-                  {imovel.precoDiario}
-
-                  <Text style={styles.valorSub}>
-                    /dia
-                  </Text>
+                  Consulte
                 </Text>
               </View>
             </View>
-
-            {/* ==================================================
-                CARACTERÍSTICAS
-            ================================================== */}
-
+            {/* CARACTERÍSTICAS */}
             <Text style={styles.secaoTitulo}>
               Características
             </Text>
 
             <View style={styles.caracteristicasRow}>
               <View style={styles.itemBadge}>
-                <Ionicons
-                  name="bed-outline"
-                  size={20}
-                  color="#0B5FFF"
-                />
-
+                <Ionicons name="bed-outline" size={22} color="#0B5FFF"/>
                 <Text style={styles.itemBadgeTexto}>
-                  {imovel.quartos} Quartos
+                  {quantidadeQuartos !== null ? `${quantidadeQuartos} ${ quantidadeQuartos === 1
+                          ? "quarto"
+                          : "quartos"
+                      }`
+                    : "Não informado"}
                 </Text>
               </View>
 
               <View style={styles.itemBadge}>
-                <Ionicons
-                  name="water-outline"
-                  size={20}
-                  color="#0B5FFF"
-                />
-
+                <Ionicons name="water-outline" size={22} color="#0B5FFF"/>
                 <Text style={styles.itemBadgeTexto}>
-                  {imovel.banheiros} Banheiros
+                  Banheiros não informados
                 </Text>
               </View>
 
               <View style={styles.itemBadge}>
-                <Ionicons
-                  name="square-outline"
-                  size={20}
-                  color="#0B5FFF"
-                />
-
+                <Ionicons name="home-outline" size={22} color="#0B5FFF"/>
                 <Text style={styles.itemBadgeTexto}>
-                  {imovel.area}
+                  {tipo || "Tipo não informado"}
                 </Text>
               </View>
             </View>
 
-            {/* ==================================================
-                DESCRIÇÃO
-            ================================================== */}
+            {/* DESCRIÇÃO */}
 
             <Text style={styles.secaoTitulo}>
               Descrição
             </Text>
 
             <Text style={styles.descricaoText}>
-              {imovel.descricao}
+              {nome ? `${titulo} localizado em ${ local || "localização não informada" }. O imóvel possui ${ quantidadeQuartos !== null ? `${quantidadeQuartos} ${ quantidadeQuartos === 1
+                            ? "quarto"
+                            : "quartos"
+                        }`
+                      : "quantidade de quartos não informada"
+                  }. Entre em contato com o anunciante para saber mais sobre as condições de aluguel, os ambientes e as comodidades disponíveis.`
+                : "As informações deste imóvel ainda não foram cadastradas."}
             </Text>
 
-            {/* ==================================================
-                MAPA / PLANTA
-            ================================================== */}
+            {/* PLANTA / LOCALIZAÇÃO */}
 
             <Text style={styles.secaoTitulo}>
-              Planta / Localização do Imóvel
+              Planta / localização do imóvel
             </Text>
 
-            <Image
-              source={{ uri: imovel.mapaPlantaImg }}
-              style={styles.mapaImg}
-              resizeMode="cover"
-            />
+            <View style={styles.plantaPlaceholder}>
+              <Ionicons name="map-outline" size={36} color="#0B5FFF"/>
+              <Text style={styles.plantaTexto}>
+                A planta ou o mapa detalhado ainda não foi cadastrado.
+              </Text>
+            </View>
 
-            {/* ==================================================
-                PROPRIETÁRIO
-            ================================================== */}
+            {/* PROPRIETÁRIO */}
 
             <Text style={styles.secaoTitulo}>
               Proprietário
             </Text>
 
             <View style={styles.proprietarioCard}>
-              <Image
-                source={{ uri: imovel.proprietario.foto }}
-                style={styles.proprietarioFoto}
-              />
+              <View style={styles.proprietarioAvatar}>
+                <Ionicons name="person-outline" size={25} color="#0B5FFF"/>
+              </View>
 
               <View style={{ flex: 1 }}>
                 <Text style={styles.proprietarioNome}>
-                  {imovel.proprietario.nome}
+                  Anunciante
                 </Text>
 
                 <Text style={styles.proprietarioSub}>
-                  Anunciante verificado
+                  Dados de contato não cadastrados
                 </Text>
               </View>
 
-              {/* WHATSAPP */}
-
-              <TouchableOpacity
-                style={styles.btnWhatsapp}
-                onPress={abrirWhatsApp}
-                activeOpacity={0.8}
-              >
-                <Ionicons
-                  name="logo-whatsapp"
-                  size={18}
-                  color="#fff"
-                />
-
+              <TouchableOpacity style={styles.btnWhatsapp} onPress={abrirWhatsApp} activeOpacity={0.8}>
+                <Ionicons name="logo-whatsapp" size={18} color="#fff"/>
                 <Text style={styles.btnWhatsappText}>
                   Contato
                 </Text>
               </TouchableOpacity>
             </View>
+
+            {/* BOTÃO VOLTAR */}
+
+            <TouchableOpacity style={styles.botaoVoltar} onPress={voltar} activeOpacity={0.8}>
+              <Ionicons name="arrow-back" size={18} color="#fff"/>
+              <Text style={styles.botaoVoltarTexto}>
+                Voltar aos imóveis
+              </Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </View>
 
-      {/* ======================================================
-          MENU DRAWER
-      ====================================================== */}
+      {/* MENU LATERAL */}
 
-      <MenuDrawer
-        visible={menuVisible}
-        onClose={fecharMenu}
-        onOpen={abrirMenu}
-      />
+      <MenuDrawer visible={menuVisible} onClose={fecharMenu} onOpen={abrirMenu}/>
     </View>
   );
 }
-
-// ============================================================
-// ESTILOS
-// ============================================================
 
 const styles = StyleSheet.create({
   container: {
@@ -478,7 +290,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#448aff",
     paddingHorizontal: 14,
     paddingBottom: 12,
-    marginBottom: -10,
   },
 
   topoLogoRow: {
@@ -490,7 +301,15 @@ const styles = StyleSheet.create({
 
   logoTopo: {
     width: 175,
-    height: 100,
+    height: 85,
+  },
+
+  hamburgerTopo: {
+    width: 28,
+    height: 35,
+    justifyContent: "center",
+    alignItems: "flex-start",
+    gap: 5,
   },
 
   hLine: {
@@ -499,21 +318,12 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
 
-  hamburgerTopo: {
-    width: 28,
-    height: 28,
-    justifyContent: "center",
-    gap: 5,
-    marginBottom: 60,
-  },
-
   conteudoBranco: {
     flex: 1,
     backgroundColor: "#fff",
     borderTopLeftRadius: 18,
     borderTopRightRadius: 18,
-    marginTop: 4,
-    paddingTop: 12,
+    marginTop: 0,
   },
 
   header: {
@@ -521,7 +331,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
+    paddingTop: 12,
     paddingBottom: 12,
+  },
+
+  headerCentro: {
+    alignItems: "center",
   },
 
   btnVoltar: {
@@ -538,13 +353,22 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 
+  linhaLaranja: {
+    width: 115,
+    height: 3,
+    backgroundColor: "#FF8C00",
+    borderRadius: 2,
+    marginTop: 4,
+  },
+
   scrollContent: {
-    paddingBottom: 30,
+    paddingBottom: 35,
   },
 
   imagemPrincipal: {
     width: "100%",
-    height: 220,
+    height: 230,
+    backgroundColor: "#eee",
   },
 
   conteudo: {
@@ -552,7 +376,7 @@ const styles = StyleSheet.create({
   },
 
   titulo: {
-    fontSize: 20,
+    fontSize: 21,
     fontWeight: "800",
     color: "#000",
   },
@@ -560,32 +384,41 @@ const styles = StyleSheet.create({
   localRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
-    marginTop: 4,
+    gap: 5,
+    marginTop: 6,
   },
 
   localText: {
+    flex: 1,
     fontSize: 13,
     color: "#666",
+  },
+
+  codigoImovel: {
+    fontSize: 11,
+    color: "#888",
+    marginTop: 6,
   },
 
   valoresContainer: {
     flexDirection: "row",
     backgroundColor: "#F4F6F9",
     borderRadius: 12,
-    padding: 12,
-    marginTop: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 8,
+    marginTop: 18,
     alignItems: "center",
   },
 
   valorCard: {
     flex: 1,
     alignItems: "center",
+    paddingHorizontal: 4,
   },
 
   divisorVertical: {
     width: 1,
-    height: "80%",
+    height: 42,
     backgroundColor: "#DDD",
   },
 
@@ -593,60 +426,70 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: "#777",
     fontWeight: "600",
+    textAlign: "center",
   },
 
   valorDestaque: {
     fontSize: 16,
     fontWeight: "800",
     color: "#FF8C00",
-    marginTop: 2,
-  },
-
-  valorSub: {
-    fontSize: 11,
-    fontWeight: "400",
-    color: "#555",
+    marginTop: 5,
+    textAlign: "center",
   },
 
   secaoTitulo: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "700",
     color: "#000",
-    marginTop: 20,
-    marginBottom: 8,
+    marginTop: 22,
+    marginBottom: 10,
   },
 
   caracteristicasRow: {
     flexDirection: "row",
-    gap: 10,
+    gap: 8,
   },
 
   itemBadge: {
     flex: 1,
+    minHeight: 85,
     backgroundColor: "#EBF1FF",
     paddingVertical: 10,
+    paddingHorizontal: 4,
     borderRadius: 8,
     alignItems: "center",
-    gap: 4,
+    justifyContent: "center",
+    gap: 6,
   },
 
   itemBadgeTexto: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "700",
     color: "#0B5FFF",
+    textAlign: "center",
   },
 
   descricaoText: {
     fontSize: 13,
     color: "#555",
-    lineHeight: 18,
+    lineHeight: 20,
   },
 
-  mapaImg: {
-    width: "100%",
-    height: 160,
+  plantaPlaceholder: {
+    minHeight: 115,
+    backgroundColor: "#F4F6F9",
     borderRadius: 10,
-    backgroundColor: "#eee",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 18,
+    gap: 8,
+  },
+
+  plantaTexto: {
+    fontSize: 12,
+    color: "#666",
+    textAlign: "center",
+    lineHeight: 18,
   },
 
   proprietarioCard: {
@@ -660,10 +503,13 @@ const styles = StyleSheet.create({
     gap: 10,
   },
 
-  proprietarioFoto: {
+  proprietarioAvatar: {
     width: 46,
     height: 46,
     borderRadius: 23,
+    backgroundColor: "#EBF1FF",
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   proprietarioNome: {
@@ -675,23 +521,39 @@ const styles = StyleSheet.create({
   proprietarioSub: {
     fontSize: 10,
     color: "#777",
+    marginTop: 3,
   },
 
   btnWhatsapp: {
     backgroundColor: "#25D366",
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 9,
     borderRadius: 20,
     gap: 4,
   },
 
   btnWhatsappText: {
     color: "#fff",
-    fontSize: 12,
+    fontSize: 11,
+    fontWeight: "700",
+  },
+
+  botaoVoltar: {
+    backgroundColor: "#0B5FFF",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 14,
+    borderRadius: 10,
+    marginTop: 25,
+    gap: 8,
+  },
+
+  botaoVoltarTexto: {
+    color: "#fff",
+    fontSize: 14,
     fontWeight: "700",
   },
 });
-
-
