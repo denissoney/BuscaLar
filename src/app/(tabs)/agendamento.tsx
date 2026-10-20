@@ -1,112 +1,106 @@
+
 import React, { useMemo, useRef, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  TextInput,
-  Modal,
-  Pressable,
-  Animated,
-  PanResponder,
-  Alert,
-} from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, TextInput, Modal, Pressable, Animated, PanResponder, Alert,} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import Svg, { Polygon } from "react-native-svg";
+import { useTheme } from "../../contexts/ThemeContext";
 
 const DIAS_SEMANA = ["D", "S", "T", "Q", "Q", "S", "S"];
-const MESES = [
-  "Janeiro",
-  "Fevereiro",
-  "Março",
-  "Abril",
-  "Maio",
-  "Junho",
-  "Julho",
-  "Agosto",
-  "Setembro",
-  "Outubro",
-  "Novembro",
-  "Dezembro",
-];
-
+const MESES = [ "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",];
 const HORARIOS = ["9:00", "10:30", "14:00", "16:30"];
-
+const LARGURA_MENU = 280;
 type TipoDia = "anterior" | "atual" | "proximo";
-type DiaCalendario = {
-  dia: number;
-  tipo: TipoDia;
-};
-
+type DiaCalendario = { dia: number; tipo: TipoDia;};
 export default function AgendarVisita() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { dark } = useTheme();
+  const hoje = new Date();
   const [menuVisible, setMenuVisible] = useState(false);
-  const [data, setData] = useState(new Date(2026, 7, 1));
-  const [diaSelecionado, setDiaSelecionado] = useState(13);
+  const [data, setData] = useState( new Date(hoje.getFullYear(), hoje.getMonth(), 1));
+  const [diaSelecionado, setDiaSelecionado] = useState(hoje.getDate());
   const [horaSelecionada, setHoraSelecionada] = useState("10:30");
   const [nome, setNome] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
-  const LARGURA_MENU = 280;
-  const menuAnim = useRef( new Animated.Value(-LARGURA_MENU)).current;
+  const menuVisibleRef = useRef(false);
+  const menuAnim = useRef(new Animated.Value(-LARGURA_MENU)).current;
+  const cores = useMemo(
+    () => ({
+      fundo: dark ? "#121212" : "#FFFFFF",
+      card: dark ? "#242426" : "#FFFFFF",
+      texto: dark ? "#FFFFFF" : "#111111",
+      textoSecundario: dark ? "#BBBBBB" : "#666666",
+      borda: dark ? "#414145" : "#E5E5E5",
+      diaOutroMes: dark ? "#333337" : "#EFEFEF",
+      input: dark ? "#1B1B1D" : "#FFFFFF",
+      placeholder: dark ? "#999999" : "#888888",
+      menu: dark ? "#242426" : "#FFFFFF",
+      menuTexto: dark ? "#FFFFFF" : "#111111",
+      menuBorda: dark ? "#414145" : "#EEEEEE",
+      azul: "#448AFF",
+      azulCalendario: "#1A5CFF",
+      laranja: "#FF8C00",
+    }), [dark]
+  );
   const abrirMenu = () => {
-    if (menuVisible) return;
+    if (menuVisibleRef.current) return;
+    menuVisibleRef.current = true;
     setMenuVisible(true);
     menuAnim.stopAnimation();
-    menuAnim.setValue(-LARGURA_MENU);
-    Animated.timing(menuAnim, {
-      toValue: 0,
-      duration: 280,
-      useNativeDriver: true,
-    }).start();
+    Animated.timing(menuAnim, { toValue: 0, duration: 250, useNativeDriver: true, }).start(); };
+  const fecharMenu = (aoFechar?: () => void) => {
+    menuVisibleRef.current = false;
+    menuAnim.stopAnimation();
+    Animated.timing(menuAnim, { toValue: -LARGURA_MENU, duration: 220, useNativeDriver: true,
+    }).start(({ finished }) => {
+      if (finished) {
+        setMenuVisible(false);
+        aoFechar?.();
+      }
+    });
   };
 
-  const fecharMenu = () => {
-    menuAnim.stopAnimation();
-    Animated.timing(menuAnim, {
-      toValue: -LARGURA_MENU,
-      duration: 220,
-      useNativeDriver: true,
-    }).start(() => {
-      setMenuVisible(false);
+  const irPara = (rota: string) => {
+    fecharMenu(() => {
+      router.push(rota as any);
     });
   };
 
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => false,
-      onMoveShouldSetPanResponder: (_, g) => {
-        return (
-          !menuVisible &&
-          g.x0 <= 60 &&
-          Math.abs(g.dx) > Math.abs(g.dy) * 1.2 &&
-          g.dx > 8
-        );
-      },
 
-      onPanResponderMove: (_, g) => {
+      onMoveShouldSetPanResponder: (_, gesto) =>
+        !menuVisibleRef.current &&
+        gesto.x0 <= 60 &&
+        Math.abs(gesto.dx) > Math.abs(gesto.dy) * 1.2 &&
+        gesto.dx > 8,
+
+      onPanResponderMove: (_, gesto) => {
         const novoX = Math.max(
           -LARGURA_MENU,
-          Math.min(0, -LARGURA_MENU + g.dx)
+          Math.min(0, -LARGURA_MENU + gesto.dx)
         );
 
         menuAnim.setValue(novoX);
       },
 
-      onPanResponderRelease: (_, g) => {
-        if (g.dx >= 90) {
+      onPanResponderRelease: (_, gesto) => {
+        if (gesto.dx >= 90) {
+          menuVisibleRef.current = true;
           setMenuVisible(true);
 
-          Animated.timing(menuAnim, {
+          Animated.spring(menuAnim, {
             toValue: 0,
-            duration: 180,
             useNativeDriver: true,
+            tension: 70,
+            friction: 12,
           }).start();
         } else {
+          menuVisibleRef.current = false;
+
           Animated.timing(menuAnim, {
             toValue: -LARGURA_MENU,
             duration: 150,
@@ -116,31 +110,24 @@ export default function AgendarVisita() {
       },
 
       onPanResponderTerminate: () => {
-        Animated.timing(menuAnim, {
-          toValue: -LARGURA_MENU,
-          duration: 150,
-          useNativeDriver: true,
-        }).start();
+        if (!menuVisibleRef.current) {
+          Animated.timing(menuAnim, {
+            toValue: -LARGURA_MENU,
+            duration: 150,
+            useNativeDriver: true,
+          }).start();
+        }
       },
     })
   ).current;
 
-  const irPara = (rota: string) => {
-    fecharMenu();
-
-    setTimeout(() => {
-      router.push(rota as any);
-    }, 230);
-  };
-
   const mudarMes = (direcao: number) => {
     setData((dataAtual) => {
-      const novaData = new Date(dataAtual);
-
-      novaData.setDate(1);
-      novaData.setMonth(novaData.getMonth() + direcao);
-
-      return novaData;
+      return new Date(
+        dataAtual.getFullYear(),
+        dataAtual.getMonth() + direcao,
+        1
+      );
     });
 
     setDiaSelecionado(1);
@@ -150,42 +137,20 @@ export default function AgendarVisita() {
     const ano = data.getFullYear();
     const mes = data.getMonth();
 
-    const primeiroDiaDoMes = new Date(
-      ano,
-      mes,
-      1
-    ).getDay();
-
-    const quantidadeDiasMes = new Date(
-      ano,
-      mes + 1,
-      0
-    ).getDate();
-
-    const quantidadeDiasMesAnterior = new Date(
-      ano,
-      mes,
-      0
-    ).getDate();
+    const primeiroDiaDoMes = new Date(ano, mes, 1).getDay();
+    const quantidadeDiasMes = new Date(ano, mes + 1, 0).getDate();
+    const quantidadeDiasMesAnterior = new Date(ano, mes, 0).getDate();
 
     const dias: DiaCalendario[] = [];
 
-    for (
-      let i = primeiroDiaDoMes - 1;
-      i >= 0;
-      i--
-    ) {
+    for (let i = primeiroDiaDoMes - 1; i >= 0; i--) {
       dias.push({
         dia: quantidadeDiasMesAnterior - i,
         tipo: "anterior",
       });
     }
 
-    for (
-      let dia = 1;
-      dia <= quantidadeDiasMes;
-      dia++
-    ) {
+    for (let dia = 1; dia <= quantidadeDiasMes; dia++) {
       dias.push({
         dia,
         tipo: "atual",
@@ -205,156 +170,167 @@ export default function AgendarVisita() {
 
     const semanas: DiaCalendario[][] = [];
 
-    for (
-      let i = 0;
-      i < dias.length;
-      i += 7
-    ) {
-      semanas.push(
-        dias.slice(i, i + 7)
-      );
+    for (let i = 0; i < dias.length; i += 7) {
+      semanas.push(dias.slice(i, i + 7));
     }
 
     return semanas;
   }, [data]);
 
-  // ============================================================
-  // CONFIRMAR AGENDAMENTO
-  // ============================================================
   const confirmarAgendamento = () => {
     if (!nome.trim()) {
+      Alert.alert("Atenção", "Digite seu nome completo.");
+      return;
+    }
+
+    const numeroWhatsApp = whatsapp.replace(/\D/g, "");
+
+    if (numeroWhatsApp.length < 10 || numeroWhatsApp.length > 13) {
       Alert.alert(
         "Atenção",
-        "Digite seu nome."
+        "Digite um número de WhatsApp válido, incluindo o DDD."
       );
       return;
     }
 
-    if (!whatsapp.trim()) {
-      Alert.alert(
-        "Atenção",
-        "Digite seu WhatsApp."
-      );
-      return;
-    }
+    const dataSelecionada = new Date(
+      data.getFullYear(),
+      data.getMonth(),
+      diaSelecionado
+    );
 
-    // Depois de preencher os dados,
-    // vai para a tela de sucesso.
-    router.push("/agendamentosucesso" as any);
+    const dataFormatada = [
+      String(dataSelecionada.getDate()).padStart(2, "0"),
+      String(dataSelecionada.getMonth() + 1).padStart(2, "0"),
+      dataSelecionada.getFullYear(),
+    ].join("/");
+
+    router.push({
+      pathname: "/agendamentosucesso",
+      params: {
+        nome: nome.trim(),
+        whatsapp: numeroWhatsApp,
+        data: dataFormatada,
+        horario: horaSelecionada,
+        imovel: "Apartamento ponta verde",
+      },
+    } as any);
   };
+
+  const renderizarItemMenu = (
+    icone: React.ComponentProps<typeof Ionicons>["name"],
+    titulo: string,
+    rota: string,
+    sair = false
+  ) => (
+    <TouchableOpacity
+      style={styles.item}
+      onPress={() => irPara(rota)}
+      activeOpacity={0.7}
+    >
+      <Ionicons
+        name={icone}
+        size={22}
+        color={sair ? "#E53935" : cores.menuTexto}
+      />
+
+      <Text
+        style={[
+          styles.itemText,
+          { color: sair ? "#E53935" : cores.menuTexto },
+        ]}
+      >
+        {titulo}
+      </Text>
+    </TouchableOpacity>
+  );
 
   return (
     <View
       style={[
         styles.container,
-        {
-          paddingTop: insets.top,
-        },
+        { backgroundColor: cores.azul, paddingTop: insets.top },
       ]}
       {...panResponder.panHandlers}
     >
+      {/* CABEÇALHO */}
+
       <View style={styles.topoAzul}>
         <View style={styles.headerAzul}>
           <TouchableOpacity
             style={styles.btnHamburguer}
             onPress={abrirMenu}
             activeOpacity={0.7}
+            accessibilityLabel="Abrir menu"
           >
-            <View
-              style={[
-                styles.traco,
-                {
-                  width: 18,
-                },
-              ]}
-            />
-
-            <View
-              style={[
-                styles.traco,
-                {
-                  width: 13,
-                },
-              ]}
-            />
-
-            <View
-              style={[
-                styles.traco,
-                {
-                  width: 8,
-                },
-              ]}
-            />
+            <View style={[styles.traco, { width: 22 }]} />
+            <View style={[styles.traco, { width: 16 }]} />
+            <View style={[styles.traco, { width: 10 }]} />
           </TouchableOpacity>
 
-          <Image
-            source={require("../../../assets/images/BuscaLar-preto.png")}
-            style={styles.logoImg}
-            resizeMode="contain"
-          />
-
-          <View
-            style={{
-              width: 32,
-            }}
-          />
+          <Image source={ dark
+                     ? require("../../../assets/images/logo.png")
+                     : require("../../../assets/images/BuscaLar-preto.png") }
+                  style={styles.logoImg}
+                  resizeMode="contain"/>
+          <View style={styles.espacoHeader} />
         </View>
       </View>
 
+      {/* CONTEÚDO */}
+
       <ScrollView
-        style={styles.content}
+        style={[
+          styles.content,
+          { backgroundColor: cores.fundo },
+        ]}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
-          paddingBottom: 90,
+          paddingBottom: Math.max(insets.bottom, 20) + 25,
         }}
       >
-        {/* TÍTULO COM SETA */}
+        {/* TÍTULO */}
 
         <View style={styles.voltarRow}>
           <TouchableOpacity
             onPress={() => router.back()}
             style={styles.btnVoltarNovo}
+            accessibilityLabel="Voltar"
           >
             <Ionicons
               name="arrow-back"
-              size={26}
-              color="#000"
+              size={25}
+              color={cores.texto}
             />
           </TouchableOpacity>
 
           <View style={styles.tituloCentro}>
-            <Text style={styles.titulo}>
+            <Text style={[styles.titulo, { color: cores.texto }]}>
               Agendar Visita
             </Text>
 
-            <Svg
-              height={4}
-              width={95}
-              style={{
-                marginTop: 3,
-              }}
-            >
+            <Svg height={4} width={95} style={{ marginTop: 3 }}>
               <Polygon
                 points="0,0 95,1 95,2 0,4"
-                fill="#FF8C00"
+                fill={cores.laranja}
               />
             </Svg>
           </View>
 
-          <View
-            style={{
-              width: 32,
-            }}
-          />
+          <View style={styles.espacoTitulo} />
         </View>
 
-        {/* CARD DO IMÓVEL */}
+        {/* IMÓVEL */}
 
         <View
           style={[
             styles.cardImovel,
             styles.sombra,
+            {
+              backgroundColor: cores.card,
+              borderColor: cores.borda,
+            },
           ]}
         >
           <Image
@@ -365,164 +341,165 @@ export default function AgendarVisita() {
           />
 
           <View style={styles.cardInfo}>
-            <Text style={styles.cardTitulo}>
+            <Text
+              style={[styles.cardTitulo, { color: cores.texto }]}
+              numberOfLines={2}
+            >
               Apartamento ponta verde
             </Text>
 
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 4,
-                marginTop: 2,
-              }}
-            >
+            <View style={styles.localizacaoRow}>
               <Ionicons
                 name="location"
-                size={12}
-                color="#FF8C00"
+                size={13}
+                color={cores.laranja}
               />
 
-              <Text style={styles.cardSub}>
-                Ponta verde, Maceió-AL - 68m² - 2 quartos
+              <Text
+                style={[
+                  styles.cardSub,
+                  { color: cores.textoSecundario },
+                ]}
+              >
+                Ponta Verde, Maceió-AL - 68m² - 2 quartos
               </Text>
             </View>
           </View>
         </View>
 
-        {/* DATA */}
+        {/* CALENDÁRIO */}
 
-        <Text style={styles.secaoTitulo}>
+        <Text style={[styles.secaoTitulo, { color: cores.texto }]}>
           Escolha a data
         </Text>
 
-        <View style={styles.linhaAzul} />
+        <View
+          style={[
+            styles.linhaAzul,
+            { backgroundColor: cores.azulCalendario },
+          ]}
+        />
 
         <View style={styles.calendarioHeaderFora}>
           <TouchableOpacity
             onPress={() => mudarMes(-1)}
             activeOpacity={0.7}
             style={styles.btnMes}
+            accessibilityLabel="Mês anterior"
           >
             <Ionicons
               name="chevron-back"
               size={22}
-              color="#1A5CFF"
+              color={cores.azulCalendario}
             />
           </TouchableOpacity>
 
-          <Text style={styles.calendarioMes}>
-            {MESES[data.getMonth()]}{" "}
-            {data.getFullYear()}
+          <Text
+            style={[
+              styles.calendarioMes,
+              { color: cores.texto },
+            ]}
+          >
+            {MESES[data.getMonth()]} {data.getFullYear()}
           </Text>
 
           <TouchableOpacity
             onPress={() => mudarMes(1)}
             activeOpacity={0.7}
             style={styles.btnMes}
+            accessibilityLabel="Próximo mês"
           >
             <Ionicons
               name="chevron-forward"
               size={22}
-              color="#1A5CFF"
+              color={cores.azulCalendario}
             />
           </TouchableOpacity>
         </View>
-
-        {/* CALENDÁRIO */}
 
         <View
           style={[
             styles.calendarioBox,
             styles.sombra,
+            {
+              backgroundColor: cores.card,
+              borderColor: cores.borda,
+            },
           ]}
         >
           <View style={styles.semanaRow}>
-            {DIAS_SEMANA.map(
-              (dia, index) => (
-                <Text
-                  key={index}
-                  style={styles.diaSemana}
-                >
-                  {dia}
-                </Text>
-              )
-            )}
+            {DIAS_SEMANA.map((dia, index) => (
+              <Text
+                key={index}
+                style={[
+                  styles.diaSemana,
+                  { color: cores.texto },
+                ]}
+              >
+                {dia}
+              </Text>
+            ))}
           </View>
 
-          {calendario.map(
-            (semana, indexSemana) => (
-              <View
-                key={indexSemana}
-                style={styles.semanaRow}
-              >
-                {semana.map(
-                  (item, indexDia) => {
-                    const isOutroMes =
-                      item.tipo !== "atual";
+          {calendario.map((semana, indexSemana) => (
+            <View key={indexSemana} style={styles.semanaRow}>
+              {semana.map((item, indexDia) => {
+                const isOutroMes = item.tipo !== "atual";
+                const isSelecionado =
+                  item.tipo === "atual" &&
+                  item.dia === diaSelecionado;
 
-                    const isSelecionado =
-                      item.tipo === "atual" &&
-                      item.dia ===
-                        diaSelecionado;
-
-                    return (
-                      <TouchableOpacity
-                        key={`${indexSemana}-${indexDia}`}
-                        style={[
-                          styles.diaBolha,
-                          isOutroMes &&
-                            styles.diaOutroMes,
-                          isSelecionado &&
-                            styles.diaSelecionado,
-                        ]}
-                        disabled={isOutroMes}
-                        onPress={() => {
-                          if (
-                            item.tipo ===
-                            "atual"
-                          ) {
-                            setDiaSelecionado(
-                              item.dia
-                            );
-                          }
-                        }}
-                        activeOpacity={0.7}
-                      >
-                        <Text
-                          style={[
-                            styles.diaTexto,
-                            isOutroMes && {
-                              color: "#999",
-                            },
-                            isSelecionado && {
-                              color: "#FFF",
-                            },
-                          ]}
-                        >
-                          {item.dia}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  }
-                )}
-              </View>
-            )
-          )}
+                return (
+                  <TouchableOpacity
+                    key={`${indexSemana}-${indexDia}`}
+                    style={[
+                      styles.diaBolha,
+                      {
+                        backgroundColor: isOutroMes
+                          ? cores.diaOutroMes
+                          : cores.laranja,
+                      },
+                      isSelecionado && styles.diaSelecionado,
+                    ]}
+                    disabled={isOutroMes}
+                    onPress={() => setDiaSelecionado(item.dia)}
+                    activeOpacity={0.7}
+                  >
+                    <Text
+                      style={[
+                        styles.diaTexto,
+                        {
+                          color: isOutroMes
+                            ? cores.textoSecundario
+                            : "#FFFFFF",
+                        },
+                      ]}
+                    >
+                      {item.dia}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          ))}
         </View>
 
         {/* HORÁRIOS */}
 
-        <Text style={styles.secaoTitulo}>
+        <Text style={[styles.secaoTitulo, { color: cores.texto }]}>
           Horários disponíveis
         </Text>
 
-        <View style={styles.linhaAzul} />
+        <View
+          style={[
+            styles.linhaAzul,
+            { backgroundColor: cores.azulCalendario },
+          ]}
+        />
 
         <View style={styles.horariosRow}>
           {HORARIOS.map((hora) => {
-            const selecionado =
-              hora === horaSelecionada;
+            const selecionado = hora === horaSelecionada;
 
             return (
               <TouchableOpacity
@@ -530,21 +507,27 @@ export default function AgendarVisita() {
                 style={[
                   styles.horaBtn,
                   styles.sombraSuave,
-                  selecionado &&
-                    styles.horaSelecionada,
+                  {
+                    backgroundColor: selecionado
+                      ? cores.laranja
+                      : dark
+                        ? "#343B49"
+                        : "#DCE8FF",
+                    borderColor: selecionado
+                      ? cores.laranja
+                      : cores.borda,
+                  },
                 ]}
-                onPress={() =>
-                  setHoraSelecionada(
-                    hora
-                  )
-                }
+                onPress={() => setHoraSelecionada(hora)}
                 activeOpacity={0.7}
               >
                 <Text
                   style={[
                     styles.horaTexto,
-                    selecionado && {
-                      color: "#FFF",
+                    {
+                      color: selecionado
+                        ? "#FFFFFF"
+                        : cores.texto,
                     },
                   ]}
                 >
@@ -557,19 +540,28 @@ export default function AgendarVisita() {
 
         {/* DADOS DO AGENDAMENTO */}
 
-        <Text style={styles.secaoTitulo}>
+        <Text style={[styles.secaoTitulo, { color: cores.texto }]}>
           Dados do agendamento
         </Text>
 
-        <View style={styles.linhaAzul} />
+        <View
+          style={[
+            styles.linhaAzul,
+            { backgroundColor: cores.azulCalendario },
+          ]}
+        />
 
         <View style={styles.dadosRow}>
-          {/* DADOS DO USUÁRIO */}
+          {/* CONTATO DO CLIENTE */}
 
           <View
             style={[
               styles.dadoCard,
               styles.sombra,
+              {
+                backgroundColor: cores.card,
+                borderColor: cores.borda,
+              },
             ]}
           >
             <View style={styles.dadoTopo}>
@@ -580,38 +572,61 @@ export default function AgendarVisita() {
                 style={styles.miniAvatar}
               />
 
-              <Text style={styles.dadoLabel}>
+              <Text
+                style={[styles.dadoLabel, { color: cores.texto }]}
+              >
                 Nome
               </Text>
             </View>
 
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                {
+                  color: cores.texto,
+                  backgroundColor: cores.input,
+                  borderColor: cores.borda,
+                },
+              ]}
               placeholder="Digite seu nome completo"
-              placeholderTextColor="#999"
+              placeholderTextColor={cores.placeholder}
               value={nome}
               onChangeText={setNome}
+              autoCapitalize="words"
+              returnKeyType="next"
+              maxLength={100}
             />
 
             <View style={styles.dadoTopo}>
               <Ionicons
                 name="logo-whatsapp"
-                size={14}
+                size={15}
                 color="#00D95F"
               />
 
-              <Text style={styles.dadoLabel}>
+              <Text
+                style={[styles.dadoLabel, { color: cores.texto }]}
+              >
                 WhatsApp
               </Text>
             </View>
 
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                {
+                  color: cores.texto,
+                  backgroundColor: cores.input,
+                  borderColor: cores.borda,
+                },
+              ]}
               placeholder="(82) 9 9999-9999"
-              placeholderTextColor="#999"
+              placeholderTextColor={cores.placeholder}
               value={whatsapp}
               onChangeText={setWhatsapp}
               keyboardType="phone-pad"
+              returnKeyType="done"
+              maxLength={16}
             />
           </View>
 
@@ -621,6 +636,10 @@ export default function AgendarVisita() {
             style={[
               styles.dadoCard,
               styles.sombra,
+              {
+                backgroundColor: cores.card,
+                borderColor: cores.borda,
+              },
             ]}
           >
             <View style={styles.dadoTopo}>
@@ -631,41 +650,43 @@ export default function AgendarVisita() {
                 style={styles.miniAvatar}
               />
 
-              <Text style={styles.dadoLabel}>
+              <Text
+                style={[styles.dadoLabel, { color: cores.texto }]}
+              >
                 Proprietário
               </Text>
             </View>
 
-            <Text style={styles.propNome}>
+            <Text style={[styles.propNome, { color: cores.texto }]}>
               Davi Miguel
             </Text>
 
-            <Text style={styles.propSub}>
-              responde em 15min
+            <Text
+              style={[
+                styles.propSub,
+                { color: cores.textoSecundario },
+              ]}
+            >
+              Responde em 15 min
             </Text>
 
             <Text style={styles.propEstrelas}>
               ★★★★★{" "}
-              <Text style={styles.propNota}>
+              <Text style={[styles.propNota, { color: cores.texto }]}>
                 4.9
               </Text>
             </Text>
           </View>
         </View>
 
-        {/* BOTÃO CONFIRMAR */}
+        {/* CONFIRMAR */}
 
         <TouchableOpacity
-          style={[
-            styles.btnConfirmar,
-            styles.sombra,
-          ]}
+          style={[styles.btnConfirmar, styles.sombra]}
           activeOpacity={0.8}
           onPress={confirmarAgendamento}
         >
-          <Text
-            style={styles.btnConfirmarText}
-          >
+          <Text style={styles.btnConfirmarText}>
             Confirmar agendamento
           </Text>
         </TouchableOpacity>
@@ -678,299 +699,96 @@ export default function AgendarVisita() {
         transparent
         animationType="none"
         statusBarTranslucent
-        onRequestClose={fecharMenu}
+        onRequestClose={() => fecharMenu()}
       >
         <View style={styles.menuWrapper}>
           <Pressable
             style={styles.menuBackground}
-            onPress={fecharMenu}
+            onPress={() => fecharMenu()}
           />
 
           <Animated.View
             style={[
               styles.sideMenu,
               {
-                paddingTop:
-                  insets.top + 70,
-                transform: [
-                  {
-                    translateX: menuAnim,
-                  },
-                ],
+                backgroundColor: cores.menu,
+                paddingTop: insets.top + 20,
+                paddingBottom: insets.bottom,
+                transform: [{ translateX: menuAnim }],
               },
             ]}
           >
-            <View style={styles.menuTopo}>
-              <View
-                style={styles.avatarLaranja}
-              >
-                <Text
-                  style={
-                    styles.avatarLaranjaText
-                  }
-                >
-                  D
-                </Text>
+            <View
+              style={[
+                styles.menuTopo,
+                { borderBottomColor: cores.menuBorda },
+              ]}
+            >
+              <View style={styles.avatarLaranja}>
+                <Text style={styles.avatarLaranjaText}>D</Text>
               </View>
 
-              <View
-                style={{
-                  flex: 1,
-                }}
-              >
+              <View style={{ flex: 1 }}>
                 <Text
-                  style={styles.menuNome}
+                  style={[
+                    styles.menuNome,
+                    { color: cores.menuTexto },
+                  ]}
                 >
                   Davi Miguel
                 </Text>
 
-                <Text
-                  style={styles.menuEmail}
-                >
+                <Text style={styles.menuEmail}>
                   davi.miguel@gmail.com
                 </Text>
               </View>
 
               <TouchableOpacity
                 style={styles.btnFechar}
-                onPress={fecharMenu}
+                onPress={() => fecharMenu()}
                 activeOpacity={0.7}
+                accessibilityLabel="Fechar menu"
               >
                 <Ionicons
                   name="close"
                   size={28}
-                  color="#000"
+                  color={cores.menuTexto}
                 />
               </TouchableOpacity>
             </View>
 
             <ScrollView
-              showsVerticalScrollIndicator={
-                false
-              }
-              contentContainerStyle={{
-                paddingBottom: 30,
-              }}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 30 }}
             >
-              <View style={styles.lista}>
-                {/* INÍCIO */}
+              {renderizarItemMenu("home", "Início", "/")}
+              <View style={[styles.linha, { backgroundColor: cores.menuBorda }]} />
 
-                <TouchableOpacity
-                  style={styles.item}
-                  onPress={() =>
-                    irPara("/")
-                  }
-                >
-                  <Ionicons
-                    name="home"
-                    size={22}
-                    color="#000"
-                  />
+              {renderizarItemMenu("location", "Filtro", "/filtro")}
+              <View style={[styles.linha, { backgroundColor: cores.menuBorda }]} />
 
-                  <Text
-                    style={styles.itemText}
-                  >
-                    Inicio
-                  </Text>
-                </TouchableOpacity>
+              {renderizarItemMenu("heart-outline", "Favoritos", "/favoritos")}
+              <View style={[styles.linha, { backgroundColor: cores.menuBorda }]} />
 
-                <View style={styles.linha} />
+              {renderizarItemMenu("calendar", "Agendamentos", "/agendamento")}
+              <View style={[styles.linha, { backgroundColor: cores.menuBorda }]} />
 
-                {/* FILTRO */}
+              {renderizarItemMenu("card", "Pagamentos", "/pagamentos")}
+              <View style={[styles.linha, { backgroundColor: cores.menuBorda }]} />
 
-                <TouchableOpacity
-                  style={styles.item}
-                  onPress={() =>
-                    irPara("/filtro")
-                  }
-                >
-                  <Ionicons
-                    name="location"
-                    size={22}
-                    color="#000"
-                  />
+              {renderizarItemMenu("document-text", "Contrato", "/contrato")}
+              <View style={[styles.linha, { backgroundColor: cores.menuBorda }]} />
 
-                  <Text
-                    style={styles.itemText}
-                  >
-                    Filtro
-                  </Text>
-                </TouchableOpacity>
+              {renderizarItemMenu("person", "Perfil", "/perfil-proprietario")}
+              <View style={[styles.linha, { backgroundColor: cores.menuBorda }]} />
 
-                <View style={styles.linha} />
+              {renderizarItemMenu("home-outline", "Casas", "/imoveis")}
+              <View style={[styles.linha, { backgroundColor: cores.menuBorda }]} />
 
-                {/* FAVORITOS */}
+              {renderizarItemMenu("settings", "Configurações", "/configuracoes")}
+              <View style={[styles.linha, { backgroundColor: cores.menuBorda }]} />
 
-                <TouchableOpacity
-                  style={styles.item}
-                  onPress={() =>
-                    irPara("/favoritos")
-                  }
-                >
-                  <Ionicons
-                    name="heart-outline"
-                    size={22}
-                    color="#000"
-                  />
-
-                  <Text
-                    style={styles.itemText}
-                  >
-                    Favorito
-                  </Text>
-                </TouchableOpacity>
-
-                <View style={styles.linha} />
-
-                {/* AGENDAMENTOS */}
-
-                <TouchableOpacity
-                  style={styles.item}
-                  onPress={() =>
-                    irPara("/agendamento")
-                  }
-                >
-                  <Ionicons
-                    name="calendar"
-                    size={22}
-                    color="#000"
-                  />
-
-                  <Text
-                    style={styles.itemText}
-                  >
-                    Agendamentos
-                  </Text>
-                </TouchableOpacity>
-
-                <View style={styles.linha} />
-
-                {/* PAGAMENTOS */}
-
-                <TouchableOpacity
-                  style={styles.item}
-                  onPress={() =>
-                    irPara("/pagamentos")
-                  }
-                >
-                  <Ionicons
-                    name="card"
-                    size={22}
-                    color="#000"
-                  />
-
-                  <Text
-                    style={styles.itemText}
-                  >
-                    Pagamentos
-                  </Text>
-                </TouchableOpacity>
-
-                <View style={styles.linha} />
-
-                {/* CONTRATO */}
-
-                <TouchableOpacity
-                  style={styles.item}
-                  onPress={() =>
-                    irPara("/contrato")
-                  }
-                >
-                  <Ionicons
-                    name="document-text"
-                    size={22}
-                    color="#000"
-                  />
-
-                  <Text
-                    style={styles.itemText}
-                  >
-                    Contrato
-                  </Text>
-                </TouchableOpacity>
-
-                <View style={styles.linha} />
-
-                {/* PERFIL */}
-
-                <TouchableOpacity
-                  style={styles.item}
-                  onPress={() =>
-                    irPara(
-                      "/perfil-proprietario"
-                    )
-                  }
-                >
-                  <Ionicons
-                    name="person"
-                    size={22}
-                    color="#000"
-                  />
-
-                  <Text
-                    style={styles.itemText}
-                  >
-                    Perfil
-                  </Text>
-                </TouchableOpacity>
-
-                <View style={styles.linha} />
-
-                {/* CASAS */}
-
-                <TouchableOpacity
-                  style={styles.item}
-                  onPress={() =>
-                    irPara("/imoveis")
-                  }
-                >
-                  <Ionicons
-                    name="home-outline"
-                    size={22}
-                    color="#000"
-                  />
-
-                  <Text
-                    style={styles.itemText}
-                  >
-                    Casas
-                  </Text>
-                </TouchableOpacity>
-
-                <View style={styles.linha} />
-
-                {/* CONFIGURAÇÕES */}
-
-                <TouchableOpacity
-                  style={styles.item}
-                  onPress={() =>
-                    irPara(
-                      "/configuracoes"
-                    )
-                  }
-                >
-                  <Ionicons
-                    name="settings"
-                    size={22}
-                    color="#000"
-                  />
-
-                  <Text
-                    style={styles.itemText}
-                  >
-                    Configurações
-                  </Text>
-                </TouchableOpacity>
-
-                <View style={styles.linha} />
-                {/* SAIR */}
-                <TouchableOpacity style={styles.item} onPress={() => irPara("/login")}>
-                  <Ionicons name="exit-outline" size={22} color="#E53935"/>
-                  <Text style={[ styles.itemText, { color: "#E53935",},]}>
-                    Sair
-                  </Text>
-                </TouchableOpacity>
-              </View>
+              {renderizarItemMenu("exit-outline", "Sair", "/login", true)}
             </ScrollView>
           </Animated.View>
         </View>
@@ -982,45 +800,46 @@ export default function AgendarVisita() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#448aff",
   },
 
   topoAzul: {
-    backgroundColor: "#448aff",
-    paddingBottom: -20,
+    backgroundColor: "#448AFF",
   },
 
   headerAzul: {
+    minHeight: 64,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 4,
   },
 
   btnHamburguer: {
     width: 32,
-    height: 32,
+    height: 40,
     justifyContent: "center",
     alignItems: "flex-start",
     gap: 5,
-    marginBottom: 90,
   },
 
   traco: {
     height: 3,
-    backgroundColor: "#FFF",
+    backgroundColor: "#FFFFFF",
     borderRadius: 10,
   },
 
   logoImg: {
-    width: 200,
-    height: 100,
+    width: 190,
+    height: 64,
+  },
+
+  espacoHeader: {
+    width: 32,
   },
 
   content: {
     flex: 1,
-    backgroundColor: "#FFF",
     borderTopLeftRadius: 18,
     borderTopRightRadius: 18,
     paddingTop: 8,
@@ -1036,8 +855,8 @@ const styles = StyleSheet.create({
   },
 
   btnVoltarNovo: {
-    width: 32,
-    height: 32,
+    width: 36,
+    height: 36,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -1048,35 +867,29 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
+  espacoTitulo: {
+    width: 36,
+  },
+
   titulo: {
     fontSize: 17,
     fontWeight: "800",
-    color: "#000",
     textAlign: "center",
   },
 
-  linhaAzul: {
-    height: 2,
-    backgroundColor: "#1A5CFF",
-    width: 50,
-    marginLeft: 12,
-    marginBottom: 8,
-    borderRadius: 2,
-  },
-
   sombra: {
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2,},
-    shadowOpacity: 0.15,
+    elevation: 3,
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
     shadowRadius: 4,
   },
 
   sombraSuave: {
     elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1,},
-    shadowOpacity: 0.1,
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
     shadowRadius: 2,
   },
 
@@ -1085,42 +898,53 @@ const styles = StyleSheet.create({
     marginHorizontal: 12,
     marginTop: 10,
     borderWidth: 1,
-    borderColor: "#000",
     borderRadius: 10,
     overflow: "hidden",
-    backgroundColor: "#FFF",
   },
 
   cardImg: {
-    width: 80,
-    height: 60,
+    width: 90,
+    height: 76,
   },
 
   cardInfo: {
     flex: 1,
     paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingVertical: 8,
     justifyContent: "center",
   },
 
   cardTitulo: {
     fontSize: 13,
     fontWeight: "700",
-    color: "#000",
+  },
+
+  localizacaoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    marginTop: 4,
   },
 
   cardSub: {
-    fontSize: 9,
-    color: "#555",
+    fontSize: 10,
     flex: 1,
   },
 
   secaoTitulo: {
     fontSize: 15,
     fontWeight: "800",
-    color: "#000",
     marginHorizontal: 12,
-    marginTop: 14,
+    marginTop: 16,
+  },
+
+  linhaAzul: {
+    height: 2,
+    width: 50,
+    marginLeft: 12,
+    marginTop: 4,
+    marginBottom: 8,
+    borderRadius: 2,
   },
 
   calendarioHeaderFora: {
@@ -1134,7 +958,7 @@ const styles = StyleSheet.create({
 
   btnMes: {
     width: 35,
-    height: 30,
+    height: 34,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -1142,43 +966,36 @@ const styles = StyleSheet.create({
   calendarioMes: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#000",
   },
 
   calendarioBox: {
     marginHorizontal: 12,
-    borderWidth: 1.2,
-    borderColor: "#000",
+    borderWidth: 1,
     borderRadius: 10,
-    padding: 10,
-    backgroundColor: "#FFF",
+    paddingHorizontal: 8,
+    paddingVertical: 10,
   },
 
   semanaRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
+    alignItems: "center",
     marginVertical: 3,
   },
 
   diaSemana: {
-    width: 28,
+    width: "13%",
     textAlign: "center",
     fontSize: 12,
     fontWeight: "700",
-    color: "#000",
   },
 
   diaBolha: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: "#FF8C00",
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
-  },
-
-  diaOutroMes: {
-    backgroundColor: "#EFEFEF",
   },
 
   diaSelecionado: {
@@ -1188,30 +1005,28 @@ const styles = StyleSheet.create({
   diaTexto: {
     fontSize: 11,
     fontWeight: "700",
-    color: "#FFF",
   },
 
   horariosRow: {
     flexDirection: "row",
+    flexWrap: "wrap",
     gap: 10,
     paddingHorizontal: 12,
   },
 
   horaBtn: {
-    backgroundColor: "#8BB5FE",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    minWidth: 68,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     borderRadius: 20,
-  },
-
-  horaSelecionada: {
-    backgroundColor: "#FF8C00",
+    borderWidth: 1,
   },
 
   horaTexto: {
     fontSize: 13,
     fontWeight: "700",
-    color: "#000",
   },
 
   dadosRow: {
@@ -1223,80 +1038,79 @@ const styles = StyleSheet.create({
 
   dadoCard: {
     flex: 1,
+    minWidth: 0,
     borderWidth: 1,
-    borderColor: "#E5E5E5",
     borderRadius: 10,
-    padding: 10,
-    backgroundColor: "#FFF",
+    padding: 9,
   },
 
   dadoTopo: {
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
-    marginBottom: 4,
+    marginBottom: 6,
   },
 
   miniAvatar: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
   },
 
   dadoLabel: {
-    fontSize: 9,
-    color: "#000",
+    fontSize: 10,
     fontWeight: "600",
+    flexShrink: 1,
   },
 
   input: {
+    minHeight: 40,
     borderWidth: 1,
-    borderColor: "#DDD",
-    borderRadius: 14,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    fontSize: 10,
-    marginBottom: 8,
-    color: "#000",
+    borderRadius: 10,
+    paddingHorizontal: 9,
+    paddingVertical: 7,
+    fontSize: 11,
+    marginBottom: 12,
   },
 
   propNome: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: "700",
-    color: "#000",
-    marginTop: 4,
+    marginTop: 5,
   },
 
   propSub: {
-    fontSize: 8,
-    color: "#777",
+    fontSize: 9,
+    marginTop: 3,
   },
 
   propEstrelas: {
-    fontSize: 11,
+    fontSize: 12,
     color: "#FF8C00",
-    marginTop: 4,
+    marginTop: 7,
   },
 
   propNota: {
-    color: "#000",
     fontSize: 10,
+    fontWeight: "700",
   },
 
   btnConfirmar: {
     backgroundColor: "#FF8C00",
     marginHorizontal: 12,
-    marginTop: 14,
-    height: 42,
-    borderRadius: 20,
+    marginTop: 18,
+    minHeight: 46,
+    borderRadius: 23,
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: 12,
   },
 
   btnConfirmarText: {
-    color: "#FFF",
+    color: "#FFFFFF",
     fontWeight: "800",
     fontSize: 13,
+    textAlign: "center",
   },
 
   menuWrapper: {
@@ -1314,13 +1128,12 @@ const styles = StyleSheet.create({
   },
 
   sideMenu: {
-    width: 280,
+    width: LARGURA_MENU,
+    maxWidth: "85%",
     height: "100%",
-    backgroundColor: "#FFF",
-    zIndex: 9999,
     elevation: 30,
-    shadowColor: "#000",
-    shadowOffset: { width: 5, height: 0,},
+    shadowColor: "#000000",
+    shadowOffset: { width: 5, height: 0 },
     shadowOpacity: 0.25,
     shadowRadius: 10,
   },
@@ -1332,45 +1145,39 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     gap: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#EEE",
   },
 
   avatarLaranja: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     backgroundColor: "#FF8C00",
     alignItems: "center",
     justifyContent: "center",
   },
 
   avatarLaranjaText: {
-    color: "#FFF",
+    color: "#FFFFFF",
     fontWeight: "800",
     fontSize: 16,
   },
 
   menuNome: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "700",
-    color: "#000",
   },
 
   menuEmail: {
-    fontSize: 11,
-    color: "#777",
-    marginTop: 1,
+    fontSize: 10,
+    color: "#888888",
+    marginTop: 2,
   },
 
   btnFechar: {
-    width: 36,
-    height: 36,
+    width: 34,
+    height: 34,
     alignItems: "center",
     justifyContent: "center",
-  },
-
-  lista: {
-    marginTop: 4,
   },
 
   item: {
@@ -1383,13 +1190,11 @@ const styles = StyleSheet.create({
 
   itemText: {
     fontSize: 14,
-    color: "#000",
     fontWeight: "500",
   },
 
   linha: {
     height: 0.8,
-    backgroundColor: "#EEE",
     marginHorizontal: 16,
   },
 });

@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
   View,
@@ -5,149 +6,174 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  ScrollView,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import { useTheme } from "../contexts/ThemeContext";
+
 export default function AgendamentoSucesso() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { dark } = useTheme();
+
+  const cores = {
+    fundo: dark ? "#121212" : "#FFFFFF",
+    texto: dark ? "#FFFFFF" : "#111111",
+    textoSecundario: dark ? "#BDBDBD" : "#555555",
+    botao: "#FF8C00",
+  };
+
+  const styles = criarEstilos(cores);
+
   return (
     <View
       style={[
         styles.container,
         {
           paddingTop: insets.top,
+          paddingBottom: insets.bottom,
         },
       ]}
     >
-      {/* LOGO AZUL */}
+      <ScrollView
+        contentContainerStyle={styles.scrollConteudo}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* LOGO */}
+        <View style={styles.logoArea}>
+          <Image
+            source={require("../../assets/images/logo.png")}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
 
-      <View style={styles.logoArea}>
-        <Image
-          source={require("../../assets/images/logo.png")}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-      </View>
+        {/* CONTEÚDO */}
+        <View style={styles.conteudo}>
+          {/* IMAGEM DE SUCESSO */}
+          <Image
+            source={require("../../assets/images/check_sucesso.png")}
+            style={styles.checkImg}
+            resizeMode="contain"
+          />
 
-      <View style={styles.conteudo}>
+          <Text style={styles.titulo}>
+            Agendamento feito com{"\n"}sucesso!
+          </Text>
 
-        {/* CHECK */}
+          <Text style={styles.sub}>
+            Seu agendamento foi confirmado com sucesso.
+            {"\n"}Agora você pode acompanhar os detalhes
+            {"\n"}do seu agendamento!
+          </Text>
 
-        <Image
-          source={require("../../assets/images/check_sucesso.png")}
-          style={styles.checkImg}
-          resizeMode="contain"
-        />
+          {/* ILUSTRAÇÃO DA CASA */}
+          <Image
+            source={require("../../assets/images/casa_chaves.png")}
+            style={styles.casaImg}
+            resizeMode="contain"
+          />
+        </View>
+      </ScrollView>
 
-        <Text style={styles.titulo}>
-          Agendamento feito com{"\n"}sucesso!
-        </Text>
-
-        <Text style={styles.sub}>
-          Seu agendamento foi confirmado com sucesso.{"\n"}
-          Agora você pode acompanhar os detalhes{"\n"}
-          do seu agendamento!
-        </Text>
-
-        {/* CASA */}
-
-        <Image
-          source={require("../../assets/images/casa_chaves.png")}
-          style={styles.casaImg}
-          resizeMode="contain"
-        />
-
-      </View>
-
-      {/* BOTÃO LARANJA LÁ EM BAIXO */}
-
+      {/* BOTÃO INFERIOR */}
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.btn}
-          onPress={() => router.push("/(tabs)" as any)}
+          activeOpacity={0.8}
+          onPress={() => router.replace("/(tabs)")}
         >
-          <Text style={styles.btnTxt}>
-            Explora Imóveis
-          </Text>
+          <Text style={styles.btnTxt}>Explorar Imóveis</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#FFF",
-  },
+const criarEstilos = (cores: {
+  fundo: string;
+  texto: string;
+  textoSecundario: string;
+  botao: string;
+}) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: cores.fundo,
+    },
 
-  logoArea: {
-    alignItems: "center",
-    paddingTop: 12,
-    paddingBottom: 8,
-  },
+    scrollConteudo: {
+      flexGrow: 1,
+    },
 
-  logo: {
-    width: 210,
-    height: 110,
-  },
+    logoArea: {
+      alignItems: "center",
+      paddingTop: 12,
+      paddingBottom: 8,
+    },
 
-  conteudo: {
-    flex: 1,
-    alignItems: "center",
-    paddingHorizontal: 24,
-    paddingTop: 10,
-  },
+    logo: {
+      width: 210,
+      height: 110,
+    },
 
-  checkImg: {
-    width: 180,
-    height: 200,
-    marginBottom: 10,
-    marginTop: -40,
-  },
+    conteudo: {
+      flexGrow: 1,
+      alignItems: "center",
+      paddingHorizontal: 24,
+      paddingTop: 10,
+      paddingBottom: 20,
+    },
 
-  titulo: {
-    fontSize: 22,
-    fontWeight: "900",
-    color: "#000",
-    textAlign: "center",
-    lineHeight: 26,
-    marginBottom: 12,
-  },
+    checkImg: {
+      width: 180,
+      height: 180,
+      marginBottom: 12,
+      marginTop: 0,
+    },
 
-  sub: {
-    fontSize: 12,
-    color: "#555",
-    textAlign: "center",
-    lineHeight: 16,
-    marginBottom: 10,
-  },
+    titulo: {
+      fontSize: 22,
+      fontWeight: "900",
+      color: cores.texto,
+      textAlign: "center",
+      lineHeight: 28,
+      marginBottom: 12,
+    },
 
-  casaImg: {
-    width: 220,
-    height: 150,
-    marginTop: 10,
-  },
+    sub: {
+      fontSize: 12,
+      color: cores.textoSecundario,
+      textAlign: "center",
+      lineHeight: 18,
+      marginBottom: 10,
+    },
 
-  footer: {
-    paddingHorizontal: 20,
-    paddingBottom: 28,
-    paddingTop: 10,
-  },
+    casaImg: {
+      width: 220,
+      height: 150,
+      marginTop: 10,
+    },
 
-  btn: {
-    backgroundColor: "#FF8C00",
-    height: 46,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    width: "100%",
-  },
+    footer: {
+      paddingHorizontal: 20,
+      paddingTop: 10,
+      paddingBottom: 12,
+    },
 
-  btnTxt: {
-    color: "#fff",
-    fontWeight: "800",
-    fontSize: 14,
-  },
-});
+    btn: {
+      backgroundColor: cores.botao,
+      minHeight: 48,
+      borderRadius: 8,
+      alignItems: "center",
+      justifyContent: "center",
+      width: "100%",
+    },
+
+    btnTxt: {
+      color: "#FFFFFF",
+      fontWeight: "800",
+      fontSize: 14,
+    },
+  });

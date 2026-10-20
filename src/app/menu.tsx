@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from "react";
 import {
   View,
@@ -12,6 +13,8 @@ import {
 
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useTheme } from "../contexts/ThemeContext";
 
 const { width } = Dimensions.get("window");
 const DRAWER_WIDTH = Math.min(width * 0.82, 320);
@@ -28,55 +31,46 @@ const menu: MenuItem[] = [
     label: "Início",
     route: "/(tabs)",
   },
-
   {
     icon: "location-outline",
     label: "Explorar",
     route: "/(tabs)/explorar",
   },
-
   {
     icon: "heart-outline",
     label: "Favoritos",
     route: "/(tabs)/favoritos",
   },
-
   {
     icon: "calendar-outline",
     label: "Agendamentos",
     route: "/(tabs)/agendamento",
   },
-
   {
     icon: "person-outline",
     label: "Perfil",
     route: "/(tabs)/perfil-proprietario",
   },
-
   {
     icon: "card-outline",
     label: "Pagamentos",
     route: "/pagamentos",
   },
-
   {
     icon: "document-text-outline",
     label: "Contrato",
     route: "/contrato",
   },
-
   {
     icon: "home-outline",
     label: "Minhas Casas",
     route: "/casas",
   },
-
   {
     icon: "settings-outline",
     label: "Configurações",
     route: "/config",
   },
-
   {
     icon: "exit-outline",
     label: "Sair",
@@ -96,22 +90,25 @@ export default function MenuDrawer({
   onOpen,
 }: MenuDrawerProps) {
   const router = useRouter();
+  const { dark } = useTheme();
 
-  // =========================================================
-  // ANIMAÇÕES
-  // =========================================================
+  const cores = {
+    fundo: dark ? "#1E1E1E" : "#FFFFFF",
+    superficie: dark ? "#292929" : "#F2F2F2",
+    texto: dark ? "#F5F5F5" : "#111111",
+    textoSecundario: dark ? "#BBBBBB" : "#666666",
+    borda: dark ? "#444444" : "#EEEEEE",
+    laranja: "#FF8C00",
+    fundoEscuro: "rgba(0,0,0,0.50)",
+  };
+
+  const styles = criarEstilos(cores);
 
   const slideAnim = useRef(
     new Animated.Value(-DRAWER_WIDTH)
   ).current;
 
-  const fadeAnim = useRef(
-    new Animated.Value(0)
-  ).current;
-
-  // =========================================================
-  // CONTROLA ABERTURA E FECHAMENTO
-  // =========================================================
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (visible) {
@@ -123,7 +120,6 @@ export default function MenuDrawer({
           mass: 0.8,
           useNativeDriver: true,
         }),
-
         Animated.timing(fadeAnim, {
           toValue: 1,
           duration: 250,
@@ -137,7 +133,6 @@ export default function MenuDrawer({
           duration: 260,
           useNativeDriver: true,
         }),
-
         Animated.timing(fadeAnim, {
           toValue: 0,
           duration: 220,
@@ -147,45 +142,36 @@ export default function MenuDrawer({
     }
   }, [visible, slideAnim, fadeAnim]);
 
-  // =========================================================
-  // CLIQUE NOS ITENS
-  // =========================================================
-
-  function handlePress(item: MenuItem) {
-    // Fecha o menu primeiro
+  async function handlePress(item: MenuItem) {
     onClose();
 
-    // Pequeno atraso para terminar a animação
-    setTimeout(() => {
+    setTimeout(async () => {
       if (item.label === "Sair") {
-        router.replace("/login");
+        try {
+          await AsyncStorage.removeItem("logado");
+          await AsyncStorage.removeItem("emailUsuario");
+
+          router.replace("/login" as any);
+        } catch {
+          Alert.alert(
+            "BuscaLar",
+            "Não foi possível encerrar a sessão. Tente novamente."
+          );
+        }
+
         return;
       }
 
-      try {
-        router.push(item.route as any);
-      } catch (error) {
-        Alert.alert(
-          "BuscaLar",
-          `Página ${item.label} ainda não criada`
-        );
-      }
+      router.push(item.route as any);
     }, 260);
   }
-
-  // =========================================================
-  // MENU
-  // =========================================================
 
   return (
     <View
       style={styles.fullScreen}
       pointerEvents={visible ? "auto" : "box-none"}
     >
-      {/* =====================================================
-          ÁREA LATERAL PARA ABRIR O MENU
-      ===================================================== */}
-
+      {/* ÁREA LATERAL PARA ABRIR O MENU */}
       {!visible && (
         <View
           style={styles.edgeArea}
@@ -199,64 +185,45 @@ export default function MenuDrawer({
         </View>
       )}
 
-      {/* =====================================================
-          FUNDO ESCURO
-      ===================================================== */}
-
+      {/* FUNDO ESCURO */}
       <Animated.View
         pointerEvents={visible ? "auto" : "none"}
         style={[
           styles.backdrop,
-          {
-            opacity: fadeAnim,
-          },
+          { opacity: fadeAnim },
         ]}
       >
         <TouchableOpacity
-          style={StyleSheet.absoluteFill}
+          style={styles.backdropButton}
           activeOpacity={1}
           onPress={onClose}
         />
       </Animated.View>
 
-      {/* =====================================================
-          MENU LATERAL
-      ===================================================== */}
-
+      {/* MENU LATERAL */}
       <Animated.View
         pointerEvents={visible ? "auto" : "none"}
         style={[
           styles.drawer,
           {
-            transform: [
-              {
-                translateX: slideAnim,
-              },
-            ],
+            transform: [{ translateX: slideAnim }],
           },
         ]}
       >
-        {/* ===================================================
-            CABEÇALHO
-        =================================================== */}
-
+        {/* CABEÇALHO */}
         <View style={styles.header}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarLetra}>
-              D
-            </Text>
+            <Text style={styles.avatarLetra}>D</Text>
           </View>
 
           <View style={styles.dadosUsuario}>
             <View style={styles.nomeLinha}>
-              <Text style={styles.nome}>
-                Davi Miguel
-              </Text>
+              <Text style={styles.nome}>Davi Miguel</Text>
 
               <Ionicons
                 name="chevron-down"
                 size={14}
-                color="#000"
+                color={cores.texto}
               />
             </View>
 
@@ -265,296 +232,228 @@ export default function MenuDrawer({
             </Text>
           </View>
 
-          {/* BOTÃO FECHAR */}
-
           <TouchableOpacity
             onPress={onClose}
             style={styles.closeBtn}
             activeOpacity={0.7}
+            accessibilityLabel="Fechar menu"
           >
             <Ionicons
               name="close"
               size={22}
-              color="#000"
+              color={cores.texto}
             />
           </TouchableOpacity>
         </View>
 
-        {/* ===================================================
-            ITENS
-        =================================================== */}
-
+        {/* ITENS DO MENU */}
         <ScrollView
           style={styles.menuScroll}
           contentContainerStyle={styles.menuContent}
           showsVerticalScrollIndicator={false}
         >
-          {menu.map((item, index) => (
-            <TouchableOpacity
-              key={`${item.label}-${index}`}
-              style={[
-                styles.item,
+          {menu.map((item, index) => {
+            const sair = item.label === "Sair";
 
-                // Linha separadora antes de sair
-                item.label === "Sair" &&
-                  styles.itemSair,
-              ]}
-              onPress={() =>
-                handlePress(item)
-              }
-              activeOpacity={0.6}
-            >
-              <Ionicons
-                name={item.icon}
-                size={22}
-                color="#000"
-                style={styles.itemIcon}
-              />
+            return (
+              <TouchableOpacity
+                key={`${item.label}-${index}`}
+                style={[
+                  styles.item,
+                  sair && styles.itemSair,
+                ]}
+                onPress={() => handlePress(item)}
+                activeOpacity={0.65}
+              >
+                <Ionicons
+                  name={item.icon}
+                  size={22}
+                  color={sair ? cores.laranja : cores.texto}
+                  style={styles.itemIcon}
+                />
 
-              <Text style={styles.itemTexto}>
-                {item.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Text
+                  style={[
+                    styles.itemTexto,
+                    sair && styles.itemTextoSair,
+                  ]}
+                >
+                  {item.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
       </Animated.View>
     </View>
   );
 }
 
-// =========================================================
-// ESTILOS
-// =========================================================
-
-const styles = StyleSheet.create({
-  // =========================================================
-  // TELA COMPLETA
-  // =========================================================
-
-  fullScreen: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-
-    zIndex: 1000,
-
-    elevation: 1000,
-  },
-
-  // =========================================================
-  // FUNDO ESCURO
-  // =========================================================
-
-  backdrop: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-
-    backgroundColor: "rgba(0,0,0,0.50)",
-  },
-
-  // =========================================================
-  // MENU
-  // =========================================================
-
-  drawer: {
-    position: "absolute",
-
-    top: 0,
-    left: 0,
-    bottom: 0,
-
-    width: DRAWER_WIDTH,
-
-    backgroundColor: "#fff",
-
-    paddingTop: 50,
-
-    elevation: 25,
-
-    shadowColor: "#000",
-
-    shadowOffset: {
-      width: 5,
-      height: 0,
+function criarEstilos(cores: {
+  fundo: string;
+  superficie: string;
+  texto: string;
+  textoSecundario: string;
+  borda: string;
+  laranja: string;
+  fundoEscuro: string;
+}) {
+  return StyleSheet.create({
+    fullScreen: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      zIndex: 1000,
+      elevation: 1000,
     },
 
-    shadowOpacity: 0.25,
+    backdrop: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: cores.fundoEscuro,
+    },
 
-    shadowRadius: 12,
+    backdropButton: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+    },
 
-    borderTopRightRadius: 20,
+    drawer: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      bottom: 0,
+      width: DRAWER_WIDTH,
+      backgroundColor: cores.fundo,
+      paddingTop: 50,
+      elevation: 25,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 5,
+        height: 0,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 12,
+      borderTopRightRadius: 20,
+      borderBottomRightRadius: 20,
+      overflow: "hidden",
+    },
 
-    borderBottomRightRadius: 20,
+    edgeArea: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      bottom: 80,
+      width: 40,
+      zIndex: 999,
+    },
 
-    overflow: "hidden",
-  },
+    edgeBtn: {
+      flex: 1,
+    },
 
-  // =========================================================
-  // ÁREA INVISÍVEL PARA ABRIR
-  // =========================================================
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: 16,
+      paddingBottom: 20,
+      borderBottomWidth: 1,
+      borderBottomColor: cores.borda,
+    },
 
-  edgeArea: {
-    position: "absolute",
+    avatar: {
+      width: 42,
+      height: 42,
+      borderRadius: 21,
+      backgroundColor: cores.laranja,
+      alignItems: "center",
+      justifyContent: "center",
+      marginRight: 10,
+    },
 
-    top: 0,
-    left: 0,
-    bottom: 80,
+    avatarLetra: {
+      color: "#FFFFFF",
+      fontWeight: "bold",
+      fontSize: 18,
+    },
 
-    width: 40,
+    dadosUsuario: {
+      flex: 1,
+    },
 
-    zIndex: 999,
-  },
+    nomeLinha: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+    },
 
-  edgeBtn: {
-    flex: 1,
-  },
+    nome: {
+      fontSize: 14,
+      fontWeight: "bold",
+      color: cores.texto,
+    },
 
-  // =========================================================
-  // CABEÇALHO
-  // =========================================================
+    email: {
+      fontSize: 10,
+      color: cores.textoSecundario,
+      marginTop: 3,
+    },
 
-  header: {
-    flexDirection: "row",
+    closeBtn: {
+      width: 34,
+      height: 34,
+      borderRadius: 17,
+      backgroundColor: cores.superficie,
+      alignItems: "center",
+      justifyContent: "center",
+      marginLeft: 6,
+    },
 
-    alignItems: "center",
+    menuScroll: {
+      flex: 1,
+      marginTop: 10,
+    },
 
-    paddingHorizontal: 20,
+    menuContent: {
+      paddingBottom: 30,
+    },
 
-    paddingBottom: 20,
+    item: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingVertical: 15,
+      paddingHorizontal: 20,
+    },
 
-    borderBottomWidth: 1,
+    itemIcon: {
+      width: 30,
+      marginRight: 10,
+    },
 
-    borderBottomColor: "#EEEEEE",
-  },
+    itemTexto: {
+      fontSize: 14,
+      color: cores.texto,
+      fontWeight: "500",
+    },
 
-  avatar: {
-    width: 42,
-    height: 42,
+    itemSair: {
+      marginTop: 8,
+      borderTopWidth: 1,
+      borderTopColor: cores.borda,
+      paddingTop: 20,
+    },
 
-    borderRadius: 21,
-
-    backgroundColor: "#FF8C00",
-
-    alignItems: "center",
-
-    justifyContent: "center",
-
-    marginRight: 12,
-  },
-
-  avatarLetra: {
-    color: "#fff",
-
-    fontWeight: "bold",
-
-    fontSize: 18,
-  },
-
-  dadosUsuario: {
-    flex: 1,
-  },
-
-  nomeLinha: {
-    flexDirection: "row",
-
-    alignItems: "center",
-  },
-
-  nome: {
-    fontSize: 15,
-
-    fontWeight: "bold",
-
-    color: "#000",
-
-    marginRight: 4,
-  },
-
-  email: {
-    fontSize: 11,
-
-    color: "#666",
-
-    marginTop: 2,
-  },
-
-  // =========================================================
-  // BOTÃO FECHAR
-  // =========================================================
-
-  closeBtn: {
-    width: 34,
-    height: 34,
-
-    borderRadius: 17,
-
-    backgroundColor: "#F2F2F2",
-
-    alignItems: "center",
-
-    justifyContent: "center",
-
-    marginLeft: 8,
-  },
-
-  // =========================================================
-  // SCROLL
-  // =========================================================
-
-  menuScroll: {
-    flex: 1,
-
-    marginTop: 10,
-  },
-
-  menuContent: {
-    paddingBottom: 30,
-  },
-
-  // =========================================================
-  // ITEM
-  // =========================================================
-
-  item: {
-    flexDirection: "row",
-
-    alignItems: "center",
-
-    paddingVertical: 16,
-
-    paddingHorizontal: 20,
-  },
-
-  itemIcon: {
-    width: 30,
-
-    marginRight: 10,
-  },
-
-  itemTexto: {
-    fontSize: 14,
-
-    color: "#000",
-
-    fontWeight: "500",
-  },
-
-  // =========================================================
-  // SAIR
-  // =========================================================
-
-  itemSair: {
-    marginTop: 8,
-
-    borderTopWidth: 1,
-
-    borderTopColor: "#EEEEEE",
-
-    paddingTop: 20,
-  },
-});
+    itemTextoSair: {
+      color: cores.laranja,
+      fontWeight: "700",
+    },
+  });
+}

@@ -1,23 +1,8 @@
-
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  ReactNode,
-} from "react";
-
+import React, { createContext, useContext, useEffect, useState, ReactNode,} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-type ThemeContextType = {
-  dark: boolean;
-  setDark: (value: boolean) => void;
-};
-
-const ThemeContext = createContext<ThemeContextType | undefined>(
-  undefined
-);
-
+type ThemeContextType = {  dark: boolean; setDark: (value: boolean) => void;};
+const ThemeContext = createContext<ThemeContextType | undefined>( undefined);
 export function ThemeProvider({
   children,
 }: {
@@ -25,7 +10,6 @@ export function ThemeProvider({
 }) {
   const [dark, setDarkState] = useState(false);
   const [carregado, setCarregado] = useState(false);
-
   useEffect(() => {
     async function carregarTema() {
       try {
