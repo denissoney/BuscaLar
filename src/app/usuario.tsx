@@ -180,41 +180,19 @@ export default function MeuPerfil() {
                 Atualize suas informações
               </Text>
             </View>
-
-            <Ionicons
-              name="chevron-forward"
-              size={19}
-              color={cores.textoSecundario}/>
+            <Ionicons name="chevron-forward" size={19} color={cores.textoSecundario}/>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.menuItem, styles.menuItemUltimo]}
-            onPress={() => irPara("/login")}
-            activeOpacity={0.7}
-          >
-            <Ionicons
-              name="exit-outline"
-              size={21}
-              color={cores.vermelho}
-              style={styles.menuIcon}
-            />
+          <TouchableOpacity style={[styles.menuItem, styles.menuItemUltimo]} onPress={() => irPara("/login")} activeOpacity={0.7}>
+            <Ionicons name="exit-outline" size={21} color={cores.vermelho} style={styles.menuIcon}/>
 
             <View style={styles.menuTextBox}>
-              <Text
-                style={[
-                  styles.menuTitle,
-                  { color: cores.vermelho },
-                ]}
-              >
+              <Text style={[ styles.menuTitle, { color: cores.vermelho }, ]}>
                 Sair da conta
               </Text>
             </View>
 
-            <Ionicons
-              name="chevron-forward"
-              size={19}
-              color={cores.textoSecundario}
-            />
+            <Ionicons name="chevron-forward" size={19} color={cores.textoSecundario}/>
           </TouchableOpacity>
         </View>
 
@@ -225,28 +203,14 @@ export default function MeuPerfil() {
               Meus favoritos
             </Text>
 
-            <TouchableOpacity
-              onPress={() => irPara("/favoritos")}
-              activeOpacity={0.7}
-            >
+            <TouchableOpacity onPress={() => irPara("/favoritos")} activeOpacity={0.7}>
               <Text style={styles.verTodos}>Ver todos</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.favoritosRow}>
-            <TouchableOpacity
-              style={styles.favCard}
-              activeOpacity={0.8}
-              onPress={() => irPara("/detalhe/1")}
-            >
-              <Image
-                source={{
-                  uri: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400",
-                }}
-                style={styles.favImg}
-                resizeMode="cover"
-              />
-
+            <TouchableOpacity style={styles.favCard} activeOpacity={0.8} onPress={() => irPara("/detalhe/1")}>
+              <Image source={{ uri: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400", }} style={styles.favImg} resizeMode="cover"/>
               <View style={styles.favInfo}>
                 <Text style={styles.favNome} numberOfLines={2}>
                   Apartamento Ponta Verde
@@ -262,18 +226,8 @@ export default function MeuPerfil() {
               </View>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.favCard}
-              activeOpacity={0.8}
-              onPress={() => irPara("/detalhe/2")}
-            >
-              <Image
-                source={{
-                  uri: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400",
-                }}
-                style={styles.favImg}
-                resizeMode="cover"
-              />
+            <TouchableOpacity style={styles.favCard} activeOpacity={0.8} onPress={() => irPara("/detalhe/2")}>
+              <Image source={{ uri: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400", }} style={styles.favImg} resizeMode="cover"/>
 
               <View style={styles.favInfo}>
                 <Text style={styles.favNome} numberOfLines={2}>
@@ -294,11 +248,7 @@ export default function MeuPerfil() {
       </ScrollView>
 
       {/* MENU LATERAL */}
-      <MenuDrawer
-        visible={menuVisible}
-        onClose={fecharMenu}
-        onOpen={abrirMenu}
-      />
+      <MenuDrawer visible={menuVisible} onClose={fecharMenu} onOpen={abrirMenu}/>
     </View>
   );
 }
